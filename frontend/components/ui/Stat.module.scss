@@ -1,0 +1,21 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.stat {
+  @include m.card;
+  padding: 1.25rem;
+  text-align: center;
+}
+
+.value {
+  font-family: v.$font-display;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: v.$color-blue;
+}
+
+.label {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.7);
+}

@@ -1,0 +1,113 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.albumHead {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.albumTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: v.$color-blue-ink;
+}
+
+.albumDescription {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.7);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+
+  @include m.respond(sm) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @include m.respond(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.thumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: v.$radius-lg;
+  background: v.$color-surface-muted;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  &:hover .thumbImage {
+    transform: scale(1.05);
+  }
+}
+
+.thumbImage {
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12, 59, 92, 0.8);
+  padding: 1rem;
+}
+
+.dialog {
+  position: relative;
+  max-height: 85vh;
+  width: 100%;
+  max-width: 48rem;
+}
+
+.dialogImageWrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  overflow: hidden;
+  border-radius: v.$radius-xl2;
+  background: #000;
+}
+
+.dialogImage {
+  object-fit: contain;
+}
+
+.caption {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: v.$color-white;
+}
+
+.closeButton {
+  position: absolute;
+  top: -0.75rem;
+  right: -0.75rem;
+  border-radius: 999px;
+  background: v.$color-white;
+  padding: 0.5rem;
+  color: v.$color-blue-ink;
+  box-shadow: v.$shadow-card;
+  border: none;
+  cursor: pointer;
+}

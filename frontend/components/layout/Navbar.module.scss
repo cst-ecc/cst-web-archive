@@ -1,0 +1,222 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: v.$color-white;
+  border-bottom: 1px solid v.$color-surface-line;
+}
+
+.bar {
+  @include m.container;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: v.$header-height;
+}
+
+/* Logo */
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.logo {
+  height: 3.25rem;
+  width: auto;
+
+  @include m.respond(md) {
+    height: 3.75rem;
+  }
+}
+
+.logoText {
+  display: none;
+
+  @include m.respond(md) {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+}
+
+.logoTitle {
+  font-family: v.$font-display;
+  font-size: 1rem;
+  font-weight: 700;
+  color: v.$color-blue;
+}
+
+.logoSubtitle {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(17, 24, 39, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Desktop nav */
+.nav {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+
+  @include m.respond(lg) {
+    display: flex;
+  }
+}
+
+/* Dropdown wrapper */
+.dropdown {
+  position: relative;
+}
+
+.dropdownTrigger {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: v.$radius-md;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: v.$color-ink;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: v.$color-surface-muted;
+    color: v.$color-blue;
+  }
+
+  svg {
+    transition: transform 0.2s ease;
+  }
+}
+
+.dropdownTriggerActive {
+  color: v.$color-blue;
+  background: v.$color-surface-muted;
+}
+
+.dropdownOpen .dropdownTrigger svg {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  min-width: 14rem;
+  background: v.$color-white;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-lg;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 0.375rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+}
+
+.dropdownOpen .dropdownMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdownItem {
+  display: block;
+  padding: 0.625rem 0.75rem;
+  border-radius: v.$radius-md;
+  transition: background-color 0.1s ease;
+
+  &:hover {
+    background: v.$color-surface-muted;
+  }
+}
+
+.dropdownItemLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: v.$color-ink;
+}
+
+.dropdownItemDesc {
+  font-size: 0.75rem;
+  color: rgba(17, 24, 39, 0.5);
+  margin-top: 0.125rem;
+}
+
+.dropdownItemActive .dropdownItemLabel {
+  color: v.$color-blue;
+}
+
+/* Burger */
+.burger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: v.$radius-md;
+  padding: 0.5rem;
+  color: v.$color-blue-ink;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  @include m.respond(lg) {
+    display: none;
+  }
+}
+
+/* Mobile nav */
+.mobileNav {
+  background: v.$color-white;
+  border-top: 1px solid v.$color-surface-line;
+  padding: 0.75rem 1.25rem 1.25rem;
+
+  @include m.respond(lg) {
+    display: none;
+  }
+}
+
+.mobileGroup {
+  & + & {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid v.$color-surface-line;
+  }
+}
+
+.mobileGroupLabel {
+  display: block;
+  padding: 0.375rem 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(17, 24, 39, 0.4);
+}
+
+.mobileLink {
+  display: block;
+  padding: 0.5rem 0.5rem;
+  border-radius: v.$radius-md;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: v.$color-ink;
+
+  &:hover {
+    background: v.$color-surface-muted;
+  }
+}
+
+.mobileLinkActive {
+  color: v.$color-blue;
+  background: v.$color-surface-muted;
+}

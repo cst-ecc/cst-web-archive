@@ -1,0 +1,32 @@
+@use "../../styles/variables" as v;
+
+.wrapper {
+  position: relative;
+}
+
+.icon {
+  pointer-events: none;
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(17, 24, 39, 0.4);
+}
+
+.input {
+  width: 100%;
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$color-surface-line;
+  background: v.$color-white;
+  padding: 0.625rem 0.75rem 0.625rem 2.5rem;
+  font-size: 0.875rem;
+  color: v.$color-ink;
+
+  &::placeholder {
+    color: rgba(17, 24, 39, 0.4);
+  }
+
+  &:focus {
+    border-color: v.$color-blue;
+  }
+}

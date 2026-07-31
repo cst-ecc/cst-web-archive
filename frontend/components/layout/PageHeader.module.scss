@@ -1,0 +1,60 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.header {
+  position: relative;
+  overflow: hidden;
+  background: v.$color-blue-deep;
+  color: v.$color-white;
+}
+
+.grid {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image:
+    linear-gradient(#ffffff22 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff22 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.inner {
+  position: relative;
+  padding-block: 3.5rem;
+
+  @include m.respond(sm) {
+    padding-block: 4rem;
+  }
+}
+
+.eyebrow {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: v.$color-yellow;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: v.$color-white;
+
+  @include m.respond(sm) {
+    font-size: 2.25rem;
+  }
+}
+
+.subtitle {
+  margin-top: 0.75rem;
+  max-width: 42rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.rule {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, v.$color-blue, v.$color-gold, v.$color-yellow);
+}

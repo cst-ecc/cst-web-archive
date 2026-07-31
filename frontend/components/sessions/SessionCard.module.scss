@@ -1,0 +1,61 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.card {
+  @include m.card;
+  @include m.card-hover;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+}
+
+.top {
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.number {
+  font-family: v.$font-display;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: v.$color-gold;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: v.$color-blue-ink;
+}
+
+.titleLink {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+}
+
+.theme {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: v.$color-blue;
+}
+
+.summary {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.7);
+  @include m.line-clamp(2);
+}
+
+.dates {
+  margin-top: 1rem;
+  border-top: 1px solid v.$color-surface-line;
+  padding-top: 0.75rem;
+  font-size: 0.75rem;
+  color: rgba(17, 24, 39, 0.6);
+}

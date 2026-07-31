@@ -1,0 +1,41 @@
+// ============================================================
+// Variables SCSS — Charte graphique CST
+// ============================================================
+
+// Couleurs
+$color-blue: #1F85CE;
+$color-blue-2: #247CD3;
+$color-blue-deep: #12547F;
+$color-blue-ink: #0C3B5C;
+$color-yellow: #F1E906;
+$color-gold: #DAA710;
+$color-ink: #111827;
+$color-accent: #B23A48;
+$color-white: #FFFFFF;
+
+$color-surface: #FFFFFF;
+$color-surface-muted: #F5F8FB;
+$color-surface-line: #E3EAF1;
+
+// Typographie
+$font-display: var(--font-display), Georgia, serif;
+$font-body: var(--font-body), system-ui, sans-serif;
+
+// Rayons / ombres
+$radius-md: 0.5rem;
+$radius-lg: 0.75rem;
+$radius-xl: 1rem;
+$radius-xl2: 1.25rem;
+
+$shadow-card: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 3px rgba(17, 24, 39, 0.06);
+$shadow-card-hover: 0 4px 10px rgba(17, 24, 39, 0.06), 0 8px 24px rgba(17, 24, 39, 0.08);
+
+// Mise en page
+$max-width-content: 80rem; // 1280px
+$header-height: 4.5rem;
+
+// Breakpoints
+$bp-sm: 640px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+$bp-xl: 1280px;

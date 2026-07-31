@@ -1,0 +1,316 @@
+@use "../styles/variables" as v;
+@use "../styles/mixins" as m;
+
+/* ---------------------------------------------------------------
+   Styles partagés pour les pages (app/*)
+   Un seul fichier évite la multiplication de modules quasi identiques.
+   --------------------------------------------------------------- */
+
+.section {
+  padding-block: 3rem;
+}
+
+.sectionMuted {
+  padding-block: 3rem;
+  background: v.$color-surface-muted;
+}
+
+.prose {
+  max-width: 48rem;
+  line-height: 1.7;
+  color: rgba(17, 24, 39, 0.8);
+
+  p + p {
+    margin-top: 1rem;
+  }
+}
+
+.grid2 {
+  display: grid;
+  gap: 1.25rem;
+
+  @include m.respond(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.grid3 {
+  display: grid;
+  gap: 1.25rem;
+
+  @include m.respond(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include m.respond(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.grid4 {
+  display: grid;
+  gap: 1.25rem;
+
+  @include m.respond(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include m.respond(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @include m.respond(xl) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.missionCard {
+  @include m.card;
+  padding: 1.5rem;
+}
+
+.missionRule {
+  margin-bottom: 1rem;
+  height: 4px;
+  width: 3rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, v.$color-blue, v.$color-gold, v.$color-yellow);
+}
+
+.missionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: v.$color-blue-ink;
+}
+
+.missionText {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.7);
+}
+
+.contactGrid {
+  display: grid;
+  gap: 2rem;
+
+  @include m.respond(lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.sideInfo {
+  @include m.card;
+  padding: 1.5rem;
+  align-self: start;
+}
+
+.sideTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: v.$color-blue-ink;
+}
+
+.sideText {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.7);
+}
+
+.sideEmail {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: v.$color-blue;
+}
+
+/* ---------- Détail document ---------- */
+.docDetail {
+  display: grid;
+  gap: 2rem;
+
+  @include m.respond(lg) {
+    grid-template-columns: 1fr 22rem;
+  }
+}
+
+.docContent {
+  max-width: 48rem;
+}
+
+.docTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: v.$color-blue-ink;
+
+  @include m.respond(sm) {
+    font-size: 1.875rem;
+  }
+}
+
+.docMeta {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.docSummary {
+  margin-top: 1.5rem;
+  line-height: 1.7;
+  color: rgba(17, 24, 39, 0.8);
+}
+
+.docSidebar {
+  @include m.card;
+  padding: 1.5rem;
+  align-self: start;
+}
+
+.ficheTitle {
+  font-weight: 600;
+  color: v.$color-blue-ink;
+  margin-bottom: 1rem;
+}
+
+.ficheGrid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.ficheLabel {
+  font-size: 0.75rem;
+  color: rgba(17, 24, 39, 0.5);
+}
+
+.ficheValue {
+  font-weight: 500;
+}
+
+.downloadButton {
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+/* ---------- Détail actualité ---------- */
+.actuDetail {
+  display: grid;
+  gap: 2rem;
+
+  @include m.respond(lg) {
+    grid-template-columns: 1fr 20rem;
+  }
+}
+
+.actuImageWrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: v.$radius-xl;
+  background: v.$color-surface-muted;
+}
+
+.actuImage {
+  object-fit: cover;
+}
+
+.actuTitle {
+  margin-top: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: v.$color-blue-ink;
+
+  @include m.respond(sm) {
+    font-size: 1.875rem;
+  }
+}
+
+.actuDate {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.actuBody {
+  margin-top: 1.5rem;
+  max-width: 48rem;
+  line-height: 1.7;
+  color: rgba(17, 24, 39, 0.8);
+
+  p + p {
+    margin-top: 1rem;
+  }
+}
+
+.relatedTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: v.$color-blue-ink;
+  margin-bottom: 0.75rem;
+}
+
+.relatedList {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* ---------- Détail session ---------- */
+.sessionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.sessionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: v.$color-blue-ink;
+
+  @include m.respond(sm) {
+    font-size: 1.875rem;
+  }
+}
+
+.sessionNumber {
+  font-family: v.$font-display;
+  font-weight: 700;
+  color: v.$color-gold;
+}
+
+.sessionMeta {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.sessionSummary {
+  margin-top: 1.5rem;
+  max-width: 48rem;
+  line-height: 1.7;
+  color: rgba(17, 24, 39, 0.8);
+}
+
+.sessionImages {
+  margin-top: 2rem;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.sessionImageWrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: v.$radius-lg;
+  background: v.$color-surface-muted;
+}
+
+.sessionImage {
+  object-fit: cover;
+}
+
+.sessionDocsTitle {
+  margin-top: 2.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: v.$color-blue-ink;
+  margin-bottom: 1rem;
+}

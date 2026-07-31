@@ -1,0 +1,47 @@
+@use "../../styles/variables" as v;
+
+.wrapper {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.eyebrow {
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: v.$color-gold;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: v.$color-blue-ink;
+
+  @media (min-width: v.$bp-sm) {
+    font-size: 1.875rem;
+  }
+}
+
+.rule {
+  margin-top: 0.75rem;
+  height: 4px;
+  width: 6rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, v.$color-blue, v.$color-gold, v.$color-yellow);
+}
+
+.action {
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: v.$color-blue;
+
+  &:hover {
+    color: v.$color-blue-deep;
+  }
+}

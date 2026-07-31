@@ -1,0 +1,101 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: v.$color-blue-deep;
+  color: v.$color-white;
+  // Photo de fond (à ajouter via style inline ou CSS quand la photo sera fournie)
+  background-size: cover;
+  background-position: center;
+}
+
+.overlay {
+  // Voile sombre si une photo de fond est utilisée
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 59, 92, 0.75);
+}
+
+.inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-block: 4rem;
+
+  @include m.respond(sm) {
+    padding-block: 5rem;
+  }
+
+  @include m.respond(lg) {
+    padding-block: 6rem;
+  }
+}
+
+.institution {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: v.$color-yellow;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  max-width: 42rem;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: v.$color-white;
+
+  @include m.respond(sm) {
+    font-size: 2.5rem;
+  }
+
+  @include m.respond(lg) {
+    font-size: 3rem;
+  }
+}
+
+.lead {
+  margin-top: 1rem;
+  max-width: 38rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+
+  @include m.respond(sm) {
+    font-size: 1.125rem;
+  }
+}
+
+.motto {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  font-style: italic;
+  color: v.$color-yellow;
+}
+
+.actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.outlineOnDark {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: v.$color-white;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.bottomLine {
+  height: 3px;
+  width: 100%;
+  background: v.$color-blue;
+}

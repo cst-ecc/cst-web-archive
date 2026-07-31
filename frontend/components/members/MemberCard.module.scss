@@ -1,0 +1,45 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.card {
+  @include m.card;
+  overflow: hidden;
+}
+
+.photoWrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: v.$color-surface-muted;
+}
+
+.photo {
+  object-fit: cover;
+}
+
+.body {
+  padding: 1rem;
+}
+
+.name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: v.$color-blue-ink;
+}
+
+.role {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: v.$color-blue;
+}
+
+.responsibility {
+  margin-top: 0.125rem;
+  font-size: 0.75rem;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.bio {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.7);
+}

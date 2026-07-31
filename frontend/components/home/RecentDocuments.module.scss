@@ -1,0 +1,19 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.section {
+  background: v.$color-surface-muted;
+  padding-block: 3.5rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1.25rem;
+
+  @include m.respond(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include m.respond(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

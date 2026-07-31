@@ -1,0 +1,46 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.bar {
+  display: flex;
+  width: 100%;
+  max-width: 36rem;
+  gap: 0.5rem;
+  border-radius: v.$radius-xl2;
+  background: v.$color-white;
+  padding: 0.5rem;
+  box-shadow: v.$shadow-card;
+}
+
+.input {
+  flex: 1;
+  border-radius: v.$radius-lg;
+  border: none;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: v.$color-ink;
+
+  &::placeholder {
+    color: rgba(17, 24, 39, 0.4);
+  }
+
+  &:focus {
+    background: v.$color-surface-muted;
+    outline: none;
+  }
+}
+
+.button {
+  border-radius: v.$radius-lg;
+  background: v.$color-blue;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: v.$color-white;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background: v.$color-blue-deep;
+  }
+}

@@ -1,0 +1,91 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.footer {
+  margin-top: 4rem;
+  background: v.$color-blue-ink;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.rule {
+  height: 4px;
+  width: 100%;
+  background: linear-gradient(90deg, v.$color-blue, v.$color-gold, v.$color-yellow);
+}
+
+.grid {
+  display: grid;
+  gap: 2.5rem;
+  padding-block: 3rem;
+
+  @include m.respond(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include m.respond(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.about {
+  @include m.respond(lg) {
+    grid-column: span 2;
+  }
+}
+
+.name {
+  font-family: v.$font-display;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: v.$color-white;
+}
+
+.fullName {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.description {
+  margin-top: 0.75rem;
+  max-width: 28rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.heading {
+  margin-bottom: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: v.$color-yellow;
+}
+
+.list {
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+
+  a:hover {
+    color: v.$color-white;
+  }
+}
+
+.bottomBar {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bottomInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-block: 1.25rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+
+  @include m.respond(sm) {
+    flex-direction: row;
+  }
+}

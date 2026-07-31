@@ -1,0 +1,33 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.grid {
+  display: grid;
+  gap: 0.75rem;
+
+  @include m.respond(sm) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.label {
+  margin-bottom: 0.25rem;
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.select {
+  width: 100%;
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$color-surface-line;
+  background: v.$color-white;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: v.$color-ink;
+
+  &:focus {
+    border-color: v.$color-blue;
+  }
+}

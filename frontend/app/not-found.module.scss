@@ -1,0 +1,32 @@
+@use "../styles/variables" as v;
+
+.wrapper {
+  padding-block: 6rem;
+  text-align: center;
+}
+
+.code {
+  font-family: v.$font-display;
+  font-size: 3.75rem;
+  font-weight: 700;
+  color: v.$color-blue;
+}
+
+.title {
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.text {
+  margin: 0.5rem auto 0;
+  max-width: 28rem;
+  color: rgba(17, 24, 39, 0.7);
+}
+
+.actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}

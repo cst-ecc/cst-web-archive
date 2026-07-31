@@ -1,0 +1,49 @@
+@use "../../styles/variables" as v;
+
+.nav {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.navButton {
+  border-radius: v.$radius-md;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  color: v.$color-blue;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.pageButton {
+  min-width: 2.25rem;
+  border-radius: v.$radius-md;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(17, 24, 39, 0.7);
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background: v.$color-surface-muted;
+  }
+}
+
+.pageButtonActive {
+  background: v.$color-blue;
+  color: v.$color-white;
+
+  &:hover {
+    background: v.$color-blue;
+  }
+}

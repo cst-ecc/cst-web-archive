@@ -1,0 +1,43 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.base {
+  @include m.button-base;
+}
+
+.solid {
+  background: v.$color-blue;
+  color: v.$color-white;
+
+  &:hover {
+    background: v.$color-blue-deep;
+  }
+}
+
+.outline {
+  background: transparent;
+  border: 1px solid v.$color-blue;
+  color: v.$color-blue;
+
+  &:hover {
+    background: rgba(31, 133, 206, 0.05);
+  }
+}
+
+.ghost {
+  background: transparent;
+  color: v.$color-blue;
+
+  &:hover {
+    background: rgba(31, 133, 206, 0.05);
+  }
+}
+
+.yellow {
+  background: v.$color-yellow;
+  color: v.$color-ink;
+
+  &:hover {
+    background: v.$color-gold;
+  }
+}

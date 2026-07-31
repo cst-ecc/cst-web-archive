@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <rect width="800" height="500" fill="#EAF2FA"/>
+  <rect width="800" height="500" fill="url(#p)" opacity="0.4"/>
+  <defs><pattern id="p" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M0 40 L40 0" stroke="#CFE0F0" stroke-width="1"/></pattern></defs>
+  <g fill="#1F85CE" opacity="0.85" transform="translate(360,200)">
+    <path d="M40 0 l40 24 v48 l-40 24 -40-24 V24 z"/>
+  </g>
+  <text x="400" y="330" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#12547F">Session — image d'illustration</text>
+</svg>

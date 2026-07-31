@@ -1,0 +1,73 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.wrapper {
+  padding-block: 3rem;
+}
+
+.layout {
+  display: grid;
+  gap: 2.5rem;
+
+  @include m.respond(lg) {
+    grid-template-columns: 1fr 20rem;
+  }
+}
+
+.sidebar {
+  @include m.card;
+  padding: 1.5rem;
+  align-self: start;
+}
+
+.sidebarTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: v.$color-blue-ink;
+}
+
+.coordList {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.8);
+}
+
+.coordLabel {
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.emailLink {
+  color: v.$color-blue;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.linksTitle {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: v.$color-blue-ink;
+}
+
+.linksList {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+
+  a {
+    color: v.$color-blue;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

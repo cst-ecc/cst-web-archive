@@ -1,0 +1,84 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.searchRow {
+  margin-bottom: 1.25rem;
+  display: grid;
+  gap: 0.75rem;
+
+  @include m.respond(lg) {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+.filtersRow {
+  margin-bottom: 1.5rem;
+}
+
+.lockedFilters {
+  margin-bottom: 1.5rem;
+  display: grid;
+  gap: 0.75rem;
+
+  @include m.respond(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.label {
+  margin-bottom: 0.25rem;
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.select {
+  width: 100%;
+  border-radius: v.$radius-lg;
+  border: 1px solid v.$color-surface-line;
+  background: v.$color-white;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+
+  &:focus {
+    border-color: v.$color-blue;
+  }
+}
+
+.count {
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.empty {
+  border-radius: v.$radius-xl2;
+  border: 1px dashed v.$color-surface-line;
+  background: v.$color-surface-muted;
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.emptyTitle {
+  font-weight: 600;
+  color: v.$color-blue-ink;
+}
+
+.emptyHint {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.6);
+}
+
+.grid {
+  display: grid;
+  gap: 1.25rem;
+
+  @include m.respond(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include m.respond(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

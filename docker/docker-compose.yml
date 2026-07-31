@@ -1,0 +1,58 @@
+# =============================================================
+# Docker Compose — Production
+# Lancer depuis le dossier docker/ :
+#   docker compose up --build -d
+# =============================================================
+
+services:
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: cst-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  # --- Futurs services (à décommenter en phase suivante) ---
+  # backend:
+  #   build:
+  #     context: ../backend
+  #     dockerfile: Dockerfile
+  #   container_name: cst-backend
+  #   ports:
+  #     - "8000:8000"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - db
+  #   restart: unless-stopped
+
+  # db:
+  #   image: postgres:16-alpine
+  #   container_name: cst-db
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   restart: unless-stopped
+
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: cst-nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #   depends_on:
+  #     - frontend
+  #     - backend
+  #   restart: unless-stopped
+
+# volumes:
+#   pgdata:
