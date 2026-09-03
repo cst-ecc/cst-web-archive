@@ -4,33 +4,39 @@ import { SITE } from "@/lib/constants";
 import styles from "./Hero.module.scss";
 
 /**
- * Héro simplifié. Pour ajouter une photo de fond :
- * - placer l'image dans public/images/hero.jpg
- * - ajouter style={{ backgroundImage: "url(/images/hero.jpg)" }} sur la section
- * Le voile .overlay assure la lisibilité du texte sur n'importe quelle photo.
+ * HÉRO — Grande photo plein écran, texte centré, dots de navigation.
+ * Pour ajouter la vraie photo : remplacer background-image dans Hero.module.scss
+ * (.hero { background-image: url("/images/home/votre-photo.jpg") })
  */
 export default function Hero() {
   return (
     <section className={styles.hero}>
-      <div className={styles.overlay} />
-      <Container className={styles.inner}>
-        <p className={styles.institution}>{SITE.institution}</p>
-        <h1 className={styles.title}>Conseil Supérieur de Transition</h1>
-        <p className={styles.lead}>
-          Organe chargé de conduire le processus de réunification et de réforme
-          institutionnelle de l'Église du Christianisme Céleste. Dialogue,
-          consensus et construction d'une gouvernance commune.
-        </p>
-        <p className={styles.motto}>{SITE.motto}</p>
+      <div className={styles.overlay} aria-hidden />
 
+      <Container className={styles.inner}>
+        <span className={styles.institution}>{SITE.institution}</span>
+        <h1 className={styles.title}>
+          Conseil Supérieur de Transition
+        </h1>
+        <p className={styles.lead}>
+          Organe de dialogue, de réforme et de réunification de l'Église
+          du Christianisme Céleste. Douze mois de travaux pour bâtir une
+          gouvernance commune, moderne et durable.
+        </p>
         <div className={styles.actions}>
           <Button href="/presentation" variant="yellow">Découvrir le CST</Button>
-          <Button href="/documents" variant="outline" className={styles.outlineOnDark}>
+          <Button href="/documents" variant="outline" className={styles.outlineLight}>
             Documents officiels
           </Button>
         </div>
       </Container>
-      <div className={styles.bottomLine} />
+
+      {/* Dots — à relier à un vrai carousel quand les photos seront prêtes */}
+      <div className={styles.dots} aria-hidden>
+        <button className={`${styles.dot} ${styles.dotActive}`} />
+        <button className={styles.dot} />
+        <button className={styles.dot} />
+      </div>
     </section>
   );
 }

@@ -1,0 +1,114 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+/* ============================================================
+   QUOTE BLOCK — Avatar circulaire, citation, nom + fonction
+   (équivalent "What Our Students Say" du template)
+   ============================================================ */
+.section {
+  padding-block: 5rem;
+  background: v.$color-white;
+  text-align: center;
+}
+
+.heading {
+  margin-bottom: 3rem;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: v.$color-blue;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: v.$color-blue-ink;
+
+  @include m.respond(sm) { font-size: 2.25rem; }
+}
+
+.underline {
+  margin: 0.75rem auto 0;
+  width: 3rem;
+  height: 3px;
+  border-radius: 999px;
+  background: v.$color-blue;
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.55);
+}
+
+/* Citation */
+.quoteWrap {
+  max-width: 44rem;
+  margin-inline: auto;
+}
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 auto 1.5rem;
+  border: 3px solid v.$color-surface-line;
+  background: v.$color-surface-muted;
+  position: relative;
+}
+
+.quoteIcon {
+  font-size: 3.5rem;
+  line-height: 1;
+  color: rgba(31, 133, 206, 0.12);
+  margin-bottom: 0.5rem;
+}
+
+.quoteText {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: rgba(17, 24, 39, 0.72);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+
+  @include m.respond(sm) { font-size: 1.0625rem; }
+}
+
+.author {
+  font-weight: 700;
+  color: v.$color-blue;
+  font-style: normal;
+  display: block;
+  margin-bottom: 0.125rem;
+}
+
+.role {
+  font-size: 0.8rem;
+  color: rgba(17, 24, 39, 0.5);
+}
+
+/* Dots */
+.dots {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.15);
+}
+
+.dotActive {
+  background: v.$color-blue;
+  width: 24px;
+}

@@ -1,101 +1,112 @@
 @use "../../styles/variables" as v;
 @use "../../styles/mixins" as m;
 
+/* ============================================================
+   HERO — Plein écran, photo de fond, texte centré
+   ============================================================ */
 .hero {
   position: relative;
+  height: 90vh;
+  min-height: 520px;
+  max-height: 800px;
   overflow: hidden;
-  background: v.$color-blue-deep;
-  color: v.$color-white;
-  // Photo de fond (à ajouter via style inline ou CSS quand la photo sera fournie)
+  background-color: v.$color-blue-ink;
+  background-image: url("/images/home/hero-bg.jpeg");
   background-size: cover;
-  background-position: center;
-}
-
-.overlay {
-  // Voile sombre si une photo de fond est utilisée
-  position: absolute;
-  inset: 0;
-  background: rgba(12, 59, 92, 0.75);
-}
-
-.inner {
-  position: relative;
+  background-position: center top;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  padding-block: 4rem;
+}
 
-  @include m.respond(sm) {
-    padding-block: 5rem;
-  }
+/* Voile sombre pour lisibilité */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 59, 92, 0.7);
+}
 
-  @include m.respond(lg) {
-    padding-block: 6rem;
-  }
+/* Contenu centré */
+.inner {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-block: 3rem;
 }
 
 .institution {
+  display: inline-block;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   color: v.$color-yellow;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .title {
-  max-width: 42rem;
-  font-size: 2rem;
+  max-width: 44rem;
+  font-size: 2.25rem;
   font-weight: 700;
   line-height: 1.15;
   color: v.$color-white;
 
-  @include m.respond(sm) {
-    font-size: 2.5rem;
-  }
-
-  @include m.respond(lg) {
-    font-size: 3rem;
-  }
+  @include m.respond(sm) { font-size: 2.75rem; }
+  @include m.respond(lg) { font-size: 3.25rem; }
 }
 
 .lead {
-  margin-top: 1rem;
-  max-width: 38rem;
+  margin-top: 1.25rem;
+  max-width: 36rem;
   font-size: 1rem;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.82);
 
-  @include m.respond(sm) {
-    font-size: 1.125rem;
-  }
-}
-
-.motto {
-  margin-top: 1.5rem;
-  font-size: 0.875rem;
-  font-style: italic;
-  color: v.$color-yellow;
+  @include m.respond(sm) { font-size: 1.125rem; }
 }
 
 .actions {
-  margin-top: 2rem;
+  margin-top: 2.25rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  justify-content: center;
+  gap: 1rem;
 }
 
-.outlineOnDark {
-  border-color: rgba(255, 255, 255, 0.3);
-  color: v.$color-white;
+/* Dots de navigation (emplacement pour un carousel futur) */
+.dots {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-bottom: 2rem;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.dotActive {
+  background: v.$color-yellow;
+  width: 28px;
+}
+
+/* Lien outline sur fond sombre */
+.outlineLight {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: v.$color-white !important;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.1) !important;
   }
-}
-
-.bottomLine {
-  height: 3px;
-  width: 100%;
-  background: v.$color-blue;
 }

@@ -1,17 +1,79 @@
 @use "../../styles/variables" as v;
 @use "../../styles/mixins" as m;
 
+/* ============================================================
+   STATS BLOCK — Fond photo sombre, grands chiffres colorés
+   (équivalent "Let the numbers speak" du template)
+   ============================================================ */
 .section {
-  background: v.$color-surface-muted;
-  padding-block: 3.5rem;
+  position: relative;
+  background-color: v.$color-blue-ink;
+  background-image: url("/images/home/stats-bg-placeholder.svg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 59, 92, 0.82);
+}
+
+.inner {
+  position: relative;
+  padding-block: 5rem;
+  text-align: center;
+}
+
+.sectionTitle {
+  font-size: 1.375rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: v.$color-white;
+  margin-bottom: 0.5rem;
+
+  @include m.respond(sm) { font-size: 1.75rem; }
+}
+
+.underline {
+  margin: 0.625rem auto 3rem;
+  width: 3rem;
+  height: 3px;
+  border-radius: 999px;
+  background: v.$color-yellow;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 2.5rem 1.5rem;
 
-  @include m.respond(sm) {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  @include m.respond(sm) { grid-template-columns: repeat(4, 1fr); }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.value {
+  font-family: v.$font-display;
+  font-size: 3rem;
+  font-weight: 700;
+  color: v.$color-yellow;
+  line-height: 1;
+
+  @include m.respond(sm) { font-size: 3.5rem; }
+}
+
+.label {
+  margin-top: 0.625rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.75);
 }

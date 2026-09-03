@@ -1,29 +1,40 @@
 # =============================================================
-# Docker Compose — Développement (hot reload)
-# Lancer depuis le dossier docker/ :
-#   docker compose -f docker-compose.dev.yml up
+# Docker Compose — Développement CST
+#
+# Développement local uniquement.
+# Expose le port 3000 sur la machine locale.
 # =============================================================
 
+name: cst_website_dev
+
 services:
-  frontend:
-    image: node:20-alpine
+  cst_frontend_dev:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.dev
+
     container_name: cst-frontend-dev
+
     working_dir: /app
-    command: sh -c "npm install && npm run dev"
+
     ports:
       - "3000:3000"
+
     env_file:
-      - .env
-    volumes:
-      # Monte le code source du frontend (chemin relatif depuis docker/)
-      - ../frontend:/app
-      # Volume nommé pour node_modules : évite les conflits
-      # host/container et persiste entre les redémarrages
-      - frontend_node_modules:/app/node_modules
+      - .env.dev
+
     environment:
-      - NODE_ENV=development
-      # Nécessaire pour le hot reload en Docker (volume monté)
-      - WATCHPACK_POLLING=true
+      NODE_ENV: development
+      NEXT_TELEMETRY_DISABLED: "1"
+      WATCHPACK_POLLING: "true"
+      HOSTNAME: "0.0.0.0"
+      PORT: "3000"
+
+    volumes:
+      - ../frontend:/app
+      - frontend_node_modules:/app/node_modules
+
+    restart: unless-stopped
 
 volumes:
   frontend_node_modules:

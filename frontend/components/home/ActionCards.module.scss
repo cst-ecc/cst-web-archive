@@ -1,0 +1,125 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+/* ============================================================
+   ACTION CARDS — Section 3 cartes avec image en header
+   (équivalent "Choose Your Course" du template)
+   ============================================================ */
+.section {
+  padding-block: 5rem;
+  background: v.$color-white;
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: v.$color-blue;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: v.$color-blue-ink;
+
+  @include m.respond(sm) { font-size: 2.25rem; }
+}
+
+.underline {
+  margin: 0.75rem auto 0;
+  width: 3rem;
+  height: 3px;
+  border-radius: 999px;
+  background: v.$color-blue;
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.55);
+}
+
+.grid {
+  display: grid;
+  gap: 1.75rem;
+
+  @include m.respond(sm) { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Carte */
+.card {
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+
+  &:hover {
+    box-shadow: 0 8px 28px rgba(12, 59, 92, 0.1);
+    transform: translateY(-3px);
+  }
+}
+
+.cardImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: v.$color-surface-muted;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+  }
+
+  .card:hover & img {
+    transform: scale(1.04);
+  }
+}
+
+.cardBody {
+  padding: 1.5rem;
+}
+
+.cardRule {
+  width: 2.5rem;
+  height: 3px;
+  border-radius: 999px;
+  background: v.$color-blue;
+  margin-bottom: 0.875rem;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: v.$color-blue-ink;
+  margin-bottom: 0.625rem;
+}
+
+.cardText {
+  font-size: 0.875rem;
+  color: rgba(17, 24, 39, 0.68);
+  line-height: 1.6;
+}
+
+.cardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: v.$color-blue;
+
+  &:hover { color: v.$color-blue-deep; }
+}

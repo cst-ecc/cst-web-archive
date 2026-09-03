@@ -21,12 +21,12 @@ export const SAMPLE_FILE = "/documents/exemple.pdf";
 // Catégories
 // ---------------------------------------------------------------
 export const CATEGORIES: Category[] = [
-  { id: 1, slug: "decisions", name: "Décisions" },
-  { id: 2, slug: "rapports", name: "Rapports" },
-  { id: 3, slug: "pv", name: "Procès-verbaux" },
-  { id: 4, slug: "communiques", name: "Communiqués" },
-  { id: 5, slug: "textes", name: "Textes consolidés" },
-  { id: 6, slug: "vulgarisation", name: "Documents de vulgarisation" },
+  { id: 1, slug: "decisions", name: "Décisions", kind: "decision", },
+  { id: 2, slug: "rapports", name: "Rapports", kind: "rapport", },
+  { id: 3, slug: "pv", name: "Procès-verbaux",  kind: "proces_verbal", },
+  { id: 4, slug: "communiques", name: "Communiqués", kind: "communique", },
+  { id: 5, slug: "textes", name: "Textes consolidés", kind: "texte_consolide", },
+  { id: 6, slug: "vulgarisation", name: "Documents de vulgarisation", kind: "document", },
 ];
 
 // ---------------------------------------------------------------
@@ -37,7 +37,7 @@ export const DOCUMENTS: DocumentItem[] = [
     id: 1, slug: "constitution-consolidee", reference: "CST/TXT/2026-001",
     title: "Constitution consolidée de l'Église du Christianisme Céleste",
     summary: "Version consolidée de la Constitution issue des travaux de relecture et d'harmonisation menés par le CST et ses commissions.",
-    kind: "texte", categorySlug: "textes", date: "2026-04-30",
+    kind: "document", categorySlug: "textes", date: "2026-04-30",
     fileUrl: SAMPLE_FILE, fileType: "pdf", fileSize: 2456000, downloads: 342,
     featured: true, status: "publie",
   },
@@ -45,7 +45,7 @@ export const DOCUMENTS: DocumentItem[] = [
     id: 2, slug: "reglement-interieur-consolide", reference: "CST/TXT/2026-002",
     title: "Règlement intérieur consolidé",
     summary: "Règlement intérieur de l'Église, élaboré et consolidé par les commissions du CST pour encadrer le fonctionnement des organes.",
-    kind: "texte", categorySlug: "textes", date: "2026-04-30",
+    kind: "document", categorySlug: "textes", date: "2026-04-30",
     fileUrl: SAMPLE_FILE, fileType: "pdf", fileSize: 1890000, downloads: 278,
     featured: true, status: "publie",
   },
@@ -77,7 +77,7 @@ export const DOCUMENTS: DocumentItem[] = [
     id: 6, slug: "harmonisation-grades", reference: "CST/TXT/2026-003",
     title: "Tableau d'harmonisation des grades",
     summary: "Harmonisation des grades entre les espaces francophone et anglophone : leaders, visionnaires, Allagba et Mamans.",
-    kind: "texte", categorySlug: "textes", date: "2026-03-27",
+    kind: "annexe", categorySlug: "textes", date: "2026-03-27",
     fileUrl: SAMPLE_FILE, fileType: "pdf", fileSize: 456000, downloads: 167,
     featured: false, status: "publie",
   },
@@ -85,7 +85,7 @@ export const DOCUMENTS: DocumentItem[] = [
     id: 7, slug: "organigramme-mondial", reference: "CST/TXT/2026-004",
     title: "Organigramme mondial de la gouvernance",
     summary: "Structure des organes mondiaux : Pasteur, Synode, Conseil Pastoral, Conseil d'Administration, Comité Exécutif, Bureau Exécutif, Conclave et départements.",
-    kind: "texte", categorySlug: "textes", date: "2026-04-17",
+    kind: "document", categorySlug: "textes", date: "2026-04-17",
     fileUrl: SAMPLE_FILE, fileType: "pdf", fileSize: 1100000, downloads: 234,
     featured: false, status: "publie",
   },
@@ -93,7 +93,7 @@ export const DOCUMENTS: DocumentItem[] = [
     id: 8, slug: "pv-9e-session", reference: "CST/PV/2026-009",
     title: "Procès-verbal de la 9e session",
     summary: "Finalisation des travaux, consolidation des conclusions et préparation du rapport final. Tenue les 16 et 17 avril 2026.",
-    kind: "pv", categorySlug: "pv", date: "2026-04-17",
+    kind: "proces_verbal", categorySlug: "pv", date: "2026-04-17",
     fileUrl: SAMPLE_FILE, fileType: "pdf", fileSize: 780000, downloads: 98,
     featured: false, status: "publie",
   },
@@ -220,9 +220,18 @@ export const NEWS: NewsItem[] = [
 // ---------------------------------------------------------------
 export const ALBUMS: GalleryAlbum[] = [
   {
-    id: 1, title: "Installation du CST — 26 avril 2025", description: "Cérémonie d'installation officielle à Cotonou.", date: "2025-04-26",
+    id: 1,
+    slug: "installation-cst-26-avril-2025",
+    title: "Installation du CST — 26 avril 2025",
+    description: "Cérémonie d'installation officielle à Cotonou.",
+    date: "2025-04-26",
+    coverUrl: "/images/session-1.svg",
     images: [
-      { id: 1, title: "Cérémonie d'installation", imageUrl: "/images/session-1.svg" },
+      {
+        id: 1,
+        title: "Cérémonie d'installation",
+        imageUrl: "/images/session-1.svg",
+      },
     ],
     status: "publie",
   },

@@ -1,0 +1,66 @@
+# =============================================================
+# Docker Compose — Production CST
+#
+# À utiliser uniquement en production.
+# Ne pas exposer le port 3000 publiquement.
+# Le trafic public passe par le reverse proxy existant ecc-shield.
+# =============================================================
+
+name: cst_website
+
+services:
+  cst_frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile.prod
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://cst.ecc.bj}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+        NEXT_PUBLIC_DATA_SOURCE: ${NEXT_PUBLIC_DATA_SOURCE:-mock}
+
+    image: cst-frontend:latest
+    container_name: cst-frontend
+
+    restart: unless-stopped
+
+    env_file:
+      - .env.prod
+
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+
+    expose:
+      - "3000"
+
+    networks:
+      - ecc_proxy_network
+
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+networks:
+  ecc_proxy_network:
+    external: true
+    name: ecc2026_ecc_network

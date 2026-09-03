@@ -3,17 +3,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import styles from "./Navbar.module.scss";
 
-function ChevronDown() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M3 4.5L6 7.5L9 4.5" />
-    </svg>
-  );
+function isActiveHref(pathname: string, href: string) {
+  return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
 function DropdownMenu({
@@ -25,36 +21,60 @@ function DropdownMenu({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const menuId = useId();
 
-  const isGroupActive = item.children?.some(
-    (c) => c.href === "/" ? pathname === "/" : pathname.startsWith(c.href)
+  const isGroupActive = item.children?.some((child) =>
+    isActiveHref(pathname, child.href)
   );
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
         setOpen(false);
       }
     }
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
-    <div ref={ref} className={cn(styles.dropdown, open && styles.dropdownOpen)}>
+    <div
+      ref={ref}
+      className={cn(styles.dropdown, open && styles.dropdownOpen)}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onFocus={() => setOpen(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setOpen(false);
+        }
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          setOpen(false);
+          ref.current?.querySelector<HTMLButtonElement>("button")?.focus();
+        }
+      }}
+    >
       <button
         type="button"
-        className={cn(styles.dropdownTrigger, isGroupActive && styles.dropdownTriggerActive)}
-        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          styles.dropdownTrigger,
+          isGroupActive && styles.dropdownTriggerActive
+        )}
+        onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
+        aria-controls={menuId}
+        aria-haspopup="true"
       >
         {item.label}
-        <ChevronDown />
       </button>
 
-      <div className={styles.dropdownMenu}>
+      <div id={menuId} className={styles.dropdownMenu}>
         {item.children?.map((child) => {
-          const active = child.href === "/" ? pathname === "/" : pathname.startsWith(child.href);
+          const active = isActiveHref(pathname, child.href);
+
           return (
             <Link
               key={child.href}
@@ -77,9 +97,36 @@ function DropdownMenu({
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeMobileGroup, setActiveMobileGroup] = useState<string | null>(null);
+
+  const isHomePage = pathname === "/";
+  const useSolidHeader = !isHomePage || scrolled || open;
+
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 12);
+    }
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setOpen(false);
+    setActiveMobileGroup(null);
+  }, [pathname]);
 
   return (
-    <header className={styles.header}>
+    <header
+      className={cn(
+        styles.header,
+        !useSolidHeader && styles.headerHero,
+        useSolidHeader && styles.headerSolid
+      )}
+    >
       <div className={styles.bar}>
         <Link href="/" className={styles.logoLink} aria-label={SITE.fullName}>
           <Image
@@ -104,38 +151,81 @@ export default function Navbar() {
 
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => setOpen((value) => !value)}
           className={styles.burger}
           aria-expanded={open}
           aria-controls="menu-mobile"
-          aria-label="Ouvrir le menu"
+          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            {open ? (
+              <path d="M6 6l12 12M18 6L6 18" />
+            ) : (
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            )}
           </svg>
         </button>
       </div>
 
       {open && (
         <nav id="menu-mobile" className={styles.mobileNav} aria-label="Navigation mobile">
-          {NAV_LINKS.map((group) => (
-            <div key={group.label} className={styles.mobileGroup}>
-              <span className={styles.mobileGroupLabel}>{group.label}</span>
-              {group.children?.map((child) => {
-                const active = child.href === "/" ? pathname === "/" : pathname.startsWith(child.href);
-                return (
-                  <Link
-                    key={child.href}
-                    href={child.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(styles.mobileLink, active && styles.mobileLinkActive)}
-                  >
-                    {child.label}
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
+          {NAV_LINKS.map((group) => {
+            const groupIsOpen = activeMobileGroup === group.label;
+            const submenuId = `mobile-submenu-${group.label
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")}`;
+
+            return (
+              <div
+                key={group.label}
+                className={cn(styles.mobileGroup, groupIsOpen && styles.mobileGroupOpen)}
+              >
+                <button
+                  type="button"
+                  className={styles.mobileParentButton}
+                  onClick={() =>
+                    setActiveMobileGroup((current) =>
+                      current === group.label ? null : group.label
+                    )
+                  }
+                  aria-expanded={groupIsOpen}
+                  aria-controls={submenuId}
+                  aria-haspopup="true"
+                >
+                  <span>{group.label}</span>
+                  <span className={styles.mobileParentIndicator} aria-hidden />
+                </button>
+
+                {groupIsOpen && (
+                  <div id={submenuId} className={styles.mobileSubmenu}>
+                    {group.children?.map((child) => {
+                      const active = isActiveHref(pathname, child.href);
+
+                      return (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          onClick={() => setOpen(false)}
+                          className={cn(styles.mobileLink, active && styles.mobileLinkActive)}
+                        >
+                          {child.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
       )}
     </header>

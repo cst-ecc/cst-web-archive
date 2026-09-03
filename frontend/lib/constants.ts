@@ -1,7 +1,7 @@
 /** Constantes globales du site CST. */
 
 export const SITE = {
-  name: "CST",
+  name: "Église du Christianisme Céleste",
   fullName: "Conseil Supérieur de Transition",
   institution: "Église du Christianisme Céleste",
   title: "CST — Conseil Supérieur de Transition",
@@ -22,7 +22,16 @@ export type NavItem = {
 
 export const NAV_LINKS: NavItem[] = [
   {
-    label: "Le CST",
+    label: "CST",
+    href: "/presentation",
+    children: [
+      { label: "Présentation", href: "/presentation", description: "Mission, vision et objectifs" },
+      { label: "Composition", href: "/membres", description: "Les membres du Conseil" },
+      { label: "Sessions", href: "/sessions", description: "Sessions de travail" },
+    ],
+  },
+  {
+    label: "CSMo",
     href: "/presentation",
     children: [
       { label: "Présentation", href: "/presentation", description: "Mission, vision et objectifs" },
