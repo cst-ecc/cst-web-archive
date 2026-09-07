@@ -6,55 +6,67 @@ import styles from "./ActionCards.module.scss";
 const cards = [
   {
     image: "/images/home/action-reunion.svg",
-    alt: "Réunification",
-    title: "Réunification",
-    text: "Restaurer l'unité de l'Église du Christianisme Céleste à travers un cadre formel de dialogue, de concertation et de décision réunissant tous les diocèses.",
+    alt: "Transition et réunification",
+    tag: "CST",
+    title: "Transition & consolidation",
+    text: "Le CST a structuré le dialogue, conduit les travaux d’harmonisation et préparé le cadre institutionnel de la réunification.",
     href: "/presentation",
-    linkLabel: "En savoir plus",
-  },
-  {
-    image: "/images/home/action-reforme.svg",
-    alt: "Réforme institutionnelle",
-    title: "Réforme institutionnelle",
-    text: "Relire, actualiser et consolider la Constitution et le Règlement intérieur. Clarifier les organes, les fonctions et la hiérarchie ecclésiale.",
-    href: "/documents",
-    linkLabel: "Voir les textes",
+    linkLabel: "Découvrir le CST",
+    external: false,
   },
   {
     image: "/images/home/action-gouvernance.svg",
-    alt: "Bonne gouvernance",
-    title: "Bonne gouvernance",
-    text: "Renforcer la transparence, la discipline et la reddition de comptes. Préparer des institutions communes, légitimes et fonctionnelles pour l'Église unifiée.",
-    href: "/sessions",
-    linkLabel: "Voir les sessions",
+    alt: "Mise en œuvre",
+    tag: "CSMO",
+    title: "Mise en œuvre & suivi",
+    text: "Le CSMO accompagne l’appropriation des orientations, leur mise en œuvre progressive et la préparation des institutions définitives.",
+    href: "#processus",
+    linkLabel: "Comprendre le CSMO",
+    external: false,
+  },
+  {
+    image: "/images/home/action-reforme.svg",
+    alt: "Digitalisation de l’ECC",
+    tag: "DIGECC",
+    title: "Digitalisation de l’ECC",
+    text: "La modernisation numérique accompagne la structuration de l’Église à travers le recensement, la cartographie et de nouveaux outils de gestion.",
+    href: "https://recensement-paroisses.ecc.bj",
+    linkLabel: "Accéder à DIGECC",
+    external: true,
   },
 ];
 
-/** Section 3 cartes avec image en header — équivalent "Choose your course" */
 export default function ActionCards() {
   return (
     <section className={styles.section}>
       <Container>
         <div className={styles.heading}>
-          <p className={styles.eyebrow}>Axes de travail</p>
-          <h2 className={styles.title}>Le CST en action</h2>
+          <p className={styles.eyebrow}>Une dynamique commune</p>
+          <h2 className={styles.title}>Trois dimensions complémentaires</h2>
           <div className={styles.underline} />
-          <p className={styles.subtitle}>Trois piliers fondamentaux pour une Église une et indivisible</p>
+          <p className={styles.subtitle}>Transition, mise en œuvre et modernisation au service d’une même mission.</p>
         </div>
 
         <div className={styles.grid}>
           {cards.map((card) => (
-            <article key={card.title} className={styles.card}>
+            <article key={card.tag} className={styles.card}>
               <div className={styles.cardImage}>
                 <Image src={card.image} alt={card.alt} fill sizes="(max-width:768px) 100vw, 33vw" />
+                <span className={styles.cardTag}>{card.tag}</span>
               </div>
               <div className={styles.cardBody}>
                 <div className={styles.cardRule} />
                 <h3 className={styles.cardTitle}>{card.title}</h3>
                 <p className={styles.cardText}>{card.text}</p>
-                <Link href={card.href} className={styles.cardLink}>
-                  {card.linkLabel} →
-                </Link>
+                {card.external ? (
+                  <a href={card.href} target="_blank" rel="noopener noreferrer" className={styles.cardLink}>
+                    {card.linkLabel} <span aria-hidden>↗</span>
+                  </a>
+                ) : (
+                  <Link href={card.href} className={styles.cardLink}>
+                    {card.linkLabel} <span aria-hidden>→</span>
+                  </Link>
+                )}
               </div>
             </article>
           ))}

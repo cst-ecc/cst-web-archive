@@ -1,14 +1,11 @@
 @use "../../styles/variables" as v;
 @use "../../styles/mixins" as m;
 
-/* ============================================================
-   HERO — Plein écran, photo de fond, texte centré
-   ============================================================ */
 .hero {
   position: relative;
+  min-height: 620px;
   height: 90vh;
-  min-height: 520px;
-  max-height: 800px;
+  max-height: 860px;
   overflow: hidden;
   background-color: v.$color-blue-ink;
   background-image: url("/images/home/hero-bg.jpeg");
@@ -16,54 +13,90 @@
   background-position: center top;
   display: flex;
   flex-direction: column;
+  isolation: isolate;
 }
 
-/* Voile sombre pour lisibilité */
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(12, 59, 92, 0.7);
+  z-index: -2;
+  background:
+    linear-gradient(90deg, rgba(7, 37, 58, 0.9) 0%, rgba(12, 59, 92, 0.72) 50%, rgba(12, 59, 92, 0.48) 100%),
+    rgba(12, 59, 92, 0.48);
+  transition: background 0.5s ease;
 }
 
-/* Contenu centré */
+.hero[data-tone="cst"] .overlay {
+  background: linear-gradient(90deg, rgba(8, 48, 77, 0.92), rgba(31, 133, 206, 0.62));
+}
+
+.hero[data-tone="csmo"] .overlay {
+  background: linear-gradient(90deg, rgba(7, 37, 58, 0.94), rgba(18, 84, 127, 0.7));
+}
+
+.glow {
+  position: absolute;
+  z-index: -1;
+  width: 32rem;
+  height: 32rem;
+  right: -10rem;
+  top: 18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(241, 233, 6, 0.18), transparent 68%);
+  pointer-events: none;
+}
+
 .inner {
   position: relative;
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding-block: 3rem;
+  width: 100%;
+  padding-block: 7rem 5rem;
+}
+
+.slideContent {
+  max-width: 48rem;
+  animation: reveal 0.65s ease both;
 }
 
 .institution {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: v.$color-yellow;
   margin-bottom: 1rem;
+
+  &::before {
+    content: "";
+    width: 2.25rem;
+    height: 2px;
+    background: currentColor;
+  }
 }
 
 .title {
-  max-width: 44rem;
-  font-size: 2.25rem;
+  max-width: 46rem;
+  font-size: 2.45rem;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.08;
   color: v.$color-white;
+  text-wrap: balance;
 
-  @include m.respond(sm) { font-size: 2.75rem; }
-  @include m.respond(lg) { font-size: 3.25rem; }
+  @include m.respond(sm) { font-size: 3rem; }
+  @include m.respond(lg) { font-size: 3.75rem; }
 }
 
 .lead {
-  margin-top: 1.25rem;
-  max-width: 36rem;
+  margin-top: 1.4rem;
+  max-width: 41rem;
   font-size: 1rem;
-  line-height: 1.65;
-  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.72;
+  color: rgba(255, 255, 255, 0.86);
 
   @include m.respond(sm) { font-size: 1.125rem; }
 }
@@ -72,41 +105,106 @@
   margin-top: 2.25rem;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
+  gap: 0.9rem;
 }
 
-/* Dots de navigation (emplacement pour un carousel futur) */
-.dots {
+.controls {
   position: relative;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   padding-bottom: 2rem;
 }
 
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 0.65rem;
+  height: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 999px;
-  border: none;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.25);
   cursor: pointer;
   padding: 0;
-  transition: background 0.2s;
+  transition: width 0.25s ease, background 0.25s ease;
 }
 
 .dotActive {
+  width: 2rem;
   background: v.$color-yellow;
-  width: 28px;
+  border-color: v.$color-yellow;
 }
 
-/* Lien outline sur fond sombre */
-.outlineLight {
-  border-color: rgba(255, 255, 255, 0.35) !important;
-  color: v.$color-white !important;
+.arrow,
+.pause {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: v.$color-white;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.45);
+  }
+}
+
+.arrow {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+}
+
+.pause {
+  margin-left: 0.35rem;
+  min-width: 4.25rem;
+  height: 2.4rem;
+  padding-inline: 0.85rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.outlineLight {
+  border-color: rgba(255, 255, 255, 0.38) !important;
+  color: v.$color-white !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 639px) {
+  .hero {
+    min-height: 680px;
+    height: auto;
+  }
+
+  .inner {
+    padding-block: 8rem 4rem;
+  }
+
+  .title {
+    font-size: 2.2rem;
+  }
+
+  .controls {
+    padding-inline: 1rem;
+  }
+
+  .pause {
+    display: none;
   }
 }

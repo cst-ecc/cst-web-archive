@@ -2,14 +2,26 @@ import type { MetadataRoute } from "next";
 import { SITE, NAV_LINKS } from "@/lib/constants";
 import { getDocuments, getSessions, getNews } from "@/lib/api";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = SITE.url;
+function internalPath(href: string, external?: boolean): string | null {
+  if (external || !href.startsWith("/")) return null;
+  const path = href.split("#")[0] || "/";
+  return path;
+}
 
-  // Pages statiques (aplaties depuis la nav)
-  const staticPages = [
-    "/",
-    ...NAV_LINKS.flatMap((g) => g.children?.map((c) => c.href) ?? []),
-  ];
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const base = SITE.url.replace(/\/$/, "");
+
+  const navPaths = NAV_LINKS.flatMap((item) => [
+    { href: item.href, external: item.external },
+    ...(item.children ?? []).map((child) => ({
+      href: child.href,
+      external: child.external,
+    })),
+  ])
+    .map((item) => internalPath(item.href, item.external))
+    .filter((path): path is string => Boolean(path));
+
+  const staticPages = [...new Set(["/", ...navPaths])];
 
   const entries: MetadataRoute.Sitemap = staticPages.map((path) => ({
     url: `${base}${path}`,
@@ -18,34 +30,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "/" ? 1.0 : 0.7,
   }));
 
-  // Documents
   const { results: docs } = await getDocuments({ pageSize: 1000 });
-  docs.forEach((d) => {
+  docs.forEach((document) => {
     entries.push({
-      url: `${base}/documents/${d.slug}`,
-      lastModified: new Date(d.date),
+      url: `${base}/documents/${document.slug}`,
+      lastModified: new Date(document.date),
       changeFrequency: "monthly",
       priority: 0.6,
     });
   });
 
-  // Sessions
   const sessions = await getSessions();
-  sessions.forEach((s) => {
+  sessions.forEach((session) => {
     entries.push({
-      url: `${base}/sessions/${s.id}`,
-      lastModified: new Date(s.startDate),
+      url: `${base}/sessions/${session.id}`,
+      lastModified: new Date(session.startDate),
       changeFrequency: "monthly",
       priority: 0.6,
     });
   });
 
-  // Actualités
   const news = await getNews();
-  news.forEach((n) => {
+  news.forEach((item) => {
     entries.push({
-      url: `${base}/actualites/${n.slug}`,
-      lastModified: new Date(n.date),
+      url: `${base}/actualites/${item.slug}`,
+      lastModified: new Date(item.date),
       changeFrequency: "monthly",
       priority: 0.6,
     });

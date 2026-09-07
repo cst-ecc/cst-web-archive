@@ -1,36 +1,35 @@
 import Hero from "@/components/home/Hero";
 import InfoBar from "@/components/home/InfoBar";
+import InstitutionalProcess from "@/components/home/InstitutionalProcess";
 import ActionCards from "@/components/home/ActionCards";
 import SplitBanner from "@/components/home/SplitBanner";
 import CategoriesGrid from "@/components/home/CategoriesGrid";
 import StatsBlock from "@/components/home/StatsBlock";
-import QuoteBlock from "@/components/home/QuoteBlock";
+import DigitalisationSection from "@/components/home/DigitalisationSection";
+import ProcessTimeline from "@/components/home/ProcessTimeline";
+import FAQSection from "@/components/home/FAQSection";
 
 export const revalidate = 300;
 
 /**
- * Page d'accueil — Disposition inspirée du template Attainment,
- * identité visuelle CST (bleu, jaune, blanc).
+ * Landing page unifiée CST / CSMO.
  *
- * Sections :
- * 1. Hero         — Grande photo plein écran, texte centré, dots
- * 2. InfoBar      — 3 faits clés (remonte sur le hero)
- * 3. ActionCards  — 3 cartes image + texte (axes du CST)
- * 4. SplitBanner  — Photo fond + carte blanche chevauchante
- * 5. Categories   — Image gauche + grille 2×3 des thèmes
- * 6. StatsBlock   — Fond photo sombre, grands chiffres jaunes
- * 7. QuoteBlock   — Avatar + citation + dots
+ * La séquence « Une même Église, une même mission » est désormais intégrée
+ * directement au Footer afin de former un seul bloc institutionnel de clôture.
  */
 export default function HomePage() {
   return (
     <>
       <Hero />
       <InfoBar />
+      <InstitutionalProcess />
       <ActionCards />
       <SplitBanner />
       <CategoriesGrid />
       <StatsBlock />
-      <QuoteBlock />
+      <DigitalisationSection />
+      <ProcessTimeline />
+      <FAQSection />
     </>
   );
 }

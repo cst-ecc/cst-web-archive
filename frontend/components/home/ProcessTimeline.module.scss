@@ -1,0 +1,13 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.section { padding-block:6rem; background:v.$color-surface-muted; }
+.heading { max-width:48rem; margin:0 auto 3.4rem; text-align:center; }
+.eyebrow { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:v.$color-gold; }
+.title { margin-top:.55rem; font-size:1.9rem; color:v.$color-blue-ink; @include m.respond(sm){font-size:2.35rem;} }
+.subtitle { margin-top:.8rem; font-size:.9rem; line-height:1.65; color:rgba(17,24,39,.6); }
+.timeline { position:relative; display:grid; gap:1rem; @include m.respond(md){grid-template-columns:repeat(3,1fr);} @include m.respond(xl){grid-template-columns:repeat(6,1fr);} }
+.step { position:relative; min-width:0; }
+.marker { display:grid; place-items:center; width:2.35rem; height:2.35rem; margin:0 0 .75rem .15rem; border-radius:50%; background:v.$color-blue-ink; color:v.$color-yellow; font-size:.67rem; font-weight:800; box-shadow:0 0 0 6px rgba(31,133,206,.07); }
+.card { min-height:100%; padding:1.35rem 1.15rem; border:1px solid v.$color-surface-line; border-radius:v.$radius-xl; background:v.$color-white; box-shadow:v.$shadow-card; h3{font-size:.92rem;text-transform:uppercase;letter-spacing:.035em;color:v.$color-blue-ink;} p{margin-top:.65rem;font-size:.79rem;line-height:1.6;color:rgba(17,24,39,.65);} }
+@include m.respond(xl){.timeline::before{content:"";position:absolute;left:1.25rem;right:1.25rem;top:1.16rem;height:1px;background:linear-gradient(90deg,v.$color-blue,rgba(218,167,16,.55),v.$color-blue);}.marker{position:relative;z-index:1;background:v.$color-white;border:2px solid v.$color-blue;color:v.$color-blue-deep;}}

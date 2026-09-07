@@ -1,0 +1,180 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.section {
+  padding-block: 6rem;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(31, 133, 206, 0.08), transparent 30%),
+    v.$color-surface-muted;
+  scroll-margin-top: 6rem;
+}
+
+.heading {
+  max-width: 48rem;
+  margin: 0 auto 3.5rem;
+  text-align: center;
+}
+
+.eyebrow,
+.kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: v.$color-blue;
+}
+
+.title {
+  margin-top: 0.55rem;
+  font-size: 1.95rem;
+  color: v.$color-blue-ink;
+
+  @include m.respond(sm) { font-size: 2.45rem; }
+}
+
+.rule {
+  width: 3.25rem;
+  height: 3px;
+  margin: 0.9rem auto 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, v.$color-blue, v.$color-gold, v.$color-yellow);
+}
+
+.subtitle {
+  margin-top: 1rem;
+  color: rgba(17, 24, 39, 0.66);
+  line-height: 1.7;
+}
+
+.flow {
+  display: grid;
+  gap: 1.25rem;
+  align-items: stretch;
+
+  @include m.respond(lg) {
+    grid-template-columns: 1fr 7rem 1fr;
+  }
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  background: v.$color-white;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  box-shadow: v.$shadow-card;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: auto -3rem -4rem auto;
+    width: 11rem;
+    height: 11rem;
+    border-radius: 50%;
+    background: rgba(31, 133, 206, 0.055);
+  }
+}
+
+.cardCurrent {
+  border-color: rgba(218, 167, 16, 0.38);
+  box-shadow: 0 14px 40px rgba(12, 59, 92, 0.09);
+}
+
+.step {
+  position: absolute;
+  top: 1.4rem;
+  right: 1.5rem;
+  font-family: v.$font-display;
+  font-size: 2.3rem;
+  font-weight: 700;
+  color: rgba(12, 59, 92, 0.08);
+}
+
+.cardTitle {
+  max-width: 25rem;
+  margin-top: 0.55rem;
+  font-size: 1.35rem;
+  color: v.$color-blue-ink;
+}
+
+.cardText {
+  position: relative;
+  z-index: 1;
+  margin-top: 1rem;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: rgba(17, 24, 39, 0.7);
+}
+
+.tags {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.35rem;
+
+  span {
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(31, 133, 206, 0.07);
+    color: v.$color-blue-deep;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+}
+
+.bridge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: v.$color-gold;
+
+  @include m.respond(lg) {
+    flex-direction: column;
+  }
+}
+
+.bridgeLine {
+  height: 1px;
+  flex: 1;
+  min-width: 2rem;
+  background: linear-gradient(90deg, transparent, rgba(218, 167, 16, 0.6), transparent);
+
+  @include m.respond(lg) {
+    width: 1px;
+    height: auto;
+    min-height: 4rem;
+  }
+}
+
+.bridgeIcon {
+  display: grid;
+  place-items: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  border: 1px solid rgba(218, 167, 16, 0.4);
+  border-radius: 50%;
+  background: v.$color-white;
+  font-size: 1.2rem;
+}
+
+.bridgeLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.takeaway {
+  max-width: 54rem;
+  margin: 2rem auto 0;
+  padding: 1rem 1.2rem;
+  text-align: center;
+  border-radius: v.$radius-lg;
+  background: rgba(218, 167, 16, 0.09);
+  color: v.$color-blue-ink;
+  font-size: 0.86rem;
+}

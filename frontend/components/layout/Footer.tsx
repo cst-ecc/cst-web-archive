@@ -1,56 +1,81 @@
 import Link from "next/link";
-import { NAV_LINKS, SITE } from "@/lib/constants";
 import Container from "./Container";
+import MissionStatement from "@/components/home/MissionStatement";
+import { FOOTER_GROUPS, SITE, type NavLink } from "@/lib/constants";
 import { getUsefulLinks } from "@/lib/api";
 import styles from "./Footer.module.scss";
+
+function FooterLink({ link }: { link: NavLink }) {
+  if (link.external) {
+    return (
+      <a href={link.href} target="_blank" rel="noopener noreferrer">
+        <span>{link.label}</span>
+        <span className={styles.externalMark} aria-hidden>↗</span>
+      </a>
+    );
+  }
+
+  return <Link href={link.href}>{link.label}</Link>;
+}
 
 export default async function Footer() {
   const links = await getUsefulLinks();
   const year = new Date().getFullYear();
 
-  // Aplatir les liens de navigation pour le footer
-  const flatLinks = NAV_LINKS.flatMap((g) => g.children ?? []);
-
   return (
     <footer className={styles.footer}>
-      <div className={styles.rule} />
-      <Container className={styles.grid}>
-        <div className={styles.about}>
-          <p className={styles.name}>{SITE.name}</p>
-          <p className={styles.fullName}>{SITE.fullName}</p>
-          <p className={styles.description}>{SITE.description}</p>
-          <p style={{ marginTop: "0.75rem", fontStyle: "italic", fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}>
-            {SITE.motto}
-          </p>
-        </div>
+      <MissionStatement />
 
-        <nav aria-label="Plan du site">
-          <p className={styles.heading}>Navigation</p>
-          <ul className={styles.list}>
-            {flatLinks.slice(0, 6).map((l) => (
-              <li key={l.href}>
-                <Link href={l.href}>{l.label}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+      <div className={styles.navigationArea}>
+        <Container className={styles.grid}>
+          <div className={styles.about}>
+            <p className={styles.processBadge}>CST → CSMO</p>
+            <p className={styles.name}>{SITE.name}</p>
+            <p className={styles.fullName}>{SITE.processName}</p>
+            <p className={styles.description}>
+              Une plateforme institutionnelle pour comprendre la transition,
+              suivre la mise en œuvre et accéder aux initiatives structurantes
+              de l’Église du Christianisme Céleste.
+            </p>
+            <p className={styles.motto}>{SITE.motto}</p>
+          </div>
 
-        <div>
-          <p className={styles.heading}>Liens utiles</p>
-          <ul className={styles.list}>
-            {links.map((l) => (
-              <li key={l.id}>
-                <Link href={l.url}>{l.label}</Link>
+          {FOOTER_GROUPS.map((group) => (
+            <nav key={group.title} aria-label={group.title}>
+              <p className={styles.heading}>{group.title}</p>
+              <ul className={styles.list}>
+                {group.links.map((link) => (
+                  <li key={`${group.title}-${link.label}`}>
+                    <FooterLink link={link} />
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+
+          <div>
+            <p className={styles.heading}>Liens utiles</p>
+            <ul className={styles.list}>
+              {links.map((link) => (
+                <li key={link.id}>
+                  <a href={link.url} target="_blank" rel="noopener noreferrer">
+                    <span>{link.label}</span>
+                    <span className={styles.externalMark} aria-hidden>↗</span>
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
               </li>
-            ))}
-            <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
-          </ul>
-        </div>
-      </Container>
+            </ul>
+          </div>
+        </Container>
+      </div>
 
       <div className={styles.bottomBar}>
         <Container className={styles.bottomInner}>
-          <p>© {year} {SITE.name} — {SITE.institution}. Tous droits réservés.</p>
+          <p>© {year} {SITE.institution}. Tous droits réservés.</p>
+          <p className={styles.bottomProcess}>{SITE.fullName} · {SITE.processName}</p>
         </Container>
       </div>
     </footer>

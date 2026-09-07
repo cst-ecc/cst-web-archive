@@ -1,0 +1,27 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.section { padding-block:6rem; background:v.$color-white; scroll-margin-top:6rem; }
+.heading { display:grid; gap:1rem; margin-bottom:3rem; @include m.respond(lg){grid-template-columns:1fr 1fr;align-items:end;} }
+.eyebrow { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; color:v.$color-gold; }
+.title { max-width:38rem; margin-top:.5rem; font-size:1.95rem; color:v.$color-blue-ink; @include m.respond(sm){font-size:2.45rem;} }
+.intro { max-width:38rem; font-size:.9rem; line-height:1.7; color:rgba(17,24,39,.62); @include m.respond(lg){justify-self:end;} }
+.grid { display:grid; gap:1.25rem; align-items:start; @include m.respond(lg){grid-template-columns:repeat(2,1fr);} }
+.groupCard { overflow:hidden; border:1px solid v.$color-surface-line; border-radius:v.$radius-xl2; background:v.$color-surface-muted; box-shadow:v.$shadow-card; }
+.groupHeader { display:flex; gap:1rem; align-items:flex-start; padding:1.35rem 1.4rem; background:linear-gradient(135deg,v.$color-blue-ink,#124f76); color:v.$color-white; }
+.groupNumber { flex:0 0 auto; display:grid; place-items:center; width:2.35rem; height:2.35rem; border-radius:.75rem; background:v.$color-gold; color:v.$color-white; font-size:.72rem; font-weight:800; }
+.groupTitle { font-size:.96rem; text-transform:uppercase; letter-spacing:.035em; color:v.$color-white; }
+.groupSubtitle { margin-top:.35rem; font-size:.76rem; line-height:1.5; color:rgba(255,255,255,.7); }
+.questions { background:v.$color-white; }
+.question + .question { border-top:1px solid v.$color-surface-line; }
+.questionButton { width:100%; display:grid; grid-template-columns:auto 1fr auto; gap:.85rem; align-items:start; padding:1.1rem 1.2rem; border:0; background:v.$color-white; text-align:left; cursor:pointer; color:v.$color-blue-ink; transition:background .2s ease; &:hover{background:rgba(31,133,206,.035);} }
+.questionOpen .questionButton { background:rgba(31,133,206,.045); }
+.questionNumber { display:grid; place-items:center; width:1.9rem; height:1.9rem; border-radius:.55rem; background:rgba(218,167,16,.12); color:v.$color-gold; font-size:.68rem; font-weight:800; }
+.questionText { padding-top:.12rem; font-size:.84rem; line-height:1.5; font-weight:700; }
+.icon { display:grid; place-items:center; width:1.8rem; height:1.8rem; border:1px solid v.$color-surface-line; border-radius:50%; color:v.$color-blue; font-size:1rem; }
+.answerWrap { display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
+.answerWrapOpen { grid-template-rows:1fr; }
+.answerInner { overflow:hidden; }
+.answerBody { padding:0 1.2rem 1.25rem 4rem; font-size:.81rem; line-height:1.65; color:rgba(17,24,39,.68); p + p{margin-top:.7rem;} }
+.takeaway { margin-top:1rem; padding:.75rem .85rem; border-left:3px solid v.$color-gold; border-radius:0 .6rem .6rem 0; background:rgba(218,167,16,.08); span{display:block;margin-bottom:.18rem;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:v.$color-gold;} strong{font-size:.76rem;line-height:1.5;color:v.$color-blue-ink;} }
+@media(max-width:639px){.answerBody{padding-left:1.2rem}.groupHeader{padding:1.15rem}.questionButton{padding:1rem}.questionText{font-size:.8rem}}

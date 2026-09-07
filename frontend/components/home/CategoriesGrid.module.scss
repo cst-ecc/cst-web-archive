@@ -1,113 +1,18 @@
 @use "../../styles/variables" as v;
 @use "../../styles/mixins" as m;
 
-/* ============================================================
-   CATEGORIES GRID — Grande image gauche + grille 2×3 droite
-   (équivalent section "Categories" du template)
-   ============================================================ */
-.section {
-  padding-block: 5rem;
-  background: v.$color-surface-muted;
-}
-
-.heading {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.eyebrow {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: v.$color-blue;
-  margin-bottom: 0.5rem;
-}
-
-.title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: v.$color-blue-ink;
-
-  @include m.respond(sm) { font-size: 2.25rem; }
-}
-
-.underline {
-  margin: 0.75rem auto 0;
-  width: 3rem;
-  height: 3px;
-  border-radius: 999px;
-  background: v.$color-blue;
-}
-
-.subtitle {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: rgba(17, 24, 39, 0.55);
-}
-
-/* Layout : image gauche + grille droite */
-.layout {
-  display: grid;
-  gap: 2.5rem;
-  align-items: start;
-
-  @include m.respond(lg) {
-    grid-template-columns: 2fr 3fr;
-  }
-}
-
-.imageWrap {
-  position: relative;
-  border-radius: v.$radius-xl;
-  overflow: hidden;
-  aspect-ratio: 3 / 4;
-  background: v.$color-surface-muted;
-
-  @include m.respond(lg) {
-    aspect-ratio: unset;
-    height: 100%;
-    min-height: 420px;
-  }
-}
-
-.image {
-  object-fit: cover;
-}
-
-/* Grille 2×3 */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0;
-  background: v.$color-white;
-  border: 1px solid v.$color-surface-line;
-  border-radius: v.$radius-xl;
-  overflow: hidden;
-}
-
-.cell {
-  padding: 1.625rem 1.5rem;
-  border-bottom: 1px solid v.$color-surface-line;
-  border-right: 1px solid v.$color-surface-line;
-
-  /* supprimer le bord droit des cellules en colonne paire */
-  &:nth-child(2n) { border-right: none; }
-  /* supprimer le bord bas des deux dernières cellules */
-  &:nth-last-child(-n+2) { border-bottom: none; }
-}
-
-.cellTitle {
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: v.$color-blue-ink;
-  margin-bottom: 0.5rem;
-}
-
-.cellText {
-  font-size: 0.8rem;
-  color: rgba(17, 24, 39, 0.62);
-  line-height: 1.55;
-}
+.section { padding-block:5.5rem; background:v.$color-surface-muted; }
+.heading { max-width:48rem; text-align:center; margin:0 auto 3rem; }
+.eyebrow { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:v.$color-blue; margin-bottom:.5rem; }
+.title { font-size:1.875rem; font-weight:700; color:v.$color-blue-ink; @include m.respond(sm){font-size:2.25rem;} }
+.underline { margin:.75rem auto 0; width:3rem; height:3px; border-radius:999px; background:linear-gradient(90deg,v.$color-blue,v.$color-gold,v.$color-yellow); }
+.subtitle { margin-top:.75rem; font-size:.9rem; line-height:1.6; color:rgba(17,24,39,.58); }
+.layout { display:grid; gap:2rem; align-items:stretch; @include m.respond(lg){grid-template-columns:2fr 3fr;} }
+.imageWrap { position:relative; border-radius:v.$radius-xl2; overflow:hidden; min-height:360px; background:v.$color-blue-ink; @include m.respond(lg){min-height:100%;} &::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(7,37,58,.8));} }
+.image { object-fit:cover; }
+.imageCaption { position:absolute; z-index:2; left:1.5rem; bottom:1.5rem; color:v.$color-white; span,strong{display:block;} span{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:v.$color-yellow;font-weight:700;} strong{margin-top:.25rem;font-family:v.$font-display;font-size:1.35rem;} }
+.grid { display:grid; grid-template-columns:1fr; background:v.$color-white; border:1px solid v.$color-surface-line; border-radius:v.$radius-xl2; overflow:hidden; @include m.respond(sm){grid-template-columns:repeat(2,1fr);} }
+.cell { position:relative; padding:1.7rem 1.55rem; border-bottom:1px solid v.$color-surface-line; @include m.respond(sm){border-right:1px solid v.$color-surface-line; &:nth-child(2n){border-right:none;} &:nth-last-child(-n+2){border-bottom:none;}} &:last-child{border-bottom:none;} }
+.index { display:block; margin-bottom:.8rem; font-size:.68rem; font-weight:800; letter-spacing:.09em; color:v.$color-gold; }
+.cellTitle { font-size:.9rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; color:v.$color-blue-ink; margin-bottom:.5rem; }
+.cellText { font-size:.82rem; color:rgba(17,24,39,.64); line-height:1.62; }

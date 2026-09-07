@@ -2,31 +2,21 @@ import Link from "next/link";
 import Container from "@/components/layout/Container";
 import styles from "./SplitBanner.module.scss";
 
-/**
- * SPLIT BANNER — Photo de fond plein largeur + carte blanche à gauche.
- * Photo de fond : remplacer split-bg-placeholder.svg par votre photo dans
- * SplitBanner.module.scss (.section { background-image: url("...") })
- */
 export default function SplitBanner() {
   return (
     <section className={styles.section}>
       <div className={styles.overlay} aria-hidden />
       <Container className={styles.inner}>
         <div className={styles.card}>
-          <p className={styles.eyebrow}>Rapport final — 30 avril 2026</p>
-          <h2 className={styles.title}>
-            Une Église réunifiée, des institutions renouvelées
-          </h2>
+          <p className={styles.eyebrow}>Du rapport final à la mise en œuvre</p>
+          <h2 className={styles.title}>Les fondations sont posées. La marche se poursuit.</h2>
           <p className={styles.text}>
-            Après douze mois de travaux, neuf sessions plénières et
-            l'implication de trois commissions spécialisées, le CST a remis
-            son rapport final. Constitution consolidée, Règlement intérieur
-            actualisé, nouvelle architecture de gouvernance mondiale et
-            diocésaine : les fondations de l'Église unifiée sont posées.
+            La phase conduite par le CST a permis de préparer un cadre commun, de consolider les textes et de définir les orientations de la réunification. Le CSMO prend désormais le relais pour accompagner leur appropriation et leur mise en œuvre progressive.
           </p>
-          <Link href="/rapports" className={styles.date}>
-            Consulter le rapport final
-          </Link>
+          <div className={styles.actions}>
+            <Link href="#processus" className={styles.link}>Comprendre la continuité CST → CSMO</Link>
+            <Link href="/rapports" className={styles.linkSecondary}>Consulter les rapports</Link>
+          </div>
         </div>
       </Container>
     </section>

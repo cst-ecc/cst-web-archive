@@ -30,10 +30,15 @@ export const metadata: Metadata = {
   applicationName: SITE.name,
   keywords: [
     "CST",
+    "CSMO",
     "Conseil Supérieur de Transition",
+    "Conseil Supérieur de Mise en Œuvre",
     "Église du Christianisme Céleste",
+    "Grande Marche vers l'Unité",
     "réunification",
+    "mise en œuvre",
     "gouvernance",
+    "digitalisation ECC",
   ],
   openGraph: {
     type: "website",
@@ -42,7 +47,14 @@ export const metadata: Metadata = {
     siteName: SITE.name,
     title: SITE.title,
     description: SITE.description,
-    images: [{ url: "/og-image.svg", width: 1200, height: 630, alt: SITE.fullName }],
+    images: [
+      {
+        url: "/og-image.svg",
+        width: 1200,
+        height: 630,
+        alt: `${SITE.fullName} — ${SITE.processName}`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

@@ -1,0 +1,85 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.section {
+  position: relative;
+  overflow: hidden;
+  padding-block: 5.5rem 2.8rem;
+  background: transparent;
+  color: v.$color-white;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  &::before {
+    width: 25rem;
+    height: 25rem;
+    left: -12rem;
+    top: -14rem;
+    background: radial-gradient(circle, rgba(31, 133, 206, 0.28), transparent 70%);
+  }
+
+  &::after {
+    width: 24rem;
+    height: 24rem;
+    right: -10rem;
+    bottom: -15rem;
+    background: radial-gradient(circle, rgba(241, 233, 6, 0.1), transparent 70%);
+  }
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  max-width: 58rem;
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: v.$color-yellow;
+}
+
+.title {
+  margin-top: 0.62rem;
+  font-size: 2rem;
+  color: v.$color-white;
+
+  @include m.respond(sm) {
+    font-size: 2.65rem;
+  }
+}
+
+.text {
+  max-width: 50rem;
+  margin: 1.2rem auto 0;
+  font-size: 0.96rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.words {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.46rem 0.72rem;
+  margin-top: 2rem;
+  font-size: 0.69rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+  color: rgba(255, 255, 255, 0.7);
+
+  i {
+    color: v.$color-gold;
+    font-style: normal;
+  }
+}
