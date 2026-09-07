@@ -47,14 +47,15 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-RUN addgroup -g 1001 -S nodejs \
-    && adduser -S nextjs -u 1001
+# Utilisateur non-root dédié au projet CST.
+RUN addgroup -g 1001 -S cstgroup \
+    && adduser -S -D -H -u 1001 -G cstgroup cstuser
 
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=cstuser:cstgroup /app/.next/standalone ./
+COPY --from=builder --chown=cstuser:cstgroup /app/.next/static ./.next/static
 
-USER nextjs
+USER cstuser
 
 EXPOSE 3000
 
