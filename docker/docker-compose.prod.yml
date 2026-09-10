@@ -179,9 +179,7 @@ services:
       - .env.prod
 
     command: >
-      sh -c "celery -A config worker
-             --loglevel=info
-             --concurrency=$${CELERY_WORKER_CONCURRENCY:-2}"
+      sh -c "celery -A config worker --loglevel=info --concurrency=$${CELERY_WORKER_CONCURRENCY:-2}"
 
     volumes:
       - cst_media_data:/app/media
