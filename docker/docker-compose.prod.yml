@@ -168,38 +168,9 @@ services:
         condition: service_healthy
 
     command: >
-      sh -c "python manage.py collectstatic --noinput &&
-             exec gunicorn config.wsgi:application
-             --bind 0.0.0.0:8000
-             --workers 3
-             --timeout 120
-             --access-logfile -
-             --error-logfile -"
+      sh -c "python manage.py collectstatic --noinput && exec gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120 --access-logfile - --error-logfile -"
 
     restart: unless-stopped
-
-    security_opt:
-      - no-new-privileges:true
-
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "python",
-          "-c",
-          "import urllib.request; r=urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=5); raise SystemExit(0 if r.status == 200 else 1)"
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "5"
-
   cst_celery_worker:
     image: cst-backend:latest
     container_name: cst-celery-worker
