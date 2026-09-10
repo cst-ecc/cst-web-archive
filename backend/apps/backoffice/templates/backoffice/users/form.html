@@ -1,0 +1,55 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}{{ page_title }} — Back-office CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-form-page">
+  <a class="bo-back-link" href="{% url 'backoffice:user_list' %}">← Utilisateurs</a>
+  <span class="bo-eyebrow">Administration</span>
+  <h1>{{ page_title }}</h1>
+
+  <form method="post" class="bo-form bo-form--card" novalidate>
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="bo-field {% if field.field.widget.input_type == 'checkbox' %}bo-field--checkbox{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <small>{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+          <p class="bo-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="bo-button">{{ submit_label }}</button>
+  </form>
+
+  {% if managed_user %}
+    <div class="bo-secondary-card">
+      <h2>Accès du compte</h2>
+
+      {% if not managed_user.has_usable_password %}
+        <p>L'utilisateur n'a pas encore défini son mot de passe.</p>
+        <form method="post" action="{% url 'backoffice:user_resend_invitation' managed_user.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="bo-button bo-button--secondary">
+            Renvoyer l'invitation
+          </button>
+        </form>
+      {% endif %}
+
+      <form method="post" action="{% url 'backoffice:user_toggle_active' managed_user.pk %}">
+        {% csrf_token %}
+        {% if managed_user.is_active %}
+          <button type="submit" class="bo-danger-button">Suspendre le compte</button>
+        {% else %}
+          <button type="submit" class="bo-button">Réactiver le compte</button>
+        {% endif %}
+      </form>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

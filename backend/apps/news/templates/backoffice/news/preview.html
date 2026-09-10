@@ -1,0 +1,37 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Aperçu — {{ news.title }}{% endblock %}
+
+{% block content %}
+<article class="bo-news-preview">
+  {% if can_edit %}
+    <a class="bo-back-link" href="{% url 'backoffice:news_edit' news.pk %}">← Retour à l’édition</a>
+  {% else %}
+    <a class="bo-back-link" href="{% url 'backoffice:news_list' %}">← Retour aux actualités</a>
+  {% endif %}
+
+  <div class="bo-news-meta">
+    <span class="bo-status bo-status--{{ news.status }}">{{ news.get_status_display }}</span>
+    {% if news.publication_date %}
+      <time datetime="{{ news.publication_date|date:'Y-m-d' }}">
+        {{ news.publication_date|date:"d/m/Y" }}
+      </time>
+    {% endif %}
+  </div>
+
+  <h1>{{ news.title }}</h1>
+  <p class="bo-news-preview__excerpt">{{ news.excerpt }}</p>
+
+  {% if news.featured_image %}
+    <img
+      class="bo-news-preview__image"
+      src="{{ news.featured_image.url }}"
+      alt="{{ news.image_alt }}"
+    >
+  {% endif %}
+
+  <div class="bo-news-preview__content">
+    {{ news.content|linebreaks }}
+  </div>
+</article>
+{% endblock %}

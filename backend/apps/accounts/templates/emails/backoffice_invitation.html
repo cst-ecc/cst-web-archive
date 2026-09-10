@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Votre accès au back-office CST/CSMO</title>
+</head>
+<body style="margin:0;padding:0;background:#f3f6f9;font-family:Arial,Helvetica,sans-serif;color:#183247;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#f3f6f9;margin:0;padding:0;">
+    <tr>
+      <td align="center" style="padding:40px 16px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(17,53,79,.08);">
+          <tr>
+            <td style="height:7px;background:#e5b828;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+
+          <tr>
+            <td style="padding:34px 40px 18px;">
+              <div style="font-size:11px;line-height:16px;letter-spacing:1.7px;text-transform:uppercase;font-weight:700;color:#277fba;">
+                Église du Christianisme Céleste
+              </div>
+              <div style="margin-top:8px;font-size:22px;line-height:30px;font-weight:700;color:#0f4f79;">
+                CST / CSMO
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:8px 40px 30px;">
+              <h1 style="margin:0;font-size:28px;line-height:36px;font-weight:700;color:#17384f;">
+                Votre accès au back-office
+              </h1>
+
+              <p style="margin:18px 0 0;font-size:16px;line-height:26px;color:#5d7080;">
+                Bonjour{% if user.first_name %} {{ user.first_name }}{% endif %},
+              </p>
+
+              <p style="margin:12px 0 0;font-size:16px;line-height:26px;color:#5d7080;">
+                Un accès au back-office CST/CSMO vient de vous être attribué.
+                Définissez votre mot de passe pour activer votre accès.
+              </p>
+
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-top:26px;">
+                <tr>
+                  <td style="border-radius:10px;background:#0f4f79;">
+                    <a href="{{ setup_url }}" style="display:inline-block;padding:14px 22px;font-size:15px;line-height:20px;font-weight:700;color:#ffffff;text-decoration:none;">
+                      Définir mon mot de passe
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;margin-top:28px;border-left:3px solid #e5b828;background:#fffaf0;">
+                <tr>
+                  <td style="padding:14px 16px;font-size:13px;line-height:21px;color:#665936;">
+                    <strong>Sécurité :</strong> ne transférez pas ce lien.
+                    Après activation, chaque connexion sera protégée par un code OTP envoyé par e-mail.
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:24px 0 0;font-size:13px;line-height:21px;color:#718696;word-break:break-all;">
+                Si le bouton ne fonctionne pas, copiez cette adresse dans votre navigateur :<br>
+                <a href="{{ setup_url }}" style="color:#0f4f79;">{{ setup_url }}</a>
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:22px 40px 28px;background:#f8fafc;border-top:1px solid #e8eef3;">
+              <div style="font-size:12px;line-height:19px;color:#81919d;">
+                CST / CSMO — Église du Christianisme Céleste
+              </div>
+              <div style="margin-top:4px;font-size:11px;line-height:18px;color:#9aa7b1;">
+                Message automatique — merci de ne pas répondre.
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

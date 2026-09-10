@@ -1,0 +1,83 @@
+name: Deploy CST Frontend
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+concurrency:
+  group: cst-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy CST to VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prepare SSH
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          echo "${{ secrets.CST_VPS_SSH_KEY }}" > ~/.ssh/cst_vps_key
+          chmod 600 ~/.ssh/cst_vps_key
+
+          ssh-keyscan -p "${{ secrets.CST_VPS_PORT }}" -H "${{ secrets.CST_VPS_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy on VPS
+        run: |
+          ssh \
+            -i ~/.ssh/cst_vps_key \
+            -p "${{ secrets.CST_VPS_PORT }}" \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            "${{ secrets.CST_VPS_USER }}@${{ secrets.CST_VPS_HOST }}" <<'REMOTE'
+          set -euo pipefail
+
+          APP_DIR="/home/eccops/apps/cst-website"
+          COMPOSE_FILE="docker-compose.prod.yml"
+          ENV_FILE=".env.prod"
+
+          echo "[CST DEPLOY] Starting deployment..."
+
+          cd "${APP_DIR}"
+
+          echo "[CST DEPLOY] Current branch:"
+          git branch --show-current
+
+          echo "[CST DEPLOY] Fetching latest code..."
+          git fetch origin main
+
+          echo "[CST DEPLOY] Resetting to origin/main..."
+          git reset --hard origin/main
+
+          echo "[CST DEPLOY] Verifying production env file..."
+          test -f "docker/${ENV_FILE}"
+
+          echo "[CST DEPLOY] Checking Docker Compose config..."
+          cd docker
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config > /dev/null
+
+          echo "[CST DEPLOY] Building cst_frontend only..."
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" build cst_frontend
+
+          echo "[CST DEPLOY] Restarting cst_frontend only..."
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --no-deps cst_frontend
+
+          echo "[CST DEPLOY] Waiting for healthcheck..."
+          sleep 10
+
+          echo "[CST DEPLOY] Container status:"
+          docker ps --filter "name=cst-frontend"
+
+          echo "[CST DEPLOY] Testing local Docker network access from ecc-shield..."
+          docker exec ecc-shield wget -S -O /dev/null http://cst-frontend:3000 2>&1 | head -40
+
+          echo "[CST DEPLOY] Testing public HTTPS..."
+          curl -fsSI https://cst.ecc.bj > /dev/null
+
+          echo "[CST DEPLOY] Deployment completed successfully."
+          REMOTE

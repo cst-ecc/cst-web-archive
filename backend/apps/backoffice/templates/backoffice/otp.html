@@ -1,0 +1,34 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Vérification — Back-office CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-auth-card" aria-labelledby="otp-title">
+  <div class="bo-brand">
+    <span class="bo-eyebrow">Vérification en deux étapes</span>
+    <h1 id="otp-title">Saisissez votre code</h1>
+    <p>Un code temporaire a été envoyé à <strong>{{ email_hint }}</strong>.</p>
+  </div>
+
+  {% if can_verify %}
+    <form method="post" class="bo-form" novalidate>
+      {% csrf_token %}
+      <div class="bo-field">
+        <label for="{{ form.code.id_for_label }}">{{ form.code.label }}</label>
+        {{ form.code }}
+        {% for error in form.code.errors %}
+          <p class="bo-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+      <button type="submit" class="bo-button">Vérifier le code</button>
+    </form>
+  {% endif %}
+
+  <form method="post" action="{% url 'backoffice:otp_resend' %}" class="bo-resend-form">
+    {% csrf_token %}
+    <button type="submit" class="bo-link-button">Renvoyer un code</button>
+  </form>
+
+  <a href="{% url 'backoffice:login' %}" class="bo-back-link">← Recommencer la connexion</a>
+</section>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Aperçu — {{ album.title }}{% endblock %}
+
+{% block content %}
+<article class="bo-gallery-preview">
+  {% if can_edit %}
+    <a class="bo-back-link" href="{% url 'backoffice:gallery_edit' album.pk %}">← Retour à l’édition</a>
+  {% else %}
+    <a class="bo-back-link" href="{% url 'backoffice:gallery_list' %}">← Retour à la galerie</a>
+  {% endif %}
+
+  <div class="bo-news-meta">
+    <span class="bo-status bo-status--{{ album.status }}">{{ album.get_status_display }}</span>
+    <time datetime="{{ album.date|date:'Y-m-d' }}">
+      {{ album.date|date:"d/m/Y" }}
+    </time>
+  </div>
+
+  <h1>{{ album.title }}</h1>
+  {% if album.description %}
+    <p class="bo-news-preview__excerpt">{{ album.description }}</p>
+  {% endif %}
+
+  <div class="bo-gallery-preview-grid">
+    {% for image in album.images.all %}
+      <figure>
+        <img src="{{ image.image.url }}" alt="{{ image.alt }}">
+        {% if image.title %}
+          <figcaption>{{ image.title }}</figcaption>
+        {% endif %}
+      </figure>
+    {% empty %}
+      <p class="bo-empty">Aucune image dans cet album.</p>
+    {% endfor %}
+  </div>
+</article>
+{% endblock %}

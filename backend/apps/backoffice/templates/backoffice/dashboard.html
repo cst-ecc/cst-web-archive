@@ -1,0 +1,65 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Tableau de bord — CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head">
+    <div>
+      <span class="bo-eyebrow">Back-office CST / CSMO</span>
+      <h1>Tableau de bord</h1>
+      <p>Votre session est protégée par une authentification à deux facteurs.</p>
+    </div>
+
+    <form method="post" action="{% url 'backoffice:logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="bo-btn bo-btn--soft">
+        Se déconnecter
+      </button>
+    </form>
+  </header>
+
+  <div class="bo-grid bo-grid--cards">
+    {% if perms.news.view_news %}
+      <a class="bo-module-card" href="{% url 'backoffice:news_list' %}">
+        <span>Contenus</span>
+        <strong>Actualités</strong>
+        <em>Créer, préparer, valider et publier les actualités.</em>
+      </a>
+    {% endif %}
+
+    {% if perms.gallery.view_galleryalbum %}
+      <a class="bo-module-card" href="{% url 'backoffice:gallery_list' %}">
+        <span>Médias</span>
+        <strong>Galerie</strong>
+        <em>Créer des albums, importer plusieurs images et publier.</em>
+      </a>
+    {% endif %}
+
+    {% if request.user.is_superuser %}
+      <a class="bo-module-card" href="{% url 'backoffice:user_list' %}">
+        <span>Administration</span>
+        <strong>Utilisateurs</strong>
+        <em>Créer, inviter, modifier ou suspendre les accès.</em>
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="bo-card bo-card--compact">
+    <dl class="bo-definition-list">
+      <div>
+        <dt>Utilisateur</dt>
+        <dd>{{ request.user.email }}</dd>
+      </div>
+      <div>
+        <dt>Rôle</dt>
+        <dd>{{ role_label }}</dd>
+      </div>
+      <div>
+        <dt>Authentification</dt>
+        <dd>Mot de passe + OTP vérifié</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+{% endblock %}

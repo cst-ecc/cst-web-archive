@@ -1,8 +1,11 @@
 # =============================================================
-# Docker Compose — Développement CST
+# Docker Compose — Développement CST / CSMO
 #
-# Développement local uniquement.
-# Expose le port 3000 sur la machine locale.
+# Objectif Étape 2B :
+# - conserver le frontend Next.js existant ;
+# - ajouter Django + PostgreSQL ;
+# - utiliser docker/nginx comme gateway CST local ;
+# - ne dépendre d'aucun service du projet de recensement en local.
 # =============================================================
 
 name: cst_website_dev
@@ -14,7 +17,6 @@ services:
       dockerfile: Dockerfile.dev
 
     container_name: cst-frontend-dev
-
     working_dir: /app
 
     ports:
@@ -34,7 +36,188 @@ services:
       - ../frontend:/app
       - frontend_node_modules:/app/node_modules
 
+    networks:
+      cst_internal:
+        aliases:
+          - cst-frontend
+
     restart: unless-stopped
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  cst_db_dev:
+    image: postgres:16-alpine
+    container_name: cst-db-dev
+
+    env_file:
+      - .env.dev
+
+    # Accès local facultatif pour un client PostgreSQL.
+    # Le binding sur 127.0.0.1 empêche une exposition réseau externe.
+    ports:
+      - "127.0.0.1:5433:5432"
+
+    volumes:
+      - cst_postgres_data:/var/lib/postgresql/data
+
+    networks:
+      cst_internal:
+        aliases:
+          - cst-db
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  cst_backend_dev:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+
+    image: cst-backend-dev:latest
+    container_name: cst-backend-dev
+    working_dir: /app
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - .env.dev
+
+    volumes:
+      - ../backend:/app
+      - cst_media_data:/app/media
+      - cst_static_data:/app/staticfiles
+
+    networks:
+      cst_internal:
+        aliases:
+          - cst-backend
+
+    depends_on:
+      cst_db_dev:
+        condition: service_healthy
+
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; r=urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=5); raise SystemExit(0 if r.status == 200 else 1)"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  cst_gateway_dev:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+
+    image: cst-gateway-dev:latest
+    container_name: cst-gateway-dev
+
+    ports:
+      - "8080:8080"
+
+    volumes:
+      - cst_media_data:/srv/cst/media:ro
+      - cst_static_data:/srv/cst/static:ro
+
+    networks:
+      cst_internal:
+        aliases:
+          - cst-gateway
+
+    depends_on:
+      cst_frontend_dev:
+        condition: service_healthy
+      cst_backend_dev:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/gateway-health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+ 
+  cst_redis:
+    image: redis:7-alpine
+    container_name: cst_redis_dev
+    command: redis-server --appendonly yes
+    volumes:
+      - cst_redis_data:/data
+    networks:
+      cst_internal:
+        aliases:
+          - cst-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  cst_celery_worker_dev:
+    build:
+      context: ../backend
+    container_name: cst_celery_worker_dev
+    command: celery -A config worker --loglevel=info --concurrency=2
+    env_file:
+      - .env.dev
+    depends_on:
+      cst_redis:
+        condition: service_healthy
+      cst_backend_dev:
+        condition: service_started
+    volumes:
+      - ../backend:/app
+      - cst_media_data:/app/media
+      - cst_static_data:/app/staticfiles
+    networks:
+      cst_internal:
+        aliases:
+          - cst-celery-worker
 
 volumes:
   frontend_node_modules:
+  cst_postgres_data:
+  cst_media_data:
+  cst_static_data:
+  cst_redis_data:
+
+networks:
+  cst_internal:
+    driver: bridge

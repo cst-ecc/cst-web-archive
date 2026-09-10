@@ -88,7 +88,11 @@ export interface NewsItem {
   date: string;
   excerpt: string;
   imageUrl: string;
+  /** Texte alternatif de l’image, si différent du titre. */
+  imageAlt?: string;
   content: string; // texte simple (paragraphes séparés par \n\n)
+  /** Permet de choisir explicitement une actualité mise en avant. */
+  featured?: boolean;
   status: PublicationStatus;
   relatedDocumentSlugs?: string[];
 }
@@ -97,6 +101,11 @@ export interface GalleryImage {
   id: number;
   title: string;
   imageUrl: string;
+  /** Texte alternatif descriptif de la photographie. */
+  alt?: string;
+  /** Dimensions utiles au rendu masonry et à Next/Image. */
+  width?: number;
+  height?: number;
 }
 
 export interface GalleryAlbum {

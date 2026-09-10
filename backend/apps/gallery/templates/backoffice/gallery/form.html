@@ -1,0 +1,131 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}{{ page_title }} — Back-office CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-form-page bo-form-page--wide">
+  <a class="bo-back-link" href="{% url 'backoffice:gallery_list' %}">← Galerie</a>
+  <span class="bo-eyebrow">Médias</span>
+  <h1>{{ page_title }}</h1>
+
+  {% if album %}
+    <div class="bo-toolbar">
+      <div class="bo-toolbar__meta">
+        <span class="bo-status bo-status--{{ album.status }}">{{ album.get_status_display }}</span>
+        <span>Slug : <code>{{ album.slug }}</code></span>
+        <a href="{% url 'backoffice:gallery_preview' album.pk %}">Voir l’aperçu</a>
+      </div>
+
+      {% if workflow_actions %}
+        <div class="bo-toolbar__actions">
+          {% for action in workflow_actions %}
+            <form method="post" action="{% url 'backoffice:gallery_transition' album.pk action.value %}">
+              {% csrf_token %}
+              <button type="submit" class="bo-btn {% if action.value == 'publish' %}{% else %}bo-btn--soft{% endif %}">
+                {% for key, label in action_labels.items %}
+                  {% if key == action %}{{ label }}{% endif %}
+                {% endfor %}
+              </button>
+            </form>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="bo-form bo-form--card" novalidate>
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="bo-field {% if field.name == 'featured' %}bo-field--checkbox{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+        {% if field.name == "cover_image" and album and album.cover_image %}
+          <div class="bo-current-image">
+            <span>Couverture actuelle</span>
+            <img src="{{ album.cover_image.url }}" alt="{{ album.cover_alt }}">
+            <small>Elle sera conservée si vous ne choisissez pas une nouvelle couverture.</small>
+          </div>
+        {% endif %}
+
+        {{ field }}
+
+        {% if field.help_text %}
+          <small class="bo-help">{{ field.help_text }}</small>
+        {% endif %}
+
+        {% for error in field.errors %}
+          <p class="bo-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+
+    {% for error in form.non_field_errors %}
+      <p class="bo-error">{{ error }}</p>
+    {% endfor %}
+
+    <button type="submit" class="bo-btn">{{ submit_label }}</button>
+  </form>
+
+  {% if album %}
+    <section class="bo-card bo-gallery-upload">
+      <h2>Images de l’album</h2>
+      <p>
+        Sélection multiple autorisée. Les fichiers sont envoyés en petits morceaux,
+        puis compressés en arrière-plan.
+      </p>
+
+      <div
+        class="bo-chunk-uploader"
+        data-gallery-chunk-uploader
+        data-start-url="{% url 'backoffice:gallery_upload_start' album.pk %}"
+        data-csrf-token="{{ csrf_token }}"
+        data-chunk-size="{{ gallery_chunk_size_bytes }}"
+        data-chunk-size-mb="{{ gallery_chunk_size_mb }}"
+        data-max-file-mb="{{ gallery_max_file_mb }}"
+        data-max-files="{{ gallery_max_files }}"
+      >
+        <div class="bo-field">
+          <label for="gallery-chunk-files">Ajouter des images</label>
+          <input
+            id="gallery-chunk-files"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            data-gallery-files
+          >
+          <small class="bo-help">
+            {{ gallery_max_file_mb }} Mo maximum par image avant compression.
+            Les envois se font par morceaux de {{ gallery_chunk_size_mb }} Mo.
+          </small>
+        </div>
+
+        <button type="button" class="bo-btn bo-btn--soft" data-gallery-upload-button>
+          Uploader les images
+        </button>
+
+        <div class="bo-upload-list" data-gallery-upload-list aria-live="polite"></div>
+      </div>
+
+      <div class="bo-gallery-grid">
+        {% for image in album.images.all %}
+          <article class="bo-gallery-tile">
+            <img src="{{ image.image.url }}" alt="{{ image.alt }}">
+            <div>
+              <strong>{{ image.title|default:"Image" }}</strong>
+              <span>{{ image.width }}×{{ image.height }} · {{ image.file_size|filesizeformat }}</span>
+            </div>
+
+            <form method="post" action="{% url 'backoffice:gallery_image_delete' image.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="bo-link-button">Supprimer</button>
+            </form>
+          </article>
+        {% empty %}
+          <p class="bo-empty">Aucune image n’a encore été ajoutée.</p>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+</section>
+{% endblock %}

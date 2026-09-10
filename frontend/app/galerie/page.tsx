@@ -7,15 +7,21 @@ import styles from "../pages.module.scss";
 
 export const metadata: Metadata = {
   title: "Galerie",
-  description: "Photographies des sessions et travaux du Conseil Supérieur de Transition.",
+  description:
+    "Mémoire visuelle des sessions, rencontres et moments marquants du processus CST et CSMO.",
 };
 export const revalidate = 300;
 
 export default async function GaleriePage() {
   const albums = await getAlbums();
+
   return (
     <>
-      <PageHeader eyebrow="Mémoire visuelle" title="Galerie" subtitle="Images des sessions et moments marquants du processus." />
+      <PageHeader
+        eyebrow="Mémoire visuelle"
+        title="Galerie"
+        subtitle="Images des sessions, rencontres et moments marquants de la Grande Marche vers l’Unité."
+      />
       <Container className={styles.section}>
         <Gallery albums={albums} />
       </Container>

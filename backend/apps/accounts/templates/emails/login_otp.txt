@@ -1,0 +1,23 @@
+CST / CSMO
+Église du Christianisme Céleste
+
+VOTRE CODE DE CONNEXION
+
+Bonjour,
+
+Une connexion au back-office CST/CSMO a été initiée avec votre adresse e-mail.
+
+Votre code de vérification est :
+
+{{ code }}
+
+Ce code expire dans {{ expiry_minutes }} minute(s) et ne peut être utilisé qu'une seule fois.
+
+Ne communiquez jamais ce code à une autre personne. Aucun administrateur ne vous demandera de lui transmettre votre code de vérification.
+
+Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer ce message.
+
+CST / CSMO
+Église du Christianisme Céleste
+
+Message automatique — merci de ne pas répondre.

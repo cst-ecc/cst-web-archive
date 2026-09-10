@@ -24,7 +24,7 @@ export default function CategoriesGrid() {
 
         <div className={styles.layout}>
           <div className={styles.imageWrap}>
-            <Image src="/images/home/categories-main.svg" alt="Processus institutionnel CST et CSMO" fill sizes="(max-width:1024px) 100vw, 40vw" className={styles.image} />
+            <Image src="/images/home/categories-main.jpg" alt="Processus institutionnel CST et CSMO" fill sizes="(max-width:1024px) 100vw, 40vw" className={styles.image} />
             <div className={styles.imageCaption}>
               <span>Une même foi</span>
               <strong>Une même Église</strong>

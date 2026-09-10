@@ -1,39 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import Container from "@/components/layout/Container";
+import { HERO_SLIDES } from "@/lib/home";
 import styles from "./Hero.module.scss";
-
-const SLIDES = [
-  {
-    eyebrow: "La grande marche vers l’unité",
-    title: "CST & CSMO — de la transition à la mise en œuvre",
-    lead:
-      "Une même dynamique au service de l’unité, de la gouvernance et de l’avenir de l’Église du Christianisme Céleste.",
-    primary: { label: "Comprendre le processus", href: "#processus" },
-    secondary: { label: "Découvrir le CST", href: "/presentation" },
-    tone: "unity",
-  },
-  {
-    eyebrow: "Conseil Supérieur de Transition",
-    title: "Préparer le cadre de la réunification",
-    lead:
-      "Dialogue, harmonisation, consolidation des textes et préparation d’une gouvernance commune : le CST a conduit la phase de transition.",
-    primary: { label: "Découvrir le CST", href: "/presentation" },
-    secondary: { label: "Voir le passage à la mise en œuvre", href: "#processus" },
-    tone: "cst",
-  },
-  {
-    eyebrow: "Conseil Supérieur de Mise en Œuvre",
-    title: "Transformer les orientations en actions",
-    lead:
-      "Le CSMO accompagne désormais la mise en œuvre, l’appropriation des orientations retenues et la préparation progressive des institutions définitives.",
-    primary: { label: "Comprendre le CSMO", href: "#processus" },
-    secondary: { label: "Voir la digitalisation", href: "#digitalisation" },
-    tone: "csmo",
-  },
-] as const;
 
 export default function Hero() {
   const [active, setActive] = useState(0);
@@ -51,17 +23,23 @@ export default function Hero() {
 
   useEffect(() => {
     if (userPaused || interactionPaused || reducedMotion) return;
+
     const timer = window.setInterval(() => {
-      setActive((current) => (current + 1) % SLIDES.length);
+      setActive((current) => (current + 1) % HERO_SLIDES.length);
     }, 7000);
+
     return () => window.clearInterval(timer);
   }, [userPaused, interactionPaused, reducedMotion]);
 
-  const slide = SLIDES[active];
+  const slide = HERO_SLIDES[active];
 
   const goTo = (index: number) => setActive(index);
-  const previous = () => setActive((active - 1 + SLIDES.length) % SLIDES.length);
-  const next = () => setActive((active + 1) % SLIDES.length);
+  const previous = () =>
+    setActive((current) =>
+      (current - 1 + HERO_SLIDES.length) % HERO_SLIDES.length,
+    );
+  const next = () =>
+    setActive((current) => (current + 1) % HERO_SLIDES.length);
 
   return (
     <section
@@ -79,11 +57,32 @@ export default function Hero() {
         }
       }}
     >
-      <div className={styles.overlay} aria-hidden />
-      <div className={styles.glow} aria-hidden />
+      <div className={styles.backgrounds} aria-hidden="true">
+        {HERO_SLIDES.map((item, index) => (
+          <Image
+            key={item.backgroundImage}
+            src={item.backgroundImage}
+            alt=""
+            fill
+            priority={index === 0}
+            sizes="100vw"
+            className={`${styles.backgroundImage} ${
+              index === active ? styles.backgroundImageActive : ""
+            }`}
+          />
+        ))}
+      </div>
+
+      <div className={styles.overlay} aria-hidden="true" />
+      <div className={styles.glow} aria-hidden="true" />
 
       <Container className={styles.inner}>
-        <div key={active} className={styles.slideContent} aria-live="polite">
+        <div
+          key={active}
+          className={styles.slideContent}
+          aria-live="polite"
+          aria-atomic="true"
+        >
           <span className={styles.institution}>{slide.eyebrow}</span>
           <h1 className={styles.title}>{slide.title}</h1>
           <p className={styles.lead}>{slide.lead}</p>
@@ -91,7 +90,11 @@ export default function Hero() {
             <Button href={slide.primary.href} variant="yellow">
               {slide.primary.label}
             </Button>
-            <Button href={slide.secondary.href} variant="outline" className={styles.outlineLight}>
+            <Button
+              href={slide.secondary.href}
+              variant="outline"
+              className={styles.outlineLight}
+            >
               {slide.secondary.label}
             </Button>
           </div>
@@ -99,16 +102,23 @@ export default function Hero() {
       </Container>
 
       <div className={styles.controls}>
-        <button type="button" className={styles.arrow} onClick={previous} aria-label="Diapositive précédente">
+        <button
+          type="button"
+          className={styles.arrow}
+          onClick={previous}
+          aria-label="Diapositive précédente"
+        >
           <span aria-hidden>←</span>
         </button>
 
         <div className={styles.dots} aria-label="Choisir une diapositive">
-          {SLIDES.map((item, index) => (
+          {HERO_SLIDES.map((item, index) => (
             <button
               key={item.eyebrow}
               type="button"
-              className={`${styles.dot} ${index === active ? styles.dotActive : ""}`}
+              className={`${styles.dot} ${
+                index === active ? styles.dotActive : ""
+              }`}
               onClick={() => goTo(index)}
               aria-label={`Afficher la diapositive ${index + 1}`}
               aria-current={index === active ? "true" : undefined}
@@ -116,7 +126,12 @@ export default function Hero() {
           ))}
         </div>
 
-        <button type="button" className={styles.arrow} onClick={next} aria-label="Diapositive suivante">
+        <button
+          type="button"
+          className={styles.arrow}
+          onClick={next}
+          aria-label="Diapositive suivante"
+        >
           <span aria-hidden>→</span>
         </button>
 
@@ -124,7 +139,11 @@ export default function Hero() {
           type="button"
           className={styles.pause}
           onClick={() => setUserPaused((value) => !value)}
-          aria-label={userPaused ? "Reprendre le défilement automatique" : "Mettre le carousel en pause"}
+          aria-label={
+            userPaused
+              ? "Reprendre le défilement automatique"
+              : "Mettre le carousel en pause"
+          }
         >
           {userPaused ? "Lecture" : "Pause"}
         </button>

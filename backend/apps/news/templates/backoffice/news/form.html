@@ -1,0 +1,84 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}{{ page_title }} — Back-office CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-form-page bo-form-page--wide">
+  <a class="bo-back-link" href="{% url 'backoffice:news_list' %}">← Actualités</a>
+  <span class="bo-eyebrow">Contenus</span>
+  <h1>{{ page_title }}</h1>
+
+  {% if news %}
+    <div class="bo-toolbar">
+      <div class="bo-toolbar__meta">
+        <span class="bo-status bo-status--{{ news.status }}">{{ news.get_status_display }}</span>
+        <span>Slug : <code>{{ news.slug }}</code></span>
+        <a href="{% url 'backoffice:news_preview' news.pk %}">Voir l’aperçu</a>
+      </div>
+
+      {% if workflow_actions %}
+        <div class="bo-toolbar__actions">
+          {% for action in workflow_actions %}
+            <form
+              method="post"
+              action="{% url 'backoffice:news_transition' news.pk action.value %}"
+            >
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="bo-btn {% if action.value == 'publish' %}{% elif action.value == 'archive' %}bo-btn--soft{% else %}bo-btn--soft{% endif %}"
+              >
+                {% for key, label in action_labels.items %}
+                  {% if key == action %}{{ label }}{% endif %}
+                {% endfor %}
+              </button>
+            </form>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="bo-form bo-form--card" novalidate>
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="bo-field {% if field.name == 'featured' %}bo-field--checkbox{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+        {% if field.name == "featured_image" and news and news.featured_image %}
+          <div class="bo-current-image">
+            <span>Image actuelle</span>
+            <img src="{{ news.featured_image.url }}" alt="{{ news.image_alt }}">
+            <small>
+              Cette image sera conservée si vous ne choisissez pas un nouveau fichier.
+            </small>
+          </div>
+        {% endif %}
+
+        {{ field }}
+
+        {% if field.name == "featured_image" %}
+          <small class="bo-help">
+            Formats acceptés : JPG, PNG, WEBP. Taille maximale avant compression : 30 Mo.
+          </small>
+        {% endif %}
+
+        {% if field.help_text %}
+          <small class="bo-help">{{ field.help_text }}</small>
+        {% endif %}
+
+        {% for error in field.errors %}
+          <p class="bo-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+
+    {% for error in form.non_field_errors %}
+      <p class="bo-error">{{ error }}</p>
+    {% endfor %}
+
+    <button type="submit" class="bo-btn">{{ submit_label }}</button>
+  </form>
+</section>
+{% endblock %}

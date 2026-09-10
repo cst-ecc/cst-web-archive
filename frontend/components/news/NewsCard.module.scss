@@ -10,14 +10,26 @@
   overflow: hidden;
 }
 
+.imageLink {
+  display: block;
+  overflow: hidden;
+}
+
 .imageWrap {
   position: relative;
   aspect-ratio: 16 / 9;
   background: v.$color-surface-muted;
+  overflow: hidden;
 }
 
 .image {
   object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+.imageLink:hover .image,
+.imageLink:focus-visible .image {
+  transform: scale(1.035);
 }
 
 .body {
@@ -36,7 +48,7 @@
 }
 
 .title {
-  margin-top: 0.25rem;
+  margin-top: 0.3rem;
   font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.4;
@@ -44,16 +56,36 @@
 }
 
 .titleLink {
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: v.$color-blue;
   }
 }
 
 .excerpt {
-  margin-top: 0.5rem;
+  margin-top: 0.55rem;
   font-size: 0.875rem;
   color: rgba(17, 24, 39, 0.7);
   @include m.line-clamp(3);
+}
+
+.readMore {
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: v.$color-blue;
+  transition: color 0.2s ease, gap 0.2s ease;
+
+  &:hover {
+    color: v.$color-blue-deep;
+    gap: 0.6rem;
+  }
 }

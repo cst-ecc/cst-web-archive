@@ -5,7 +5,7 @@ import styles from "./ActionCards.module.scss";
 
 const cards = [
   {
-    image: "/images/home/action-reunion.svg",
+    image: "/images/home/action-reunion.jpg",
     alt: "Transition et réunification",
     tag: "CST",
     title: "Transition & consolidation",
@@ -15,7 +15,7 @@ const cards = [
     external: false,
   },
   {
-    image: "/images/home/action-gouvernance.svg",
+    image: "/images/home/action-gouvernance.jpg",
     alt: "Mise en œuvre",
     tag: "CSMO",
     title: "Mise en œuvre & suivi",
@@ -25,7 +25,7 @@ const cards = [
     external: false,
   },
   {
-    image: "/images/home/action-reforme.svg",
+    image: "/images/home/action-reforme.jpg",
     alt: "Digitalisation de l’ECC",
     tag: "DIGECC",
     title: "Digitalisation de l’ECC",

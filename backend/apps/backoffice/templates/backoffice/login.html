@@ -1,0 +1,39 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Connexion — Back-office CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-auth-card" aria-labelledby="login-title">
+  <div class="bo-brand">
+    <span class="bo-eyebrow">CST / CSMO</span>
+    <h1 id="login-title">Accès au back-office</h1>
+    <p>Connectez-vous avec votre adresse e-mail et votre mot de passe.</p>
+  </div>
+
+  <form method="post" class="bo-form" novalidate>
+    {% csrf_token %}
+
+    <div class="bo-field">
+      <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+      {{ form.email }}
+      {% for error in form.email.errors %}
+        <p class="bo-error">{{ error }}</p>
+      {% endfor %}
+    </div>
+
+    <div class="bo-field">
+      <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+      {{ form.password }}
+      {% for error in form.password.errors %}
+        <p class="bo-error">{{ error }}</p>
+      {% endfor %}
+    </div>
+
+    <button type="submit" class="bo-button">Continuer</button>
+  </form>
+
+  <p class="bo-security-note">
+    Une vérification par code e-mail sera demandée après validation du mot de passe.
+  </p>
+</section>
+{% endblock %}

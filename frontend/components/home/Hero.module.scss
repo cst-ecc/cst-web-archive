@@ -8,12 +8,31 @@
   max-height: 860px;
   overflow: hidden;
   background-color: v.$color-blue-ink;
-  background-image: url("/images/home/hero-bg.jpeg");
-  background-size: cover;
-  background-position: center top;
   display: flex;
   flex-direction: column;
   isolation: isolate;
+}
+
+.backgrounds {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  overflow: hidden;
+  background: v.$color-blue-ink;
+}
+
+.backgroundImage {
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0;
+  transform: scale(1.035);
+  transition: opacity 0.8s ease, transform 7s ease;
+  will-change: opacity, transform;
+}
+
+.backgroundImageActive {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .overlay {
@@ -206,5 +225,12 @@
 
   .pause {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backgroundImage {
+    transform: none;
+    transition: opacity 0.01ms linear;
   }
 }

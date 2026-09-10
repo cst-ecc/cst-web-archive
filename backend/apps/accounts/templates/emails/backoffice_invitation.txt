@@ -1,0 +1,24 @@
+CST / CSMO
+Église du Christianisme Céleste
+
+VOTRE ACCÈS AU BACK-OFFICE
+
+Bonjour{% if user.first_name %} {{ user.first_name }}{% endif %},
+
+Un accès au back-office CST/CSMO vient de vous être attribué.
+
+Pour activer votre compte et définir votre mot de passe, ouvrez le lien suivant :
+
+{{ setup_url }}
+
+Pour votre sécurité :
+- ne transférez pas ce lien ;
+- choisissez un mot de passe personnel et robuste ;
+- la connexion au back-office sera ensuite protégée par un code OTP envoyé par e-mail.
+
+Si vous ne vous attendiez pas à recevoir cette invitation, contactez l'administrateur du CST/CSMO.
+
+CST / CSMO
+Église du Christianisme Céleste
+
+Message automatique — merci de ne pas répondre.

@@ -1,9 +1,10 @@
 # =============================================================
-# Docker Compose — Production CST
+# Docker Compose — Production CST / CSMO
 #
-# À utiliser uniquement en production.
-# Ne pas exposer le port 3000 publiquement.
-# Le trafic public passe par le reverse proxy existant ecc-shield.
+# Étape 2B : le gateway CST est ajouté EN PARALLÈLE.
+# Le frontend reste temporairement raccordé à ecc_proxy_network afin que
+# l'upstream actuel d'ecc-shield (cst-frontend:3000) continue de fonctionner
+# jusqu'à la bascule volontaire vers cst-gateway:8080.
 # =============================================================
 
 name: cst_website
@@ -21,8 +22,6 @@ services:
     image: cst-frontend:latest
     container_name: cst-frontend
 
-    restart: unless-stopped
-
     env_file:
       - .env.prod
 
@@ -36,7 +35,16 @@ services:
       - "3000"
 
     networks:
-      - ecc_proxy_network
+      cst_internal:
+        aliases:
+          - cst-frontend
+      # TRANSITION : maintenir ce raccordement tant que ecc-shield pointe
+      # directement vers cst-frontend:3000.
+      ecc_proxy_network:
+        aliases:
+          - cst-frontend
+
+    restart: unless-stopped
 
     security_opt:
       - no-new-privileges:true
@@ -60,7 +68,196 @@ services:
         max-size: "10m"
         max-file: "5"
 
+  cst_db:
+    image: postgres:16-alpine
+    container_name: cst-db
+
+    env_file:
+      - .env.prod
+
+    volumes:
+      - cst_postgres_data:/var/lib/postgresql/data
+
+    networks:
+      cst_internal:
+        aliases:
+          - cst-db
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  cst_backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+
+    image: cst-backend:latest
+    container_name: cst-backend
+
+    env_file:
+      - .env.prod
+
+    expose:
+      - "8000"
+
+    volumes:
+      - cst_media_data:/app/media
+      - cst_static_data:/app/staticfiles
+
+    networks:
+      cst_internal:
+        aliases:
+          - cst-backend
+
+    depends_on:
+      cst_db:
+        condition: service_healthy
+
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             exec gunicorn config.wsgi:application
+             --bind 0.0.0.0:8000
+             --workers 3
+             --timeout 120
+             --access-logfile -
+             --error-logfile -"
+
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; r=urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=5); raise SystemExit(0 if r.status == 200 else 1)"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  cst_gateway:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+
+    image: cst-gateway:latest
+    container_name: cst-gateway
+
+    expose:
+      - "8080"
+
+    volumes:
+      - cst_media_data:/srv/cst/media:ro
+      - cst_static_data:/srv/cst/static:ro
+
+    networks:
+      cst_internal:
+        aliases:
+          - cst-gateway
+      ecc_proxy_network:
+        aliases:
+          - cst-gateway
+
+    depends_on:
+      cst_frontend:
+        condition: service_healthy
+      cst_backend:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/gateway-health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  cst_redis:
+    image: redis:7-alpine
+    container_name: cst_redis_dev
+    command: redis-server --appendonly yes
+    volumes:
+      - cst_redis_data:/data
+    networks:
+      cst_internal:
+        aliases:
+          - cst-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  cst_celery_worker_dev:
+    build:
+      context: ../backend
+    container_name: cst_celery_worker_dev
+    command: celery -A config worker --loglevel=info --concurrency=2
+    env_file:
+      - .env.dev
+    depends_on:
+      cst_redis:
+        condition: service_healthy
+      cst_backend_dev:
+        condition: service_started
+    volumes:
+      - ../backend:/app
+      - cst_media_data:/app/media
+      - cst_static_data:/app/staticfiles
+    networks:
+      cst_internal:
+        aliases:
+          - cst-celery-worker
+
+volumes:
+  cst_postgres_data:
+    name: cst_website_postgres_data
+  cst_media_data:
+    name: cst_website_media_data
+  cst_redis_data:
+    name: cst_website_redis_data
+  cst_static_data:
+    name: cst_website_static_data
+
 networks:
+  cst_internal:
+    name: cst_website_internal
+    driver: bridge
+
+  # Réseau de liaison uniquement avec le reverse proxy actuellement en place.
   ecc_proxy_network:
     external: true
     name: ecc2026_ecc_network

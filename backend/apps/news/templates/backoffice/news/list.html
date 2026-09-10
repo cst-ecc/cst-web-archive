@@ -1,0 +1,113 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Actualités — Back-office CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head">
+    <div>
+      <a class="bo-back-link" href="{% url 'backoffice:dashboard' %}">← Tableau de bord</a>
+      <span class="bo-eyebrow">Contenus</span>
+      <h1>Actualités</h1>
+      <p>Préparer, valider et publier les actualités du CST / CSMO.</p>
+    </div>
+
+    {% if perms.news.add_news %}
+      <a href="{% url 'backoffice:news_create' %}" class="bo-btn">
+        Nouvelle actualité
+      </a>
+    {% endif %}
+  </header>
+
+  <form method="get" class="bo-news-filters" data-auto-submit-filter>
+    <input
+      type="search"
+      name="q"
+      value="{{ query }}"
+      placeholder="Rechercher une actualité"
+      aria-label="Rechercher une actualité"
+    >
+
+    <select name="status" aria-label="Filtrer par statut">
+      <option value="">Tous les statuts</option>
+      {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+          {{ label }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <noscript>
+      <button type="submit" class="bo-btn bo-btn--soft">Filtrer</button>
+    </noscript>
+  </form>
+
+  <div class="bo-table-wrap">
+    <table class="bo-table">
+      <thead>
+        <tr>
+          <th>Actualité</th>
+          <th>Statut</th>
+          <th>Auteur</th>
+          <th>Date</th>
+          <th>Mise en avant</th>
+          <th><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in page_obj %}
+          <tr>
+            <td>
+              <strong>{{ item.title }}</strong>
+              <span>{{ item.excerpt|truncatechars:90 }}</span>
+            </td>
+            <td>
+              <span class="bo-status bo-status--{{ item.status }}">
+                {{ item.get_status_display }}
+              </span>
+            </td>
+            <td>
+              {% if item.author %}
+                {{ item.author.get_full_name|default:item.author.email }}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td>{{ item.publication_date|date:"d/m/Y"|default:"—" }}</td>
+            <td>{% if item.featured %}Oui{% else %}—{% endif %}</td>
+            <td class="bo-table__actions">
+              <a href="{% url 'backoffice:news_preview' item.pk %}">Aperçu</a>
+              {% if item.status != "archive" %}
+                {% if perms.news.review_news or item.status == "brouillon" %}
+                  &nbsp;·&nbsp;
+                  <a href="{% url 'backoffice:news_edit' item.pk %}">Modifier</a>
+                {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="bo-empty">Aucune actualité trouvée.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="bo-pagination" aria-label="Pagination">
+      {% if page_obj.has_previous %}
+        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&page={{ page_obj.previous_page_number }}">
+          Précédent
+        </a>
+      {% endif %}
+      <span>Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&page={{ page_obj.next_page_number }}">
+          Suivant
+        </a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Lien invalide — CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-auth-card">
+  <div class="bo-brand">
+    <span class="bo-eyebrow">Activation du compte</span>
+    <h1>Lien invalide ou expiré</h1>
+    <p>
+      Ce lien d'activation n'est plus valide. Contactez le Super administrateur
+      afin qu'une nouvelle invitation vous soit envoyée.
+    </p>
+  </div>
+
+  <a href="{% url 'backoffice:login' %}" class="bo-button">Retour à la connexion</a>
+</section>
+{% endblock %}

@@ -1,4 +1,7 @@
-FROM --platform=arm64 nginx:1.25-alpine
-COPY ./default.conf /etc/nginx/nginx.conf
-RUN mkdir -p /var/www/html
-COPY --from=frontend /app/.next/standalone /var/www/html
+# Gateway applicatif CST / CSMO.
+# Il ne contient ni le frontend ni le backend : il route uniquement les flux.
+FROM nginx:1.28-alpine
+
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 8080

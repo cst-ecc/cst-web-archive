@@ -1,0 +1,42 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>{% block title %}Back-office CST/CSMO{% endblock %}</title>
+
+  <link rel="stylesheet" href="{% static 'backoffice/css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'backoffice/css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'backoffice/css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'backoffice/css/tables.css' %}">
+  <link rel="stylesheet" href="{% static 'backoffice/css/news.css' %}">
+  <link rel="stylesheet" href="{% static 'backoffice/css/gallery.css' %}">
+  <link rel="stylesheet" href="{% static 'backoffice/css/loader.css' %}">
+
+  <script src="{% static 'backoffice/js/messages.js' %}" defer></script>
+  <script src="{% static 'backoffice/js/filters.js' %}" defer></script>
+  <script src="{% static 'backoffice/js/uploads.js' %}" defer></script>
+  <script src="{% static 'backoffice/js/gallery_chunk_upload.js' %}" defer></script>
+  <script src="{% static 'backoffice/js/loading.js' %}" defer></script>
+</head>
+<body>
+  <main class="bo-shell">
+    {% if messages %}
+      <div class="bo-messages" aria-live="polite">
+        {% for message in messages %}
+          <div
+            class="bo-message bo-message--{{ message.tags|default:'info' }}"
+            data-auto-dismiss-message
+          >
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
