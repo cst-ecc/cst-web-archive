@@ -1,4 +1,7 @@
 (function () {
+  const CHUNK_RETRY_LIMIT = 3;
+  const STATUS_POLL_INTERVAL_MS = 1200;
+
   function makeDots() {
     const dots = document.createElement("span");
     dots.className = "bo-loader-dots";
@@ -59,7 +62,8 @@
   }
 
   function updateRow(row, percent, text, state) {
-    row.querySelector(".bo-upload-progress span").style.width = `${percent}%`;
+    row.querySelector(".bo-upload-progress span").style.width =
+      `${Math.max(0, Math.min(100, percent))}%`;
     row.querySelector(".bo-upload-row__status").textContent = text;
     row.dataset.state = state || "";
   }
@@ -81,6 +85,30 @@
 
   async function sleep(ms) {
     return new Promise((resolve) => window.setTimeout(resolve, ms));
+  }
+
+  async function withRetry(action, onRetry) {
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= CHUNK_RETRY_LIMIT; attempt += 1) {
+      try {
+        return await action(attempt);
+      } catch (error) {
+        lastError = error;
+
+        if (attempt >= CHUNK_RETRY_LIMIT) {
+          break;
+        }
+
+        if (typeof onRetry === "function") {
+          onRetry(attempt, error);
+        }
+
+        await sleep(600 * attempt);
+      }
+    }
+
+    throw lastError || new Error("L’opération a échoué.");
   }
 
   async function pollStatus(statusUrl, csrfToken, row) {
@@ -107,8 +135,35 @@
             : "Upload en cours";
 
       updateRow(row, Math.max(payload.progress || 0, 96), label, "processing");
-      await sleep(1200);
+      await sleep(STATUS_POLL_INTERVAL_MS);
     }
+  }
+
+  async function uploadChunk({ session, csrfToken, file, chunkIndex, chunkSize, totalChunks, row }) {
+    const start = chunkIndex * chunkSize;
+    const end = Math.min(file.size, start + chunkSize);
+    const chunk = file.slice(start, end);
+
+    const formData = new FormData();
+    formData.append("chunkIndex", String(chunkIndex));
+    formData.append("chunk", chunk, file.name);
+
+    return withRetry(
+      () =>
+        fetchJson(session.chunkUrl, {
+          method: "POST",
+          headers: { "X-CSRFToken": csrfToken },
+          body: formData,
+        }),
+      (attempt) => {
+        updateRow(
+          row,
+          Math.round((chunkIndex / totalChunks) * 100),
+          `Nouvel essai ${attempt + 1}/${CHUNK_RETRY_LIMIT} pour le morceau ${chunkIndex + 1}`,
+          "uploading",
+        );
+      },
+    );
   }
 
   async function uploadFile({ file, uploader, csrfToken, chunkSize, row }) {
@@ -130,18 +185,14 @@
     });
 
     for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex += 1) {
-      const start = chunkIndex * chunkSize;
-      const end = Math.min(file.size, start + chunkSize);
-      const chunk = file.slice(start, end);
-
-      const formData = new FormData();
-      formData.append("chunkIndex", String(chunkIndex));
-      formData.append("chunk", chunk, file.name);
-
-      const payload = await fetchJson(session.chunkUrl, {
-        method: "POST",
-        headers: { "X-CSRFToken": csrfToken },
-        body: formData,
+      const payload = await uploadChunk({
+        session,
+        csrfToken,
+        file,
+        chunkIndex,
+        chunkSize,
+        totalChunks,
+        row,
       });
 
       updateRow(

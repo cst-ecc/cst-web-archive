@@ -1,0 +1,116 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Documents — Back-office CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head">
+    <div>
+      <a class="bo-back-link" href="{% url 'backoffice:dashboard' %}">← Tableau de bord</a>
+      <span class="bo-eyebrow">Bibliothèque</span>
+      <h1>Documents</h1>
+      <p>Créer, classer, valider et publier les documents institutionnels.</p>
+    </div>
+
+    {% if perms.documents.add_document %}
+      <a href="{% url 'backoffice:document_create' %}" class="bo-btn">
+        Nouveau document
+      </a>
+    {% endif %}
+  </header>
+
+  <form method="get" class="bo-news-filters" data-auto-submit-filter>
+    <input
+      type="search"
+      name="q"
+      value="{{ query }}"
+      placeholder="Rechercher un document"
+      aria-label="Rechercher un document"
+    >
+
+    <select name="status" aria-label="Filtrer par statut">
+      <option value="">Tous les statuts</option>
+      {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+          {{ label }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <select name="kind" aria-label="Filtrer par type">
+      <option value="">Tous les types</option>
+      {% for value, label in kind_choices %}
+        <option value="{{ value }}" {% if kind_filter == value %}selected{% endif %}>
+          {{ label }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <noscript>
+      <button type="submit" class="bo-btn bo-btn--soft">Filtrer</button>
+    </noscript>
+  </form>
+
+  <div class="bo-table-wrap">
+    <table class="bo-table">
+      <thead>
+        <tr>
+          <th>Document</th>
+          <th>Statut</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Taille</th>
+          <th><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for document in page_obj %}
+          <tr>
+            <td>
+              <strong>{{ document.title }}</strong>
+              <span>{{ document.reference|default:document.summary|truncatechars:90 }}</span>
+            </td>
+            <td>
+              <span class="bo-status bo-status--{{ document.status }}">
+                {{ document.get_status_display }}
+              </span>
+            </td>
+            <td>{{ document.get_kind_display }}</td>
+            <td>{{ document.date|date:"d/m/Y" }}</td>
+            <td>{{ document.size_label|default:"—" }}</td>
+            <td class="bo-table__actions">
+              <a href="{% url 'backoffice:document_preview' document.pk %}">Aperçu</a>
+              {% if document.status != "archive" %}
+                {% if perms.documents.review_document or document.status == "brouillon" %}
+                  &nbsp;·&nbsp;
+                  <a href="{% url 'backoffice:document_edit' document.pk %}">Modifier</a>
+                {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="bo-empty">Aucun document trouvé.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="bo-pagination" aria-label="Pagination">
+      {% if page_obj.has_previous %}
+        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&kind={{ kind_filter|urlencode }}&page={{ page_obj.previous_page_number }}">
+          Précédent
+        </a>
+      {% endif %}
+      <span>Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&kind={{ kind_filter|urlencode }}&page={{ page_obj.next_page_number }}">
+          Suivant
+        </a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
+{% endblock %}

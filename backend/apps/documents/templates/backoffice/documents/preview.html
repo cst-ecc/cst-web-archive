@@ -1,0 +1,56 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Aperçu — {{ document.title }}{% endblock %}
+
+{% block content %}
+<article class="bo-document-preview">
+  {% if can_edit %}
+    <a class="bo-back-link" href="{% url 'backoffice:document_edit' document.pk %}">← Retour à l’édition</a>
+  {% else %}
+    <a class="bo-back-link" href="{% url 'backoffice:document_list' %}">← Retour aux documents</a>
+  {% endif %}
+
+  <div class="bo-news-meta">
+    <span class="bo-status bo-status--{{ document.status }}">{{ document.get_status_display }}</span>
+    <span>{{ document.get_kind_display }}</span>
+    <time datetime="{{ document.date|date:'Y-m-d' }}">
+      {{ document.date|date:"d/m/Y" }}
+    </time>
+  </div>
+
+  <h1>{{ document.title }}</h1>
+
+  {% if document.reference %}
+    <p><strong>Référence :</strong> {{ document.reference }}</p>
+  {% endif %}
+
+  <p class="bo-news-preview__excerpt">{{ document.summary }}</p>
+
+  <dl class="bo-definition-list">
+    <div>
+      <dt>Catégorie</dt>
+      <dd>{{ document.category.name|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>Fichier</dt>
+      <dd>
+        {% if document.file %}
+          <a href="{{ document.file.url }}" target="_blank" rel="noopener">
+            {{ document.original_filename|default:document.file.name }}
+          </a>
+        {% else %}
+          —
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>Taille</dt>
+      <dd>{{ document.size_label|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>Pages</dt>
+      <dd>{{ document.pages|default:"—" }}</dd>
+    </div>
+  </dl>
+</article>
+{% endblock %}

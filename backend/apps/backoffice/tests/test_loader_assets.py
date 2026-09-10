@@ -8,3 +8,4 @@ class BackofficeLoaderAssetsTests(TestCase):
         self.assertIsNotNone(finders.find("backoffice/js/uploads.js"))
         self.assertIsNotNone(finders.find("backoffice/js/gallery_chunk_upload.js"))
         self.assertIsNotNone(finders.find("backoffice/css/loader.css"))
+        self.assertIsNotNone(finders.find("backoffice/css/documents.css"))

@@ -93,7 +93,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="galleryuploadsession",
-            index=models.Index(fields=["album", "status"], name="gallery_upload_album_status_idx"),
+            index=models.Index(fields=["album", "status"], name="gal_up_album_status_idx"),
         ),
         migrations.AddIndex(
             model_name="galleryuploadsession",

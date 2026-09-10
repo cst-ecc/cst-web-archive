@@ -262,7 +262,7 @@ class GalleryUploadSession(TimeStampedModel):
         verbose_name_plural = "sessions d’upload galerie"
         ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=["album", "status"], name="gallery_upload_album_status_idx"),
+            models.Index(fields=["album", "status"], name="gal_up_album_status_idx"),
             models.Index(fields=["created_by", "status"], name="gallery_upload_user_status_idx"),
         ]
 

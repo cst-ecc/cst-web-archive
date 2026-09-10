@@ -5,6 +5,7 @@
  * - NEXT_PUBLIC_DATA_SOURCE=mock conserve le fonctionnement historique ;
  * - NEXT_PUBLIC_NEWS_SOURCE=api branche uniquement les Actualités ;
  * - NEXT_PUBLIC_GALLERY_SOURCE=api branche uniquement la Galerie ;
+ * - NEXT_PUBLIC_DOCUMENTS_SOURCE=api branche uniquement les Documents ;
  * - NEXT_PUBLIC_DATA_SOURCE=api servira plus tard pour basculer tous les modules.
  */
 import {
@@ -43,6 +44,10 @@ const USE_NEWS_API =
 const USE_GALLERY_API =
   Boolean(API_BASE) &&
   (process.env.NEXT_PUBLIC_GALLERY_SOURCE === "api" || USE_API);
+
+const USE_DOCUMENTS_API =
+  Boolean(API_BASE) &&
+  (process.env.NEXT_PUBLIC_DOCUMENTS_SOURCE === "api" || USE_API);
 
 class ApiFetchError extends Error {
   status: number;
@@ -124,8 +129,87 @@ function normalizePublicAlbums(items: GalleryAlbum[]): GalleryAlbum[] {
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
+function normalizePublicDocuments(items: DocumentItem[]): DocumentItem[] {
+  return items
+    .filter(isPublic)
+    .filter((document) => Boolean(document.slug && document.title && document.date))
+    .map((document) => ({
+      ...document,
+      summary: document.summary ?? "",
+      reference: document.reference ?? "",
+      downloads: Number(document.downloads ?? 0),
+      pages: document.pages ?? undefined,
+      sizeLabel: document.sizeLabel ?? "",
+      featured: Boolean(document.featured),
+    }));
+}
+
+function sortDocuments(
+  items: DocumentItem[],
+  ordering: DocumentQuery["ordering"] = "recent",
+): DocumentItem[] {
+  switch (ordering) {
+    case "ancien":
+      return [...items].sort((a, b) => a.date.localeCompare(b.date));
+    case "titre":
+      return [...items].sort((a, b) => a.title.localeCompare(b.title, "fr"));
+    case "populaire":
+      return [...items].sort((a, b) => b.downloads - a.downloads);
+    case "recent":
+    default:
+      return [...items].sort((a, b) => b.date.localeCompare(a.date));
+  }
+}
+
+function filterMockDocuments(
+  items: DocumentItem[],
+  query: DocumentQuery,
+): DocumentItem[] {
+  let filtered = items.filter(isPublic);
+
+  if (query.categorySlug) {
+    filtered = filtered.filter((d) => d.categorySlug === query.categorySlug);
+  }
+  if (query.kind) {
+    filtered = filtered.filter((d) => d.kind === query.kind);
+  }
+  if (query.year) {
+    filtered = filtered.filter((d) => new Date(d.date).getFullYear() === query.year);
+  }
+  if (query.search) {
+    const q = normalize(query.search);
+    filtered = filtered.filter(
+      (d) =>
+        normalize(d.title).includes(q) ||
+        normalize(d.summary).includes(q) ||
+        normalize(d.reference).includes(q),
+    );
+  }
+
+  return filtered;
+}
+
+function paginateDocuments(
+  items: DocumentItem[],
+  query: DocumentQuery = {},
+): Paginated<DocumentItem> {
+  const ordered = sortDocuments(items, query.ordering);
+  const page = Math.max(1, query.page ?? 1);
+  const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
+  const start = (page - 1) * pageSize;
+
+  return {
+    count: ordered.length,
+    page,
+    pageSize,
+    results: ordered.slice(start, start + pageSize),
+  };
+}
+
 const mockNews = () => normalizePublicNews(rawNews);
 const mockAlbums = () => normalizePublicAlbums(rawAlbums);
+const mockDocuments = (query: DocumentQuery = {}) =>
+  paginateDocuments(filterMockDocuments(rawDocuments, query), query);
 
 // ------------------------------------------------------------------
 // CATÉGORIES
@@ -141,82 +225,63 @@ export async function getCategories(): Promise<Category[]> {
 export async function getDocuments(
   query: DocumentQuery = {},
 ): Promise<Paginated<DocumentItem>> {
-  if (USE_API) {
+  if (USE_DOCUMENTS_API) {
     const p = new URLSearchParams();
+
     if (query.search) p.set("search", query.search);
     if (query.categorySlug) p.set("category", query.categorySlug);
     if (query.kind) p.set("kind", query.kind);
     if (query.year) p.set("year", String(query.year));
     if (query.ordering) p.set("ordering", query.ordering);
-    p.set("page", String(query.page ?? 1));
-    p.set("page_size", String(query.pageSize ?? DEFAULT_PAGE_SIZE));
-    return apiFetch<Paginated<DocumentItem>>(`/documents/?${p.toString()}`);
-  }
 
-  let items = rawDocuments.filter(isPublic);
-
-  if (query.categorySlug) {
-    items = items.filter((d) => d.categorySlug === query.categorySlug);
-  }
-  if (query.kind) {
-    items = items.filter((d) => d.kind === query.kind);
-  }
-  if (query.year) {
-    items = items.filter((d) => new Date(d.date).getFullYear() === query.year);
-  }
-  if (query.search) {
-    const q = normalize(query.search);
-    items = items.filter(
-      (d) =>
-        normalize(d.title).includes(q) ||
-        normalize(d.summary).includes(q) ||
-        normalize(d.reference).includes(q),
+    const suffix = p.toString() ? `?${p.toString()}` : "";
+    const items = await safeApiFetch<DocumentItem[]>(
+      `/documents/${suffix}`,
+      "Documents",
     );
+
+    if (items) {
+      return paginateDocuments(normalizePublicDocuments(items), query);
+    }
   }
 
-  switch (query.ordering) {
-    case "ancien":
-      items = [...items].sort((a, b) => a.date.localeCompare(b.date));
-      break;
-    case "titre":
-      items = [...items].sort((a, b) => a.title.localeCompare(b.title, "fr"));
-      break;
-    case "populaire":
-      items = [...items].sort((a, b) => b.downloads - a.downloads);
-      break;
-    case "recent":
-    default:
-      items = [...items].sort((a, b) => b.date.localeCompare(a.date));
-  }
-
-  const page = Math.max(1, query.page ?? 1);
-  const pageSize = query.pageSize ?? DEFAULT_PAGE_SIZE;
-  const start = (page - 1) * pageSize;
-  const results = items.slice(start, start + pageSize);
-
-  return { count: items.length, page, pageSize, results };
+  return mockDocuments(query);
 }
 
 export async function getDocumentBySlug(
   slug: string,
 ): Promise<DocumentItem | null> {
-  if (USE_API) {
+  if (USE_DOCUMENTS_API) {
     try {
-      return await apiFetch<DocumentItem>(`/documents/${slug}/`);
-    } catch {
-      return null;
+      const item = await apiFetch<DocumentItem>(`/documents/${slug}/`);
+      return isPublic(item) ? normalizePublicDocuments([item])[0] ?? null : null;
+    } catch (error) {
+      if (error instanceof ApiFetchError && error.status === 404) {
+        return null;
+      }
+
+      console.warn("[CST] Détail Documents indisponible, fallback mock :", error);
+      return rawDocuments.find((d) => d.slug === slug && isPublic(d)) ?? null;
     }
   }
+
   return rawDocuments.find((d) => d.slug === slug && isPublic(d)) ?? null;
 }
 
 export async function getFeaturedDocuments(limit = 4): Promise<DocumentItem[]> {
-  if (USE_API) {
-    return apiFetch<DocumentItem[]>(`/documents/?featured=1&page_size=${limit}`);
+  if (USE_DOCUMENTS_API) {
+    const items = await safeApiFetch<DocumentItem[]>(
+      "/documents/?featured=1",
+      "Documents",
+    );
+
+    if (items) {
+      return sortDocuments(normalizePublicDocuments(items), "recent").slice(0, limit);
+    }
   }
 
-  return rawDocuments
-    .filter((d) => isPublic(d) && d.featured)
+  return normalizePublicDocuments(rawDocuments)
+    .filter((d) => d.featured)
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, limit);
 }
@@ -228,9 +293,16 @@ export async function getRecentDocuments(limit = 6): Promise<DocumentItem[]> {
 
 /** Années distinctes présentes (pour les filtres). */
 export async function getDocumentYears(): Promise<number[]> {
-  const years = new Set(
-    rawDocuments.filter(isPublic).map((d) => new Date(d.date).getFullYear()),
-  );
+  let source = normalizePublicDocuments(rawDocuments);
+
+  if (USE_DOCUMENTS_API) {
+    const items = await safeApiFetch<DocumentItem[]>("/documents/", "Documents");
+    if (items) {
+      source = normalizePublicDocuments(items);
+    }
+  }
+
+  const years = new Set(source.map((d) => new Date(d.date).getFullYear()));
   return [...years].sort((a, b) => b - a);
 }
 

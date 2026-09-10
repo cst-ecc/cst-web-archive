@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "apps.backoffice.apps.BackofficeConfig",
     "apps.news.apps.NewsConfig",
     "apps.gallery.apps.GalleryConfig",
+    "apps.documents.apps.DocumentsConfig",
 ]
 
 MIDDLEWARE = [
@@ -169,3 +170,6 @@ GALLERY_MAX_FILES_PER_SELECTION = env.int(
 GALLERY_UPLOAD_SESSION_TTL_HOURS = env.int(
     "GALLERY_UPLOAD_SESSION_TTL_HOURS"
 )
+
+# Document upload limits
+MAX_DOCUMENT_UPLOAD_MB = env.int("MAX_DOCUMENT_UPLOAD_MB")

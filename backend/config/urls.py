@@ -11,6 +11,7 @@ urlpatterns = [
     path("api/v1/", include("apps.core.urls")),
     path("api/v1/news/", include("apps.news.api_urls")),
     path("api/v1/albums/", include("apps.gallery.api_urls")),
+    path("api/v1/documents/", include("apps.documents.api_urls")),
 ]
 
 if settings.DEBUG:

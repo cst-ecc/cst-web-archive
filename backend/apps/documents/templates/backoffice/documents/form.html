@@ -1,0 +1,74 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}{{ page_title }} — Back-office CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-form-page bo-form-page--wide">
+  <a class="bo-back-link" href="{% url 'backoffice:document_list' %}">← Documents</a>
+  <span class="bo-eyebrow">Bibliothèque</span>
+  <h1>{{ page_title }}</h1>
+
+  {% if document %}
+    <div class="bo-toolbar">
+      <div class="bo-toolbar__meta">
+        <span class="bo-status bo-status--{{ document.status }}">{{ document.get_status_display }}</span>
+        <span>Slug : <code>{{ document.slug }}</code></span>
+        <a href="{% url 'backoffice:document_preview' document.pk %}">Voir l’aperçu</a>
+      </div>
+
+      {% if workflow_actions %}
+        <div class="bo-toolbar__actions">
+          {% for action in workflow_actions %}
+            <form method="post" action="{% url 'backoffice:document_transition' document.pk action.value %}">
+              {% csrf_token %}
+              <button type="submit" class="bo-btn {% if action.value == 'publish' %}{% else %}bo-btn--soft{% endif %}">
+                {% for key, label in action_labels.items %}
+                  {% if key == action %}{{ label }}{% endif %}
+                {% endfor %}
+              </button>
+            </form>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="bo-form bo-form--card" novalidate>
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="bo-field {% if field.name == 'featured' %}bo-field--checkbox{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+        {% if field.name == "file" and document and document.file %}
+          <div class="bo-current-file">
+            <span>Fichier actuel</span>
+            <a href="{{ document.file.url }}" target="_blank" rel="noopener">
+              {{ document.original_filename|default:document.file.name }}
+            </a>
+            <small>
+              Ce fichier sera conservé si vous ne choisissez pas un nouveau document.
+            </small>
+          </div>
+        {% endif %}
+
+        {{ field }}
+
+        {% if field.help_text %}
+          <small class="bo-help">{{ field.help_text }}</small>
+        {% endif %}
+
+        {% for error in field.errors %}
+          <p class="bo-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+
+    {% for error in form.non_field_errors %}
+      <p class="bo-error">{{ error }}</p>
+    {% endfor %}
+
+    <button type="submit" class="bo-btn">{{ submit_label }}</button>
+  </form>
+</section>
+{% endblock %}

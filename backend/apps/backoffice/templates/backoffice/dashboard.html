@@ -36,6 +36,14 @@
       </a>
     {% endif %}
 
+    {% if perms.documents.view_document %}
+      <a class="bo-module-card" href="{% url 'backoffice:document_list' %}">
+        <span>Bibliothèque</span>
+        <strong>Documents</strong>
+        <em>Classer, téléverser et publier les documents institutionnels.</em>
+      </a>
+    {% endif %}
+
     {% if request.user.is_superuser %}
       <a class="bo-module-card" href="{% url 'backoffice:user_list' %}">
         <span>Administration</span>

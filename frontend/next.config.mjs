@@ -25,6 +25,10 @@ const nextConfig = {
         source: "/media/:path*",
         destination: `${djangoOrigin}/media/:path*`,
       },
+      {
+        source: "/api/:path*",
+        destination: `${djangoOrigin}/api/:path*`,
+      },
     ];
   },
 };

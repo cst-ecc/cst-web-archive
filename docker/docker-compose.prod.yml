@@ -1,10 +1,12 @@
 # =============================================================
 # Docker Compose — Production CST / CSMO
 #
-# Étape 2B : le gateway CST est ajouté EN PARALLÈLE.
-# Le frontend reste temporairement raccordé à ecc_proxy_network afin que
-# l'upstream actuel d'ecc-shield (cst-frontend:3000) continue de fonctionner
-# jusqu'à la bascule volontaire vers cst-gateway:8080.
+# À lancer depuis le dossier docker/ :
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+#
+# Le trafic public doit passer par le reverse proxy externe ecc-shield,
+# qui doit pointer cst.ecc.bj vers cst-gateway:8080.
+# Ne pas exposer directement cst_frontend, cst_backend, PostgreSQL ou Redis.
 # =============================================================
 
 name: cst_website
@@ -16,8 +18,11 @@ services:
       dockerfile: Dockerfile.prod
       args:
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://cst.ecc.bj}
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://cst-backend:8000/api/v1}
         NEXT_PUBLIC_DATA_SOURCE: ${NEXT_PUBLIC_DATA_SOURCE:-mock}
+        NEXT_PUBLIC_NEWS_SOURCE: ${NEXT_PUBLIC_NEWS_SOURCE:-api}
+        NEXT_PUBLIC_GALLERY_SOURCE: ${NEXT_PUBLIC_GALLERY_SOURCE:-api}
+        NEXT_PUBLIC_DOCUMENTS_SOURCE: ${NEXT_PUBLIC_DOCUMENTS_SOURCE:-api}
 
     image: cst-frontend:latest
     container_name: cst-frontend
@@ -30,6 +35,12 @@ services:
       NEXT_TELEMETRY_DISABLED: "1"
       PORT: "3000"
       HOSTNAME: "0.0.0.0"
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://cst.ecc.bj}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://cst-backend:8000/api/v1}
+      NEXT_PUBLIC_DATA_SOURCE: ${NEXT_PUBLIC_DATA_SOURCE:-mock}
+      NEXT_PUBLIC_NEWS_SOURCE: ${NEXT_PUBLIC_NEWS_SOURCE:-api}
+      NEXT_PUBLIC_GALLERY_SOURCE: ${NEXT_PUBLIC_GALLERY_SOURCE:-api}
+      NEXT_PUBLIC_DOCUMENTS_SOURCE: ${NEXT_PUBLIC_DOCUMENTS_SOURCE:-api}
 
     expose:
       - "3000"
@@ -38,8 +49,8 @@ services:
       cst_internal:
         aliases:
           - cst-frontend
-      # TRANSITION : maintenir ce raccordement tant que ecc-shield pointe
-      # directement vers cst-frontend:3000.
+      # Transition de sécurité : peut être supprimé quand ecc-shield ne pointe
+      # plus jamais directement vers cst-frontend:3000.
       ecc_proxy_network:
         aliases:
           - cst-frontend
@@ -98,6 +109,35 @@ services:
         max-size: "10m"
         max-file: "5"
 
+  cst_redis:
+    image: redis:7-alpine
+    container_name: cst-redis
+
+    command: redis-server --appendonly yes
+
+    volumes:
+      - cst_redis_data:/data
+
+    networks:
+      cst_internal:
+        aliases:
+          - cst-redis
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
   cst_backend:
     build:
       context: ../backend
@@ -123,6 +163,8 @@ services:
 
     depends_on:
       cst_db:
+        condition: service_healthy
+      cst_redis:
         condition: service_healthy
 
     command: >
@@ -151,6 +193,46 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  cst_celery_worker:
+    image: cst-backend:latest
+    container_name: cst-celery-worker
+
+    env_file:
+      - .env.prod
+
+    command: >
+      sh -c "celery -A config worker
+             --loglevel=info
+             --concurrency=$${CELERY_WORKER_CONCURRENCY:-2}"
+
+    volumes:
+      - cst_media_data:/app/media
+      - cst_static_data:/app/staticfiles
+
+    networks:
+      cst_internal:
+        aliases:
+          - cst-celery-worker
+
+    depends_on:
+      cst_db:
+        condition: service_healthy
+      cst_redis:
+        condition: service_healthy
+      cst_backend:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
 
     logging:
       driver: json-file
@@ -205,43 +287,6 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  cst_redis:
-    image: redis:7-alpine
-    container_name: cst_redis_dev
-    command: redis-server --appendonly yes
-    volumes:
-      - cst_redis_data:/data
-    networks:
-      cst_internal:
-        aliases:
-          - cst-redis
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
-  cst_celery_worker_dev:
-    build:
-      context: ../backend
-    container_name: cst_celery_worker_dev
-    command: celery -A config worker --loglevel=info --concurrency=2
-    env_file:
-      - .env.dev
-    depends_on:
-      cst_redis:
-        condition: service_healthy
-      cst_backend_dev:
-        condition: service_started
-    volumes:
-      - ../backend:/app
-      - cst_media_data:/app/media
-      - cst_static_data:/app/staticfiles
-    networks:
-      cst_internal:
-        aliases:
-          - cst-celery-worker
-
 volumes:
   cst_postgres_data:
     name: cst_website_postgres_data
@@ -257,7 +302,8 @@ networks:
     name: cst_website_internal
     driver: bridge
 
-  # Réseau de liaison uniquement avec le reverse proxy actuellement en place.
+  # Réseau existant du reverse proxy principal ecc-shield.
+  # Ne pas modifier ce réseau ni les services du recensement.
   ecc_proxy_network:
     external: true
     name: ecc2026_ecc_network

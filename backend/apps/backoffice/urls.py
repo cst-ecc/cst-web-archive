@@ -1,5 +1,6 @@
 from django.urls import path
 
+from apps.documents import backoffice_views as document_views
 from apps.gallery import backoffice_views as gallery_views
 from apps.news import backoffice_views as news_views
 
@@ -82,5 +83,23 @@ urlpatterns = [
         "gallery/images/<int:pk>/delete/",
         gallery_views.gallery_image_delete_view,
         name="gallery_image_delete",
+    ),
+
+    path("documents/", document_views.document_list_view, name="document_list"),
+    path("documents/new/", document_views.document_create_view, name="document_create"),
+    path(
+        "documents/<int:pk>/edit/",
+        document_views.document_edit_view,
+        name="document_edit",
+    ),
+    path(
+        "documents/<int:pk>/preview/",
+        document_views.document_preview_view,
+        name="document_preview",
+    ),
+    path(
+        "documents/<int:pk>/transition/<str:action>/",
+        document_views.document_transition_view,
+        name="document_transition",
     ),
 ]

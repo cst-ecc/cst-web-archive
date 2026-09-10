@@ -1,4 +1,4 @@
-name: Deploy CST Frontend
+name: Deploy CST Production
 
 on:
   push:
@@ -41,43 +41,57 @@ jobs:
           COMPOSE_FILE="docker-compose.prod.yml"
           ENV_FILE=".env.prod"
 
-          echo "[CST DEPLOY] Starting deployment..."
+          echo "[CST DEPLOY] Starting full-stack deployment..."
 
           cd "${APP_DIR}"
 
-          echo "[CST DEPLOY] Current branch:"
-          git branch --show-current
-
           echo "[CST DEPLOY] Fetching latest code..."
           git fetch origin main
-
-          echo "[CST DEPLOY] Resetting to origin/main..."
           git reset --hard origin/main
 
           echo "[CST DEPLOY] Verifying production env file..."
           test -f "docker/${ENV_FILE}"
 
-          echo "[CST DEPLOY] Checking Docker Compose config..."
           cd docker
+
+          echo "[CST DEPLOY] Checking Docker Compose config..."
           docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config > /dev/null
 
-          echo "[CST DEPLOY] Building cst_frontend only..."
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" build cst_frontend
+          echo "[CST DEPLOY] Building images..."
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" build \
+            cst_frontend cst_backend cst_gateway
 
-          echo "[CST DEPLOY] Restarting cst_frontend only..."
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --no-deps cst_frontend
+          echo "[CST DEPLOY] Starting database and Redis..."
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d cst_db cst_redis
 
-          echo "[CST DEPLOY] Waiting for healthcheck..."
+          echo "[CST DEPLOY] Waiting for database and Redis..."
           sleep 10
 
-          echo "[CST DEPLOY] Container status:"
-          docker ps --filter "name=cst-frontend"
+          echo "[CST DEPLOY] Django check..."
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" run --rm cst_backend \
+            python manage.py check
 
-          echo "[CST DEPLOY] Testing local Docker network access from ecc-shield..."
-          docker exec ecc-shield wget -S -O /dev/null http://cst-frontend:3000 2>&1 | head -40
+          echo "[CST DEPLOY] Applying migrations..."
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" run --rm cst_backend \
+            python manage.py migrate --noinput
+
+          echo "[CST DEPLOY] Starting application services..."
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --remove-orphans \
+            cst_backend cst_celery_worker cst_frontend cst_gateway
+
+          echo "[CST DEPLOY] Waiting for healthchecks..."
+          sleep 20
+
+          echo "[CST DEPLOY] Container status:"
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" ps
+
+          echo "[CST DEPLOY] Testing internal gateway from ecc-shield..."
+          docker exec ecc-shield wget -q -O /dev/null http://cst-gateway:8080/gateway-health
+          docker exec ecc-shield wget -q -O /dev/null http://cst-gateway:8080/api/v1/health/
 
           echo "[CST DEPLOY] Testing public HTTPS..."
           curl -fsSI https://cst.ecc.bj > /dev/null
+          curl -fsS https://cst.ecc.bj/api/v1/health/ > /dev/null
 
           echo "[CST DEPLOY] Deployment completed successfully."
           REMOTE
