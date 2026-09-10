@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import {
+  useCallback,
   useEffect,
   useId,
   useRef,
@@ -32,35 +33,35 @@ export default function Gallery({ albums }: { albums: GalleryAlbum[] }) {
     activeAlbum && active ? activeAlbum.images[active.imageIndex] : null;
   const imageCount = activeAlbum?.images.length ?? 0;
 
-  const close = () => {
+  const close = useCallback(() => {
     setActive(null);
     window.requestAnimationFrame(() => lastTriggerRef.current?.focus());
-  };
+  }, []);
 
-  const previous = () => {
+  const previous = useCallback(() => {
     setActive((current) => {
       if (!current) return current;
       const album = albums[current.albumIndex];
-      if (album.images.length <= 1) return current;
+      if (!album || album.images.length <= 1) return current;
       return {
         ...current,
         imageIndex:
           (current.imageIndex - 1 + album.images.length) % album.images.length,
       };
     });
-  };
+  }, [albums]);
 
-  const next = () => {
+  const next = useCallback(() => {
     setActive((current) => {
       if (!current) return current;
       const album = albums[current.albumIndex];
-      if (album.images.length <= 1) return current;
+      if (!album || album.images.length <= 1) return current;
       return {
         ...current,
         imageIndex: (current.imageIndex + 1) % album.images.length,
       };
     });
-  };
+  }, [albums]);
 
   useEffect(() => {
     if (!active) return;
@@ -91,12 +92,15 @@ export default function Gallery({ albums }: { albums: GalleryAlbum[] }) {
       if (event.key === "Tab") {
         const dialog = document.querySelector<HTMLElement>("[data-gallery-dialog]");
         if (!dialog) return;
+
         const controls = Array.from(
           dialog.querySelectorAll<HTMLElement>(
             'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
           ),
         );
+
         if (controls.length === 0) return;
+
         const first = controls[0];
         const last = controls[controls.length - 1];
 
@@ -116,7 +120,7 @@ export default function Gallery({ albums }: { albums: GalleryAlbum[] }) {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [active, imageCount, albums]);
+  }, [active, imageCount, close, previous, next]);
 
   const openImage = (
     albumIndex: number,

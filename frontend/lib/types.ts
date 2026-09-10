@@ -20,7 +20,9 @@ export type DocumentKind =
   | "note"
   | "communique"
   | "annexe"
-  | "texte_consolide";
+  | "texte_consolide"
+  | "vulgarisation"
+  | "autre";
 
 export interface Category {
   id: number;
@@ -43,9 +45,15 @@ export interface DocumentItem {
   summary: string;
   /** Chemin/URL du fichier. En phase mock : chemin dans /public. */
   fileUrl: string;
+  /** Lien de téléchargement suivi par le backend, si différent de fileUrl. */
+  downloadUrl?: string;
   fileType: "pdf" | "docx" | "xlsx" | "image" | "autre";
   /** Taille en octets (formatée à l'affichage). */
   fileSize: number;
+  /** Libellé de taille déjà formaté côté API, si disponible. */
+  sizeLabel?: string;
+  /** Nombre de pages, si renseigné côté back-office. */
+  pages?: number;
   status: PublicationStatus;
   featured: boolean;
   downloads: number;

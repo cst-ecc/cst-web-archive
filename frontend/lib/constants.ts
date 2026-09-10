@@ -164,12 +164,21 @@ export const FOOTER_GROUPS: FooterGroup[] = [
 
 /** Labels des types de documents. */
 export const KIND_LABELS: Record<string, string> = {
+  document: "Document",
   decision: "Décision",
   rapport: "Rapport",
-  pv: "Procès-verbal",
+  proces_verbal: "Procès-verbal",
+  compte_rendu: "Compte rendu",
+  note: "Note",
   communique: "Communiqué",
-  texte: "Texte consolidé",
+  annexe: "Annexe",
+  texte_consolide: "Texte consolidé",
+  vulgarisation: "Vulgarisation",
   autre: "Document",
+
+  // Compatibilité avec les anciens libellés/slugs utilisés au début du projet.
+  pv: "Procès-verbal",
+  texte: "Texte consolidé",
 };
 
 /** Taille de page par défaut pour la pagination. */

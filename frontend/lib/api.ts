@@ -100,6 +100,24 @@ async function safeApiFetch<T>(
 /** N'exposer publiquement que les contenus « publié ». */
 const isPublic = <T extends { status: string }>(x: T) => x.status === "publie";
 
+function inferFileType(urlOrName: string): DocumentItem["fileType"] {
+  const value = urlOrName.toLowerCase().split("?")[0] ?? "";
+
+  if (value.endsWith(".pdf")) return "pdf";
+  if (value.endsWith(".doc") || value.endsWith(".docx") || value.endsWith(".odt")) return "docx";
+  if (value.endsWith(".xls") || value.endsWith(".xlsx") || value.endsWith(".ods")) return "xlsx";
+  if (
+    value.endsWith(".jpg") ||
+    value.endsWith(".jpeg") ||
+    value.endsWith(".png") ||
+    value.endsWith(".webp")
+  ) {
+    return "image";
+  }
+
+  return "autre";
+}
+
 function normalizePublicNews(items: NewsItem[]): NewsItem[] {
   return items
     .filter(isPublic)
@@ -133,15 +151,25 @@ function normalizePublicDocuments(items: DocumentItem[]): DocumentItem[] {
   return items
     .filter(isPublic)
     .filter((document) => Boolean(document.slug && document.title && document.date))
-    .map((document) => ({
-      ...document,
-      summary: document.summary ?? "",
-      reference: document.reference ?? "",
-      downloads: Number(document.downloads ?? 0),
-      pages: document.pages ?? undefined,
-      sizeLabel: document.sizeLabel ?? "",
-      featured: Boolean(document.featured),
-    }));
+    .map((document) => {
+      const fileUrl = document.fileUrl || document.downloadUrl || "#";
+      const downloadUrl = document.downloadUrl || fileUrl;
+
+      return {
+        ...document,
+        summary: document.summary ?? "",
+        reference: document.reference ?? "",
+        categorySlug: document.categorySlug ?? "",
+        fileUrl,
+        downloadUrl,
+        fileType: document.fileType ?? inferFileType(fileUrl),
+        fileSize: Number(document.fileSize ?? 0),
+        downloads: Number(document.downloads ?? 0),
+        pages: document.pages ?? undefined,
+        sizeLabel: document.sizeLabel ?? "",
+        featured: Boolean(document.featured),
+      };
+    });
 }
 
 function sortDocuments(

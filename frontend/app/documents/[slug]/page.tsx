@@ -77,7 +77,12 @@ export default async function DocumentDetailPage({
               <dd className={styles.ficheValue}>{doc.downloads}</dd>
             </div>
           </dl>
-          <Button href={doc.fileUrl} variant="solid" className={styles.downloadButton} download>
+          <Button
+            href={doc.downloadUrl ?? doc.fileUrl}
+            variant="solid"
+            className={styles.downloadButton}
+            download
+          >
             Télécharger le document
           </Button>
         </aside>
