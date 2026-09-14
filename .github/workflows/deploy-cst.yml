@@ -23,23 +23,32 @@ jobs:
     steps:
       - name: Prepare SSH
         shell: bash
+        env:
+          CST_VPS_SSH_KEY: ${{ secrets.CST_VPS_SSH_KEY }}
+          CST_VPS_KNOWN_HOSTS: ${{ secrets.CST_VPS_KNOWN_HOSTS }}
+          CST_VPS_HOST: ${{ secrets.CST_VPS_HOST }}
+          CST_VPS_PORT: ${{ secrets.CST_VPS_PORT }}
         run: |
           set -euo pipefail
 
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
-          printf "%s" "${{ secrets.CST_VPS_SSH_KEY }}" > ~/.ssh/cst_vps_key
+          printf "%s\n" "$CST_VPS_SSH_KEY" > ~/.ssh/cst_vps_key
+          sed -i 's/\r$//' ~/.ssh/cst_vps_key
           chmod 600 ~/.ssh/cst_vps_key
 
-          if [ -n "${{ secrets.CST_VPS_KNOWN_HOSTS }}" ]; then
-            printf "%s\n" "${{ secrets.CST_VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          ssh-keygen -y -f ~/.ssh/cst_vps_key > /dev/null
+
+          if [ -n "${CST_VPS_KNOWN_HOSTS:-}" ]; then
+            printf "%s\n" "$CST_VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
           else
-            ssh-keyscan -p "${{ secrets.CST_VPS_PORT }}" -H "${{ secrets.CST_VPS_HOST }}" >> ~/.ssh/known_hosts
+            ssh-keyscan -p "$CST_VPS_PORT" -H "$CST_VPS_HOST" >> ~/.ssh/known_hosts
           fi
 
+          sed -i 's/\r$//' ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
-
+          
       - name: Deploy on VPS
         shell: bash
         run: |
