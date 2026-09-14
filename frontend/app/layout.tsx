@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Sora, Inter } from "next/font/google";
+// The stylesheet is processed by Next.js/Sass and has no runtime module shape.
+// @ts-ignore — keep the side-effect import type-check safe when Sass declarations are unavailable.
 import "./globals.scss";
 import { SITE } from "@/lib/constants";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PageLoader from "@/components/layout/PageLoader";
+import SocialFloatingLinks from "@/components/layout/SocialFloatingLinks";
 import styles from "./layout.module.scss";
 
 const display = Sora({
@@ -83,6 +86,7 @@ export default function RootLayout({
           Aller au contenu
         </a>
         <Navbar />
+        <SocialFloatingLinks />
         <main id="contenu" className={styles.main}>
           {children}
         </main>

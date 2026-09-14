@@ -11,87 +11,205 @@ concurrency:
   group: cst-production-deploy
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     name: Deploy CST to VPS
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Prepare SSH
+        shell: bash
         run: |
+          set -euo pipefail
+
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
-          echo "${{ secrets.CST_VPS_SSH_KEY }}" > ~/.ssh/cst_vps_key
+          printf "%s" "${{ secrets.CST_VPS_SSH_KEY }}" > ~/.ssh/cst_vps_key
           chmod 600 ~/.ssh/cst_vps_key
 
-          ssh-keyscan -p "${{ secrets.CST_VPS_PORT }}" -H "${{ secrets.CST_VPS_HOST }}" >> ~/.ssh/known_hosts
+          if [ -n "${{ secrets.CST_VPS_KNOWN_HOSTS }}" ]; then
+            printf "%s\n" "${{ secrets.CST_VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -p "${{ secrets.CST_VPS_PORT }}" -H "${{ secrets.CST_VPS_HOST }}" >> ~/.ssh/known_hosts
+          fi
+
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Deploy on VPS
+        shell: bash
         run: |
           ssh \
             -i ~/.ssh/cst_vps_key \
             -p "${{ secrets.CST_VPS_PORT }}" \
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
             "${{ secrets.CST_VPS_USER }}@${{ secrets.CST_VPS_HOST }}" <<'REMOTE'
-          set -euo pipefail
+          set -Eeuo pipefail
 
           APP_DIR="/home/eccops/apps/cst-website"
+          DOCKER_DIR="${APP_DIR}/docker"
           COMPOSE_FILE="docker-compose.prod.yml"
           ENV_FILE=".env.prod"
+          LOCK_FILE="/tmp/cst-production-deploy.lock"
 
-          echo "[CST DEPLOY] Starting full-stack deployment..."
+          log() {
+            echo "[CST DEPLOY] $(date '+%Y-%m-%d %H:%M:%S') — $*"
+          }
+
+          on_error() {
+            log "❌ Échec du déploiement. État des containers :"
+            cd "${DOCKER_DIR}" || exit 1
+            docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" ps || true
+
+            log "Logs backend :"
+            docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" logs --tail=120 cst_backend || true
+
+            log "Logs gateway :"
+            docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" logs --tail=120 cst_gateway || true
+
+            log "Logs frontend :"
+            docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" logs --tail=120 cst_frontend || true
+          }
+
+          trap on_error ERR
+
+          wait_healthy() {
+            container="$1"
+            timeout="${2:-180}"
+            elapsed=0
+
+            log "Attente healthcheck : ${container}"
+
+            while [ "${elapsed}" -lt "${timeout}" ]; do
+              status="$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "${container}" 2>/dev/null || true)"
+
+              if [ "${status}" = "healthy" ] || [ "${status}" = "running" ]; then
+                if docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{end}}' "${container}" 2>/dev/null | grep -q "healthy"; then
+                  log "${container} est healthy"
+                  return 0
+                fi
+
+                if ! docker inspect --format='{{if .State.Health}}yes{{else}}no{{end}}' "${container}" 2>/dev/null | grep -q "yes"; then
+                  log "${container} est running"
+                  return 0
+                fi
+              fi
+
+              sleep 5
+              elapsed=$((elapsed + 5))
+            done
+
+            log "Timeout healthcheck pour ${container}"
+            docker logs --tail=120 "${container}" || true
+            return 1
+          }
+
+          exec 9>"${LOCK_FILE}"
+
+          if ! flock -n 9; then
+            log "Un autre déploiement CST est déjà en cours."
+            exit 1
+          fi
+
+          log "Démarrage du déploiement CST production"
 
           cd "${APP_DIR}"
 
-          echo "[CST DEPLOY] Fetching latest code..."
-          git fetch origin main
+          log "Synchronisation Git avec origin/main"
+          git fetch --prune origin main
+
+          # Nettoyage prudent :
+          # - supprime les fichiers non suivis qui peuvent bloquer git ;
+          # - protège explicitement le fichier d'environnement production.
+          git clean -fd -e docker/.env.prod
           git reset --hard origin/main
 
-          echo "[CST DEPLOY] Verifying production env file..."
-          test -f "docker/${ENV_FILE}"
+          log "Vérification du fichier d'environnement"
+          test -s "docker/${ENV_FILE}"
 
-          cd docker
+          cd "${DOCKER_DIR}"
 
-          echo "[CST DEPLOY] Checking Docker Compose config..."
+          log "Validation Docker Compose"
           docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config > /dev/null
 
-          echo "[CST DEPLOY] Building images..."
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" build \
-            cst_frontend cst_backend cst_gateway
-
-          echo "[CST DEPLOY] Starting database and Redis..."
+          log "Démarrage PostgreSQL et Redis"
           docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d cst_db cst_redis
 
-          echo "[CST DEPLOY] Waiting for database and Redis..."
-          sleep 10
+          wait_healthy cst-db 180
+          wait_healthy cst-redis 120
 
-          echo "[CST DEPLOY] Django check..."
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" run --rm cst_backend \
+          log "Backup PostgreSQL CST"
+          mkdir -p /home/eccops/backups/cst
+          if docker ps --format '{{.Names}}' | grep -qx 'cst-db'; then
+            docker exec cst-db sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' \
+              | gzip > "/home/eccops/backups/cst/cst_$(date '+%Y%m%d_%H%M%S').sql.gz"
+          fi
+
+          log "Build des images"
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" build \
+            cst_backend cst_frontend cst_gateway
+
+          log "Django check"
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" run --rm --no-deps cst_backend \
             python manage.py check
 
-          echo "[CST DEPLOY] Applying migrations..."
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" run --rm cst_backend \
+          log "Migrations Django"
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" run --rm --no-deps cst_backend \
             python manage.py migrate --noinput
 
-          echo "[CST DEPLOY] Starting application services..."
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d --remove-orphans \
-            cst_backend cst_celery_worker cst_frontend cst_gateway
+          log "Collectstatic Django"
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" run --rm --no-deps cst_backend \
+            python manage.py collectstatic --noinput
 
-          echo "[CST DEPLOY] Waiting for healthchecks..."
-          sleep 20
+          log "Recréation du backend"
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d \
+            --force-recreate \
+            --no-deps \
+            cst_backend
 
-          echo "[CST DEPLOY] Container status:"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" ps
+          wait_healthy cst-backend 180
 
-          echo "[CST DEPLOY] Testing internal gateway from ecc-shield..."
+          log "Recréation du frontend"
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d \
+            --force-recreate \
+            --no-deps \
+            cst_frontend
+
+          wait_healthy cst-frontend 180
+
+          log "Recréation de Celery et du gateway"
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d \
+            --force-recreate \
+            --no-deps \
+            cst_celery_worker cst_gateway
+
+          wait_healthy cst-gateway 180
+
+          log "Vérification communication gateway → backend"
+          docker exec cst-gateway wget -q -O /dev/null http://cst-backend:8000/api/v1/health/
+
+          log "Vérification communication ecc-shield → cst-gateway"
           docker exec ecc-shield wget -q -O /dev/null http://cst-gateway:8080/gateway-health
           docker exec ecc-shield wget -q -O /dev/null http://cst-gateway:8080/api/v1/health/
 
-          echo "[CST DEPLOY] Testing public HTTPS..."
+          log "Validation configuration nginx externe"
+          docker exec ecc-shield nginx -t
+
+          log "Test HTTPS public"
           curl -fsSI https://cst.ecc.bj > /dev/null
           curl -fsS https://cst.ecc.bj/api/v1/health/ > /dev/null
 
-          echo "[CST DEPLOY] Deployment completed successfully."
+          log "État final des containers"
+          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" ps
+
+          log "✅ Déploiement CST terminé avec succès"
           REMOTE
+
