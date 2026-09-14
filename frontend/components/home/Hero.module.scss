@@ -75,14 +75,21 @@
 }
 
 .slideContent {
-  max-width: 48rem;
+  width: min(100%, 48rem);
+  max-height: calc(100% - 2rem);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   animation: reveal 0.65s ease both;
 }
 
 .institution {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.6rem;
+  max-width: 100%;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -95,45 +102,58 @@
     width: 2.25rem;
     height: 2px;
     background: currentColor;
+    flex: 0 0 auto;
   }
 }
 
 .title {
   max-width: 46rem;
-  font-size: 2.45rem;
+  font-size: clamp(2.35rem, 5vw, 3.75rem);
   font-weight: 700;
   line-height: 1.08;
   color: v.$color-white;
   text-wrap: balance;
+  overflow-wrap: anywhere;
 
-  @include m.respond(sm) { font-size: 3rem; }
-  @include m.respond(lg) { font-size: 3.75rem; }
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 
 .lead {
   margin-top: 1.4rem;
   max-width: 41rem;
-  font-size: 1rem;
+  font-size: clamp(1rem, 1.6vw, 1.125rem);
   line-height: 1.72;
   color: rgba(255, 255, 255, 0.86);
+  overflow-wrap: anywhere;
 
-  @include m.respond(sm) { font-size: 1.125rem; }
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 
 .actions {
-  margin-top: 2.25rem;
+  margin-top: clamp(1.4rem, 3vw, 2.25rem);
   display: flex;
   flex-wrap: wrap;
   gap: 0.9rem;
+  flex-shrink: 0;
 }
 
 .controls {
-  position: relative;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2rem;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding-bottom: 2rem;
+  padding-inline: 1rem;
 }
 
 .dots {
@@ -207,20 +227,51 @@
 
 @media (max-width: 639px) {
   .hero {
-    min-height: 680px;
-    height: auto;
+    min-height: 640px;
+    height: 100svh;
+    max-height: none;
   }
 
   .inner {
-    padding-block: 8rem 4rem;
+    align-items: center;
+    padding-block: 7.5rem 6.25rem;
+  }
+
+  .slideContent {
+    max-height: calc(100svh - 14rem);
+  }
+
+  .institution {
+    font-size: 0.68rem;
+    line-height: 1.45;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.85rem;
+
+    &::before {
+      width: 1.8rem;
+    }
   }
 
   .title {
-    font-size: 2.2rem;
+    font-size: clamp(1.85rem, 8vw, 2.25rem);
+    line-height: 1.12;
+    -webkit-line-clamp: 3;
+  }
+
+  .lead {
+    margin-top: 1rem;
+    font-size: 0.98rem;
+    line-height: 1.62;
+    -webkit-line-clamp: 3;
+  }
+
+  .actions {
+    margin-top: 1.45rem;
+    gap: 0.75rem;
   }
 
   .controls {
-    padding-inline: 1rem;
+    bottom: 1.4rem;
   }
 
   .pause {

@@ -1,6 +1,6 @@
 "use client";
 
-// import Image from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
@@ -283,14 +283,14 @@ export default function Navbar() {
     >
       <div className={styles.bar}>
         <Link href="/" className={styles.logoLink} aria-label={`${SITE.name} — ${SITE.fullName}`}>
-          {/* <Image
-            src="/logo/logo-cst-transparent.png"
+          <Image
+            src="/logo/logo-ecc.png"
             alt=""
             width={160}
             height={160}
             priority
             className={styles.logo}
-          /> */}
+          /> 
           <div className={styles.logoText}>
             <span className={styles.logoTitle}>{SITE.name}</span>
             <span className={styles.logoSubtitle}>{SITE.fullName}</span>

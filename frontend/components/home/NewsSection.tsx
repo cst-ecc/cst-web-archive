@@ -1,23 +1,34 @@
 import Image from "next/image";
 import Link from "next/link";
 import Container from "@/components/layout/Container";
-import { getFeaturedNews, getRecentNews } from "@/lib/api";
+import { getRecentNews } from "@/lib/api";
 import { isDjangoMediaUrl } from "@/lib/media";
 import { formatDate } from "@/lib/utils";
+import type { NewsItem } from "@/lib/types";
 import styles from "./NewsSection.module.scss";
 
-export default async function NewsSection() {
-  const [featuredItems, recentItems] = await Promise.all([
-    getFeaturedNews(1),
-    getRecentNews(4),
-  ]);
+type NewsSectionProps = {
+  items?: NewsItem[];
+};
 
-  const featured = featuredItems[0] ?? recentItems[0];
+const NEWS_FALLBACK_IMAGE = "/og-image.svg";
+
+function getNewsImageUrl(item: NewsItem) {
+  return item.imageUrl || NEWS_FALLBACK_IMAGE;
+}
+
+function shouldBypassImageOptimization(src: string) {
+  return isDjangoMediaUrl(src) || src.toLowerCase().endsWith(".svg");
+}
+
+export default async function NewsSection({ items }: NewsSectionProps = {}) {
+  const sectionItems = (items ?? (await getRecentNews(3))).slice(0, 3);
+  const featured = sectionItems[0];
+
   if (!featured) return null;
 
-  const secondary = recentItems
-    .filter((item) => item.id !== featured.id)
-    .slice(0, 2);
+  const featuredImageUrl = getNewsImageUrl(featured);
+  const secondary = sectionItems.slice(1, 3);
 
   return (
     <section className={styles.section} aria-labelledby="home-news-title">
@@ -48,14 +59,14 @@ export default async function NewsSection() {
             >
               <div className={styles.featuredImageWrap}>
                 <Image
-                  src={featured.imageUrl}
+                  src={featuredImageUrl}
                   alt={featured.imageAlt ?? featured.title}
                   fill
                   sizes="(max-width: 1023px) 100vw, 65vw"
                   className={styles.featuredImage}
-                  unoptimized={isDjangoMediaUrl(featured.imageUrl)}
+                  unoptimized={shouldBypassImageOptimization(featuredImageUrl)}
                 />
-                <span className={styles.featuredBadge}>À la une</span>
+                <span className={styles.featuredBadge}>À lire</span>
               </div>
             </Link>
 
@@ -80,43 +91,47 @@ export default async function NewsSection() {
 
           {secondary.length > 0 && (
             <div className={styles.secondaryList}>
-              {secondary.map((item) => (
-                <article key={item.id} className={styles.secondaryCard}>
-                  <Link
-                    href={`/actualites/${item.slug}`}
-                    className={styles.secondaryImageLink}
-                    aria-label={`Lire l’actualité : ${item.title}`}
-                  >
-                    <div className={styles.secondaryImageWrap}>
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.imageAlt ?? item.title}
-                        fill
-                        sizes="(max-width: 1023px) 100vw, 34vw"
-                        className={styles.secondaryImage}
-                        unoptimized={isDjangoMediaUrl(item.imageUrl)}
-                      />
-                    </div>
-                  </Link>
-                  <div className={styles.secondaryBody}>
-                    <time dateTime={item.date} className={styles.date}>
-                      {formatDate(item.date)}
-                    </time>
-                    <h3 className={styles.secondaryTitle}>
-                      <Link href={`/actualites/${item.slug}`}>
-                        {item.title}
-                      </Link>
-                    </h3>
-                    <p className={styles.secondaryExcerpt}>{item.excerpt}</p>
+              {secondary.map((item) => {
+                const imageUrl = getNewsImageUrl(item);
+
+                return (
+                  <article key={item.id} className={styles.secondaryCard}>
                     <Link
                       href={`/actualites/${item.slug}`}
-                      className={styles.readMore}
+                      className={styles.secondaryImageLink}
+                      aria-label={`Lire l’actualité : ${item.title}`}
                     >
-                      Lire la suite <span aria-hidden>→</span>
+                      <div className={styles.secondaryImageWrap}>
+                        <Image
+                          src={imageUrl}
+                          alt={item.imageAlt ?? item.title}
+                          fill
+                          sizes="(max-width: 1023px) 100vw, 34vw"
+                          className={styles.secondaryImage}
+                          unoptimized={shouldBypassImageOptimization(imageUrl)}
+                        />
+                      </div>
                     </Link>
-                  </div>
-                </article>
-              ))}
+                    <div className={styles.secondaryBody}>
+                      <time dateTime={item.date} className={styles.date}>
+                        {formatDate(item.date)}
+                      </time>
+                      <h3 className={styles.secondaryTitle}>
+                        <Link href={`/actualites/${item.slug}`}>
+                          {item.title}
+                        </Link>
+                      </h3>
+                      <p className={styles.secondaryExcerpt}>{item.excerpt}</p>
+                      <Link
+                        href={`/actualites/${item.slug}`}
+                        className={styles.readMore}
+                      >
+                        Lire la suite <span aria-hidden>→</span>
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </div>

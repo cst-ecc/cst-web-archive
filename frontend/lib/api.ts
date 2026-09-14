@@ -422,6 +422,91 @@ export async function getRecentNews(limit = 3): Promise<NewsItem[]> {
   return (await getNews()).slice(0, limit);
 }
 
+type NewsIdentity = Pick<NewsItem, "id" | "slug">;
+
+function newsIdentityKeys(item: NewsIdentity): string[] {
+  const keys = [`id:${item.id}`];
+
+  if (item.slug) {
+    keys.push(`slug:${item.slug}`);
+  }
+
+  return keys;
+}
+
+function hasSameNewsIdentity(
+  item: NewsIdentity,
+  selected: NewsIdentity[],
+): boolean {
+  const keys = new Set(newsIdentityKeys(item));
+  return selected.some((candidate) =>
+    newsIdentityKeys(candidate).some((key) => keys.has(key)),
+  );
+}
+
+/**
+ * Sélectionne les actualités du Hero :
+ * - l'actualité mise en avant si elle existe ;
+ * - puis les actualités les plus récentes non déjà sélectionnées ;
+ * - maximum 3 éléments par défaut.
+ */
+export function selectHeroNewsItems(
+  items: NewsItem[],
+  limit = 3,
+): NewsItem[] {
+  const news = normalizePublicNews(items);
+  const selected: NewsItem[] = [];
+  const featured = news.find((item) => item.featured);
+
+  if (featured) {
+    selected.push(featured);
+  }
+
+  for (const item of news) {
+    if (selected.length >= limit) break;
+    if (!hasSameNewsIdentity(item, selected)) {
+      selected.push(item);
+    }
+  }
+
+  return selected.slice(0, limit);
+}
+
+/**
+ * Retourne les actualités restantes, en excluant celles déjà utilisées
+ * dans le Hero ou dans une autre zone de mise en avant.
+ */
+export function selectRemainingNewsItems(
+  items: NewsItem[],
+  excludedItems: NewsIdentity[],
+  limit = 3,
+): NewsItem[] {
+  const excludedKeys = new Set(
+    excludedItems.flatMap((item) => newsIdentityKeys(item)),
+  );
+
+  return normalizePublicNews(items)
+    .filter((item) =>
+      newsIdentityKeys(item).every((key) => !excludedKeys.has(key)),
+    )
+    .slice(0, limit);
+}
+
+/**
+ * Groupe les actualités de la landing page en une seule récupération,
+ * afin d'éviter les doublons entre le Hero et la section Actualités.
+ */
+export async function getLandingNews(
+  heroLimit = 3,
+  sectionLimit = 3,
+): Promise<{ heroNews: NewsItem[]; sectionNews: NewsItem[] }> {
+  const news = await getNews();
+  const heroNews = selectHeroNewsItems(news, heroLimit);
+  const sectionNews = selectRemainingNewsItems(news, heroNews, sectionLimit);
+
+  return { heroNews, sectionNews };
+}
+
 // ------------------------------------------------------------------
 // GALERIE
 // ------------------------------------------------------------------
