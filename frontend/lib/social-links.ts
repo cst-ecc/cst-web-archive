@@ -66,7 +66,7 @@ export const SOCIAL_LINKS: SocialLink[] = [
     // },
     {
         name: "WhatsApp",
-        href: "https://wa.me/",
+        href: "https://wa.me/c/2290148899999",
         icon: "whatsapp",
         ariaLabel: "Nous contacter sur WhatsApp",
         enabled: true,

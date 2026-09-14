@@ -2,7 +2,7 @@
 
 .wrapper {
     position: fixed;
-    left: clamp(0.85rem, 2vw, 1.5rem);
+    right: clamp(0.85rem, 2vw, 1.5rem);
     top: 50%;
     transform: translateY(-50%);
     z-index: 1200;
