@@ -1,0 +1,86 @@
+@use "../../styles/variables" as v;
+
+.card {
+  height: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 3.15rem 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  border: 1px solid rgba(31, 133, 206, 0.12);
+  border-radius: v.$radius-xl2;
+  padding: 0.72rem 0.8rem;
+  background: linear-gradient(135deg, rgba(31, 133, 206, 0.09), rgba(255, 255, 255, 0.98));
+
+  &[data-tone="gold"] {
+    border-color: rgba(218, 167, 16, 0.18);
+    background: linear-gradient(135deg, rgba(218, 167, 16, 0.13), rgba(255, 255, 255, 0.98));
+  }
+
+  &[data-tone="green"] {
+    background: linear-gradient(135deg, rgba(31, 133, 206, 0.07), rgba(241, 233, 6, 0.05), rgba(255, 255, 255, 0.98));
+  }
+
+  &[data-tone="violet"] {
+    border-color: rgba(12, 59, 92, 0.13);
+    background: linear-gradient(135deg, rgba(12, 59, 92, 0.08), rgba(255, 255, 255, 0.98));
+  }
+
+  h3 {
+    color: v.$color-blue-ink;
+    font-family: v.$font-display;
+    font-size: 0.9rem;
+    line-height: 1.15;
+  }
+
+  p {
+    margin-top: 0.18rem;
+    color: rgba(17, 24, 39, 0.61);
+    font-size: 0.69rem;
+    line-height: 1.4;
+  }
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba(31, 133, 206, 0.12);
+  color: v.$color-blue-deep;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.38rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: v.$color-blue;
+  font-size: 0.61rem;
+  font-weight: 900;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: v.$color-blue-deep;
+  }
+}
+
+@media (min-width: 1280px) {
+  .card {
+    grid-template-columns: 3.45rem 1fr;
+    padding: 0.8rem 0.9rem;
+
+    h3 { font-size: 0.96rem; }
+    p { font-size: 0.72rem; }
+  }
+
+  .icon {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+}

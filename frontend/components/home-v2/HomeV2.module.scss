@@ -1,0 +1,47 @@
+@use "../../styles/variables" as v;
+
+.shell {
+  position: relative;
+  width: 100%;
+  background: v.$color-surface-muted;
+}
+
+.deck {
+  position: relative;
+  min-height: calc(100svh - #{v.$header-height});
+}
+
+.panel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: v.$color-surface-muted;
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    height: calc(100dvh - #{v.$header-height});
+    overflow: hidden;
+  }
+
+  .deck,
+  .panel {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 1023px) {
+  .shell,
+  .deck {
+    height: auto;
+    overflow: visible;
+  }
+
+  .panel {
+    position: relative;
+    min-height: calc(100svh - #{v.$header-height});
+    overflow: visible;
+  }
+}

@@ -1,0 +1,68 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.topicGrid {
+  display: grid;
+  gap: 0.65rem;
+
+  @include m.respond(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include m.respond(lg) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.flow {
+  margin-top: 0.72rem;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  padding: 0.72rem;
+  background: v.$color-white;
+}
+
+.steps {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.45rem;
+
+  @include m.respond(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  article {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.6rem;
+    align-items: start;
+    min-width: 0;
+    padding: 0.45rem 0.55rem;
+    border-radius: v.$radius-lg;
+    background: v.$color-surface-muted;
+  }
+
+  article > span {
+    display: grid;
+    place-items: center;
+    width: 1.85rem;
+    height: 1.85rem;
+    border-radius: 50%;
+    background: v.$color-blue-deep;
+    color: v.$color-white;
+    font-size: 0.62rem;
+    font-weight: 900;
+  }
+
+  h4 {
+    color: v.$color-blue-ink;
+    font-size: 0.76rem;
+  }
+
+  p {
+    margin-top: 0.08rem;
+    color: rgba(17, 24, 39, 0.58);
+    font-size: 0.64rem;
+    line-height: 1.36;
+  }
+}

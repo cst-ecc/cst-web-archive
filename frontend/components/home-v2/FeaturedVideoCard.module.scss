@@ -1,0 +1,97 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.card {
+    min-height: 5.5rem;
+
+    display: grid;
+
+    overflow: hidden;
+
+    border: 1px solid v.$color-surface-line;
+    border-radius: v.$radius-lg;
+
+    background: v.$color-surface-muted;
+}
+
+.player {
+    position: relative;
+    min-height: 10.5rem;
+    overflow: hidden;
+    background: v.$color-blue-ink;
+
+    iframe {
+        position: absolute;
+        inset: 0;
+
+        width: 100%;
+        height: 100%;
+
+        border: 0;
+    }
+}
+
+.content {
+    align-self: center;
+    min-width: 0;
+    padding: 0.6rem 0.7rem;
+
+    h3 {
+        margin-top: 0.2rem;
+
+        color: v.$color-blue-ink;
+        font-size: 0.75rem;
+        line-height: 1.25;
+
+        @include m.line-clamp(2);
+    }
+
+    p {
+        margin-top: 0.25rem;
+
+        color: rgba(17, 24, 39, 0.56);
+        font-size: 0.6rem;
+        line-height: 1.4;
+
+        @include m.line-clamp(2);
+    }
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+
+    color: v.$color-blue;
+    font-size: 0.55rem;
+    font-weight: 800;
+
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+
+    i {
+        width: 1.25rem;
+        height: 1.25rem;
+
+        display: grid;
+        place-items: center;
+
+        border-radius: 50%;
+
+        background: v.$color-yellow;
+        color: v.$color-blue-ink;
+
+        font-size: 0.48rem;
+        font-style: normal;
+    }
+}
+
+@media (max-width: 639px) {
+    .card {
+        grid-template-columns: 1fr;
+    }
+
+    .player {
+        aspect-ratio: 16 / 9;
+    }
+}

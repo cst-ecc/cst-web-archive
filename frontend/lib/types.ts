@@ -103,6 +103,22 @@ export interface NewsItem {
   featured?: boolean;
   status: PublicationStatus;
   relatedDocumentSlugs?: string[];
+
+  /**
+ * Emplacement éditorial spécifique sur l'accueil.
+ * L'absence de valeur correspond à une actualité classique.
+ */
+  homeSlot?: NewsHomeSlot;
+
+  /**
+   * PDF, communiqué ou flyer associé à l'article.
+   */
+  attachment?: NewsAttachment;
+
+  /**
+   * Date de l'événement si différente de la date de publication.
+   */
+  eventDate?: string;
 }
 
 export interface GalleryImage {
@@ -158,4 +174,33 @@ export interface DocumentQuery {
   ordering?: "recent" | "ancien" | "titre" | "populaire";
   page?: number;
   pageSize?: number;
+}
+
+export type NewsHomeSlot =
+  | "alert_info"
+  | "upcoming_event";
+
+export type NewsAttachmentType =
+  | "pdf"
+  | "image";
+
+export interface NewsAttachment {
+  type: NewsAttachmentType;
+
+  /**
+   * URL réelle du PDF ou de l'image.
+   * Ex. /media/news/communique.pdf
+   */
+  url: string;
+
+  /**
+   * Image de prévisualisation facultative.
+   * Très utile pour afficher la couverture d'un PDF.
+   */
+  previewUrl?: string;
+
+  /**
+   * Ex. "Communiqué officiel — PDF"
+   */
+  label?: string;
 }

@@ -6,8 +6,9 @@ import "./globals.scss";
 import { SITE } from "@/lib/constants";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import FooterVisibility from "@/components/layout/FooterVisibility";
 import PageLoader from "@/components/layout/PageLoader";
-import SocialFloatingLinks from "@/components/layout/SocialFloatingLinks";
+// import SocialFloatingLinks from "@/components/layout/SocialFloatingLinks";
 import styles from "./layout.module.scss";
 
 const display = Sora({
@@ -86,11 +87,13 @@ export default function RootLayout({
           Aller au contenu
         </a>
         <Navbar />
-        <SocialFloatingLinks />
+        {/* <SocialFloatingLinks /> */}
         <main id="contenu" className={styles.main}>
           {children}
         </main>
-        <Footer />
+        <FooterVisibility>
+          <Footer />
+        </FooterVisibility>
       </body>
     </html>
   );

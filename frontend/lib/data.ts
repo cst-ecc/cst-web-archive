@@ -23,7 +23,7 @@ export const SAMPLE_FILE = "/documents/exemple.pdf";
 export const CATEGORIES: Category[] = [
   { id: 1, slug: "decisions", name: "Décisions", kind: "decision", },
   { id: 2, slug: "rapports", name: "Rapports", kind: "rapport", },
-  { id: 3, slug: "pv", name: "Procès-verbaux",  kind: "proces_verbal", },
+  { id: 3, slug: "pv", name: "Procès-verbaux", kind: "proces_verbal", },
   { id: 4, slug: "communiques", name: "Communiqués", kind: "communique", },
   { id: 5, slug: "textes", name: "Textes consolidés", kind: "texte_consolide", },
   { id: 6, slug: "vulgarisation", name: "Documents de vulgarisation", kind: "document", },
@@ -216,6 +216,55 @@ export const NEWS: NewsItem[] = [
     imageUrl: "/images/news/mission-cote-divoire.jpg",
     imageAlt: "Séances d’information sur le processus CST et CSMO en Côte d’Ivoire",
     featured: false, date: "2026-03-27",
+    relatedDocumentSlugs: [],
+    status: "publie",
+  },
+  {
+    id: 4,
+    slug: "alerte-info-communique",
+    title: "Communiqué officiel",
+    excerpt:
+      "Retrouvez les dernières informations officielles relatives au processus de mise en œuvre.",
+    content:
+      "Un communiqué officiel a été publié dans le cadre du processus de mise en œuvre.\n\nLe document intégral est disponible ci-dessous.",
+    imageUrl: "/images/home/hero-cst.jpg",
+    imageAlt: "Communiqué officiel du CSMO",
+    featured: false,
+    date: "2026-09-16",
+
+    homeSlot: "alert_info",
+
+    attachment: {
+      type: "pdf",
+      url: SAMPLE_FILE,
+      label: "Communiqué officiel — PDF",
+    },
+
+    relatedDocumentSlugs: [],
+    status: "publie",
+  },
+  {
+    id: 5,
+    slug: "prochain-evenement-csmo",
+    title: "Prochain rendez-vous du processus",
+    excerpt:
+      "Découvrez les informations pratiques et le programme du prochain temps fort.",
+    content:
+      "Un nouveau rendez-vous est prévu dans le cadre de la mise en œuvre du processus.\n\nRetrouvez sur cette page le programme et les informations utiles.",
+    imageUrl: "/images/home/next-event.jpg",
+    imageAlt: "Prochain événement du CSMO",
+    featured: true,
+    date: "2026-09-16",
+
+    homeSlot: "upcoming_event",
+    eventDate: "2026-09-23",
+
+    attachment: {
+      type: "image",
+      url: "/images/home/next-event.jpg",
+      label: "Flyer de l'événement",
+    },
+
     relatedDocumentSlugs: [],
     status: "publie",
   },

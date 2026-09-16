@@ -1,0 +1,35 @@
+@use "../../styles/variables" as v;
+
+.heading {
+  min-height: 2.2rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.8rem;
+
+  > div > span {
+    color: v.$color-blue;
+    font-size: 0.58rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    margin-top: 0.1rem;
+    color: v.$color-blue-ink;
+    font-size: 1rem;
+    line-height: 1.15;
+  }
+
+  a,
+  button {
+    border: 0;
+    background: transparent;
+    color: v.$color-blue;
+    font-size: 0.64rem;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+}

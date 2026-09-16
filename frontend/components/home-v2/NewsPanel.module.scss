@@ -1,0 +1,142 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.dashboard {
+  display: grid;
+  gap: 0.7rem;
+
+  @include m.respond(lg) {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) minmax(15rem, 0.68fr);
+  }
+}
+
+.leadCard,
+.card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  background: v.$color-white;
+}
+
+.leadCard {
+  @include m.respond(lg) {
+    display: grid;
+    grid-template-columns: minmax(9rem, 0.9fr) minmax(0, 1.1fr);
+  }
+}
+
+.leadImage {
+  position: relative;
+  min-height: 8rem;
+  background: v.$color-surface-line;
+
+  @include m.respond(lg) {
+    min-height: 100%;
+  }
+}
+
+.coverImage {
+  object-fit: cover;
+}
+
+.leadBody {
+  padding: 0.65rem;
+
+  > span {
+    color: v.$color-blue;
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  h3 {
+    margin-top: 0.22rem;
+    color: v.$color-blue-ink;
+    font-size: 0.98rem;
+    @include m.line-clamp(2);
+  }
+
+  p {
+    margin-top: 0.28rem;
+    color: rgba(17, 24, 39, 0.58);
+    font-size: 0.65rem;
+    line-height: 1.38;
+    @include m.line-clamp(3);
+  }
+
+  > strong {
+    display: inline-block;
+    margin-top: 0.35rem;
+    color: v.$color-blue;
+    font-size: 0.62rem;
+  }
+}
+
+.card {
+  padding: 0.72rem;
+}
+
+.newsList,
+.linkList {
+  display: grid;
+  gap: 0.28rem;
+  margin-top: 0.42rem;
+}
+
+.newsList a,
+.linkList a {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border-radius: v.$radius-md;
+  padding: 0.43rem 0.48rem;
+  color: v.$color-blue-ink;
+
+  &:hover,
+  &:focus-visible {
+    background: v.$color-surface-muted;
+  }
+
+  > span {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  strong,
+  small {
+    display: block;
+  }
+
+  strong {
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+
+  small {
+    margin-top: 0.08rem;
+    color: rgba(17, 24, 39, 0.48);
+    font-size: 0.57rem;
+  }
+
+  i {
+    margin-left: auto;
+    color: v.$color-blue;
+    font-style: normal;
+  }
+}
+
+.empty {
+  border: 1px dashed v.$color-surface-line;
+  border-radius: v.$radius-xl;
+  padding: 2rem;
+  color: rgba(17, 24, 39, 0.56);
+}
+
+@media (max-width: 639px) {
+  .leadImage {
+    min-height: 12rem;
+  }
+}

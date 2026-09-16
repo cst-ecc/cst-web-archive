@@ -1,7 +1,12 @@
-import { SOCIAL_LINKS, type SocialIconName, type SocialLink } from "@/lib/social-links";
+import {
+    SOCIAL_LINKS,
+    type SocialIconName,
+    type SocialLink,
+} from "@/lib/social-links";
+
 import styles from "./SocialFloatingLinks.module.scss";
 
-type SocialFloatingLinksProps = {
+type SocialInlineLinksProps = {
     links?: SocialLink[];
 };
 
@@ -58,11 +63,13 @@ function SocialIcon({ name }: { name: SocialIconName }) {
     }
 }
 
-export default function SocialFloatingLinks({
+export default function SocialInlineLinks({
     links = SOCIAL_LINKS,
-}: SocialFloatingLinksProps) {
+}: SocialInlineLinksProps) {
     const visibleLinks = links.filter(
-        (link) => link.enabled !== false && link.href.trim().length > 0,
+        (link) =>
+            link.enabled !== false &&
+            link.href.trim().length > 0,
     );
 
     if (visibleLinks.length === 0) {
@@ -70,26 +77,23 @@ export default function SocialFloatingLinks({
     }
 
     return (
-        <aside
-            className={styles.wrapper}
-            aria-label="Liens vers les réseaux sociaux"
+        <nav
+            className={styles.socials}
+            aria-label="Réseaux sociaux officiels"
         >
-            <nav className={styles.nav} aria-label="Réseaux sociaux officiels">
-                {visibleLinks.map((link) => (
-                    <a
-                        key={link.name}
-                        href={link.href}
-                        className={styles.link}
-                        aria-label={link.ariaLabel}
-                        title={link.name}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <SocialIcon name={link.icon} />
-                        <span className={styles.label}>{link.name}</span>
-                    </a>
-                ))}
-            </nav>
-        </aside>
+            {visibleLinks.map((link) => (
+                <a
+                    key={link.name}
+                    href={link.href}
+                    className={styles.link}
+                    aria-label={link.ariaLabel}
+                    title={link.name}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <SocialIcon name={link.icon} />
+                </a>
+            ))}
+        </nav>
     );
 }

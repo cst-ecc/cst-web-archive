@@ -57,7 +57,8 @@
   gap: 0.7rem;
   flex-shrink: 0;
   border-radius: v.$radius-md;
-
+  height: 100%;
+  width: 100%;
   &:focus-visible {
     outline: 3px solid var(--nav-focus-ring);
     outline-offset: 4px;
@@ -65,7 +66,6 @@
 }
 
 .logo {
-  height: 3.15rem;
   width: auto;
 
   @include m.respond(md) {
@@ -529,3 +529,456 @@
     transition: none;
   }
 }
+
+.dropdownSplitTrigger {
+  display: inline-flex;
+  align-items: center;
+  border-radius: v.$radius-md;
+
+  &:hover,
+  &:focus-within {
+    background: var(--nav-hover-bg);
+  }
+
+  .dropdownTrigger {
+    border-radius: v.$radius-md 0 0 v.$radius-md;
+    padding-right: 0.28rem;
+  }
+}
+
+.dropdownParentLink {
+  &:hover,
+  &:focus-visible {
+    background: transparent;
+  }
+}
+
+.dropdownToggle {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.75rem;
+  height: 2.5rem;
+  margin-left: -0.15rem;
+  padding: 0 0.42rem 0 0.18rem;
+  border: 0;
+  border-radius: 0 v.$radius-md v.$radius-md 0;
+  background: transparent;
+  color: var(--nav-text);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--nav-hover-text);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--nav-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.desktopTools {
+  display: none;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+}
+
+.languageSwitch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.12rem;
+  min-height: 2.35rem;
+  padding: 0.18rem;
+  border: 1px solid color-mix(in srgb, var(--nav-text) 18%, transparent);
+  border-radius: 999px;
+}
+
+.languageActive,
+.languagePending {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2rem;
+  height: 1.9rem;
+  padding-inline: 0.42rem;
+  border-radius: 999px;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.languageActive {
+  color: v.$color-blue-ink;
+  background: v.$color-yellow;
+}
+
+.languagePending {
+  border: 0;
+  background: transparent;
+  color: var(--nav-muted);
+  cursor: not-allowed;
+}
+
+.searchButton {
+  display: inline-grid;
+  place-items: center;
+  width: 2.45rem;
+  height: 2.45rem;
+  padding: 0;
+  border: 0;
+  border-radius: v.$radius-md;
+  background: transparent;
+  color: var(--nav-text);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--nav-hover-text);
+    background: var(--nav-hover-bg);
+  }
+}
+
+.digeccButton,
+.mobileDigecc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  min-height: 2.45rem;
+  border-radius: v.$radius-lg;
+  padding: 0.55rem 0.82rem;
+  background: v.$color-yellow;
+  color: v.$color-blue-ink;
+  font-size: 0.71rem;
+  font-weight: 900;
+  letter-spacing: 0.035em;
+  box-shadow: 0 8px 20px rgba(241, 233, 6, 0.14);
+  transition: transform 0.16s ease, background-color 0.16s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: mix(v.$color-white, v.$color-yellow, 18%);
+    transform: translateY(-1px);
+  }
+}
+
+.searchPanel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 45;
+  border-top: 1px solid v.$color-surface-line;
+  border-bottom: 1px solid v.$color-surface-line;
+  background: rgba(255, 255, 255, 0.985);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(14px);
+}
+
+.searchPanelInner {
+  @include m.container;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding-block: 0.9rem;
+
+  > :first-child {
+    flex: 1 1 auto;
+  }
+}
+
+.searchClose {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid v.$color-surface-line;
+  border-radius: 50%;
+  background: v.$color-white;
+  color: v.$color-blue-ink;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mobileParentSplit {
+  display: grid;
+  grid-template-columns: 1fr 3rem;
+  align-items: center;
+  border-radius: v.$radius-lg;
+}
+
+.mobileParentLink,
+.mobileParentToggle {
+  min-height: 3rem;
+  border: 0;
+  background: transparent;
+  color: v.$color-ink;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mobileParentLink {
+  display: flex;
+  align-items: center;
+  padding: 0.72rem 0.78rem;
+  border-radius: v.$radius-lg 0 0 v.$radius-lg;
+}
+
+.mobileParentToggle {
+  display: grid;
+  place-items: center;
+  border-radius: 0 v.$radius-lg v.$radius-lg 0;
+  cursor: pointer;
+}
+
+.mobileParentSplit:hover,
+.mobileParentSplit:focus-within {
+  background: v.$color-surface-muted;
+}
+
+.mobileTools {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 0.45rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid v.$color-surface-line;
+}
+
+.mobileToolsTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mobileTools .languageSwitch {
+  border-color: v.$color-surface-line;
+}
+
+.mobileTools .languagePending {
+  color: rgba(17, 24, 39, 0.45);
+}
+
+@media (max-width: 1279px) {
+  .searchPanel {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .digeccButton,
+  .mobileDigecc,
+  .dropdownToggle {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Accueil V2 — navigation équilibrée autour du logo
+
+   Structure desktop :
+   Langue | espace | menus gauche | logo | menus droite | espace | Recherche + DIGECC
+
+   Les deux espaces sont identiques. Les deux groupes de menus partent du logo
+   avec exactement la même distance. Les outils ne déplacent jamais le logo.
+   ------------------------------------------------------------------ */
+.headerHome {
+  .bar {
+    max-width: 100rem;
+  }
+
+  .logoText {
+    display: none;
+  }
+}
+
+.homeBar {
+  --home-logo-size: 4.6rem;
+  --home-logo-gap: 0.65rem;
+  --home-tools-gap: 1.15rem;
+  --home-tools-width: 8.4rem;
+  --home-menu-gap: 0.08rem;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.homeLogoLink {
+  flex: 0 0 auto;
+  z-index: 2;
+}
+
+.homeNavLeft,
+.homeNavRight,
+.homeLeftTools {
+  display: none;
+}
+
+.homeRightSide {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+/* Desktop : grille parfaitement symétrique autour du logo. */
+@include m.respond(xl) {
+  .homeBar {
+    display: grid;
+    grid-template-columns:
+      var(--home-tools-width)
+      var(--home-tools-gap)
+      minmax(0, 1fr)
+      var(--home-logo-gap)
+      var(--home-logo-size)
+      var(--home-logo-gap)
+      minmax(0, 1fr)
+      var(--home-tools-gap)
+      var(--home-tools-width);
+    align-items: center;
+  }
+
+  .homeLeftTools {
+    grid-column: 1;
+    display: flex;
+    align-items: center;
+    justify-self: start;
+  }
+
+  .homeNavLeft,
+  .homeNavRight {
+    position: static;
+    display: flex;
+    align-items: center;
+    gap: var(--home-menu-gap);
+    transform: none;
+  }
+
+  .homeNavLeft {
+    grid-column: 3;
+    justify-self: end;
+    justify-content: flex-end;
+  }
+
+  .homeLogoLink {
+    grid-column: 5;
+    justify-self: center;
+    padding: 0;
+  }
+
+  .homeLogoLink .logo {
+    width: auto;
+    height: var(--home-logo-size);
+  }
+
+  .homeNavRight {
+    grid-column: 7;
+    justify-self: start;
+    justify-content: flex-start;
+  }
+
+  /* Le wrapper n'intervient pas dans la géométrie desktop. */
+  .homeRightSide {
+    display: contents;
+  }
+
+  .desktopTools {
+    grid-column: 9;
+    position: static;
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    gap: 0.32rem;
+    transform: none;
+    z-index: 3;
+  }
+
+  .headerHome .navLink,
+  .headerHome .dropdownTrigger {
+    min-height: 2.35rem;
+    padding: 0.42rem 0.5rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .headerHome .burger {
+    display: none;
+  }
+}
+
+/* Desktop compact : on réduit les dimensions sans casser la symétrie. */
+@media (min-width: 1280px) and (max-width: 1450px) {
+  .homeBar {
+    --home-logo-size: 3.25rem;
+    --home-logo-gap: 0.38rem;
+    --home-tools-gap: 0.55rem;
+    --home-tools-width: 7rem;
+    --home-menu-gap: 0;
+  }
+
+  .headerHome .navLink,
+  .headerHome .dropdownTrigger {
+    min-height: 2.2rem;
+    padding-inline: 0.34rem;
+    font-size: 0.58rem;
+    letter-spacing: 0;
+  }
+
+  .dropdownToggle {
+    min-width: 1.35rem;
+    height: 2.2rem;
+    padding-right: 0.18rem;
+  }
+
+  .desktopTools {
+    gap: 0.14rem;
+  }
+
+  .languageSwitch {
+    min-height: 2.05rem;
+    padding: 0.1rem;
+  }
+
+  .languageActive,
+  .languagePending {
+    min-width: 1.55rem;
+    height: 1.65rem;
+    padding-inline: 0.25rem;
+    font-size: 0.56rem;
+  }
+
+  .searchButton {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .digeccButton {
+    min-height: 2.05rem;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.58rem;
+  }
+}
+
+/* Grands écrans : davantage d'air, toujours de manière symétrique. */
+@media (min-width: 1536px) {
+  .homeBar {
+    --home-logo-gap: 0.9rem;
+    --home-tools-gap: 1.5rem;
+    --home-tools-width: 9rem;
+    --home-menu-gap: 0.16rem;
+  }
+
+  .headerHome .navLink,
+  .headerHome .dropdownTrigger {
+    padding-inline: 0.62rem;
+    font-size: 0.7rem;
+  }
+}
+

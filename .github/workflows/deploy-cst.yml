@@ -3,7 +3,7 @@ name: Deploy CST Production
 on:
   push:
     branches:
-      - main
+      - feature-v2
 
   workflow_dispatch:
 

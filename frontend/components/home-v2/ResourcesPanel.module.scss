@@ -1,0 +1,171 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.grid {
+  display: grid;
+  gap: 0.7rem;
+
+  @include m.respond(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.card {
+  min-width: 0;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  padding: 0.72rem;
+  background: v.$color-white;
+
+  &[data-tone="gold"] {
+    background: linear-gradient(135deg, rgba(218, 167, 16, 0.07), v.$color-white 42%);
+  }
+
+  &[data-tone="green"] {
+    background: linear-gradient(135deg, rgba(31, 133, 206, 0.06), rgba(241, 233, 6, 0.035), v.$color-white 50%);
+  }
+}
+
+.header {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+
+  h3 {
+    color: v.$color-blue-ink;
+    font-size: 0.9rem;
+  }
+
+  p {
+    margin-top: 0.1rem;
+    color: rgba(17, 24, 39, 0.56);
+    font-size: 0.63rem;
+    line-height: 1.35;
+  }
+}
+
+.iconCircle {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: rgba(31, 133, 206, 0.12);
+  color: v.$color-blue-deep;
+}
+
+.links {
+  display: grid;
+  gap: 0.28rem;
+  margin-top: 0.42rem;
+
+  a {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    border-radius: v.$radius-md;
+    padding: 0.43rem 0.48rem;
+    color: v.$color-blue-ink;
+
+    &:hover,
+    &:focus-visible {
+      background: v.$color-surface-muted;
+    }
+
+    > span {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    strong,
+    small {
+      display: block;
+    }
+
+    strong {
+      font-size: 0.68rem;
+      line-height: 1.2;
+    }
+
+    small {
+      margin-top: 0.08rem;
+      color: rgba(17, 24, 39, 0.48);
+      font-size: 0.57rem;
+      line-height: 1.25;
+    }
+
+    i {
+      margin-left: auto;
+      color: v.$color-blue;
+      font-style: normal;
+    }
+  }
+}
+
+.callout {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: v.$radius-xl2;
+  padding: 0.65rem 0.85rem;
+  background: linear-gradient(90deg, rgba(31, 133, 206, 0.09), rgba(218, 167, 16, 0.1));
+
+  > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  strong,
+  small {
+    display: block;
+  }
+
+  strong {
+    color: v.$color-blue-ink;
+    font-size: 0.72rem;
+  }
+
+  small {
+    margin-top: 0.08rem;
+    color: rgba(17, 24, 39, 0.54);
+    font-size: 0.6rem;
+  }
+
+  > div:last-child {
+    display: flex;
+    gap: 0.45rem;
+  }
+
+  button,
+  a {
+    border: 0;
+    border-radius: v.$radius-lg;
+    padding: 0.52rem 0.75rem;
+    background: v.$color-blue-deep;
+    color: v.$color-white;
+    font-size: 0.62rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  a {
+    background: v.$color-yellow;
+    color: v.$color-blue-ink;
+  }
+}
+
+@media (max-width: 639px) {
+  .callout {
+    display: grid;
+
+    > div:last-child {
+      flex-wrap: wrap;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+@use "../../styles/variables" as v;
+
+.overview {
+  min-height: calc(100svh - #{v.$header-height});
+  background: v.$color-white;
+  color: v.$color-ink;
+}
+
+@media (min-width: 1024px) {
+  .overview {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+}

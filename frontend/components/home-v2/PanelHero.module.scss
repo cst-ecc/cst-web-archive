@@ -1,0 +1,194 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+$section-hero-height: clamp(13.5rem, 31dvh, 18rem);
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 22rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  color: v.$color-white;
+
+  @include m.respond(lg) {
+    height: $section-hero-height;
+    min-height: 0;
+  }
+}
+
+.image,
+.overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.image {
+  z-index: -2;
+  background: v.$color-blue-ink;
+}
+
+.cover {
+  object-fit: cover;
+}
+
+.overlay {
+  z-index: -1;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7, 50, 91, 0.97),
+      rgba(12, 59, 92, 0.88) 36%,
+      rgba(31, 133, 206, 0.42) 66%,
+      rgba(12, 59, 92, 0.12)
+    ),
+    linear-gradient(
+      0deg,
+      rgba(5, 31, 48, 0.28),
+      transparent 56%
+    );
+}
+
+.inner {
+  @include m.container;
+
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Seulement lorsqu'une image secondaire est fournie */
+.innerWithImage {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr);
+  align-items: center;
+  gap: 2rem;
+
+  @include m.respond(lg) {
+    grid-template-columns: 12rem minmax(0, 1fr);
+    gap: 2.5rem;
+  }
+}
+
+.sideImage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+}
+
+.sideImageContent {
+  object-fit: cover;
+}
+
+.content {
+  min-width: 0;
+}
+
+.content h2 {
+  max-width: 19ch;
+  margin-top: 0.42rem;
+  color: v.$color-white;
+  font-family: v.$font-display;
+  font-size: clamp(2.15rem, 3.55vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: v.$color-yellow;
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+
+  &::before {
+    content: "";
+    width: 2rem;
+    height: 2px;
+    border-radius: 999px;
+    background: v.$color-yellow;
+  }
+}
+
+.subtitle {
+  max-width: 43rem;
+  margin-top: 0.6rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(0.83rem, 1vw, 1rem);
+  line-height: 1.48;
+}
+
+.quote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+  max-width: 43rem;
+  margin-top: 0.65rem;
+  color: rgba(255, 255, 255, 0.79);
+  font-family: Georgia, serif;
+  font-size: 0.8rem;
+  font-style: italic;
+
+  small {
+    color: v.$color-yellow;
+    font-family: v.$font-body;
+    font-size: 0.62rem;
+    font-style: normal;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+.alt {
+  position: absolute;
+  right: 1.3rem;
+  bottom: 0.85rem;
+  max-width: 16rem;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1023px) {
+  .innerWithImage {
+    grid-template-columns: 8rem minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero {
+    min-height: 24rem;
+  }
+
+  .innerWithImage {
+    grid-template-columns: 1fr;
+  }
+
+  .sideImage {
+    display: none;
+  }
+
+  .content h2 {
+    font-size: clamp(2.15rem, 11vw, 3.2rem);
+  }
+
+  .alt {
+    display: none;
+  }
+}

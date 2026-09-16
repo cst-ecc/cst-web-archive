@@ -1,0 +1,43 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.frame {
+  min-height: calc(100svh - #{v.$header-height});
+  display: flex;
+  flex-direction: column;
+  background: v.$color-white;
+}
+
+.body {
+  @include m.container;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+}
+
+@include m.respond(lg) {
+  .frame {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .body {
+    overflow: hidden;
+    padding-top: 0.65rem;
+    padding-bottom: 0.6rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .frame {
+    overflow: visible;
+  }
+
+  .body {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}

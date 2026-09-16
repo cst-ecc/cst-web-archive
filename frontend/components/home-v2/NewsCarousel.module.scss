@@ -1,0 +1,186 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.carousel {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid v.$color-surface-line;
+    border-radius: v.$radius-lg;
+    background: v.$color-white;
+}
+
+.slide {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-columns:
+        minmax(9rem, 0.9fr) minmax(0, 1.1fr);
+
+    color: inherit;
+}
+
+.imageWrap {
+    position: relative;
+    min-height: 8rem;
+    overflow: hidden;
+    background: v.$color-surface-muted;
+}
+
+.image {
+    object-fit: cover;
+}
+
+.imageOverlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg,
+            transparent 52%,
+            rgba(5, 31, 48, 0.52));
+}
+
+.counter {
+    position: absolute;
+    left: 0.65rem;
+    bottom: 0.55rem;
+
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    color: v.$color-white;
+    font-size: 0.56rem;
+    font-weight: 800;
+
+    i {
+        width: 1rem;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.55);
+    }
+}
+
+.body {
+    align-self: center;
+    min-width: 0;
+    padding: 0.75rem 0.8rem;
+
+    time {
+        color: rgba(17, 24, 39, 0.46);
+        font-size: 0.61rem;
+    }
+
+    h3 {
+        margin-top: 0.3rem;
+        color: v.$color-blue-ink;
+        font-size: clamp(0.95rem, 1.15vw, 1.2rem);
+        line-height: 1.2;
+
+        @include m.line-clamp(2);
+    }
+
+    p {
+        margin-top: 0.38rem;
+        color: rgba(17, 24, 39, 0.6);
+        font-size: 0.69rem;
+        line-height: 1.45;
+
+        @include m.line-clamp(2);
+    }
+
+    strong {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+
+        margin-top: 0.48rem;
+
+        color: v.$color-blue;
+        font-size: 0.64rem;
+    }
+}
+
+.navigation {
+    position: absolute;
+    right: 0.55rem;
+    top: 0.55rem;
+
+    display: flex;
+    gap: 0.25rem;
+
+    button {
+        width: 1.7rem;
+        height: 1.7rem;
+
+        display: grid;
+        place-items: center;
+
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        border-radius: 50%;
+
+        background: rgba(5, 31, 48, 0.46);
+        color: v.$color-white;
+
+        backdrop-filter: blur(6px);
+
+        cursor: pointer;
+
+        transition:
+            background 0.18s ease,
+            transform 0.18s ease;
+
+        &:hover {
+            background: v.$color-blue;
+            transform: translateY(-1px);
+        }
+    }
+}
+
+.dots {
+    position: absolute;
+    right: 0.7rem;
+    bottom: 0.55rem;
+
+    display: flex;
+    gap: 0.25rem;
+
+    button {
+        width: 0.35rem;
+        height: 0.35rem;
+
+        border: 0;
+        border-radius: 999px;
+
+        background: rgba(12, 59, 92, 0.22);
+        cursor: pointer;
+
+        transition: width 0.18s ease;
+    }
+
+    .activeDot {
+        width: 1.1rem;
+        background: v.$color-yellow;
+    }
+}
+
+.empty {
+    display: grid;
+    place-items: center;
+    min-height: 8rem;
+
+    border: 1px dashed v.$color-surface-line;
+    border-radius: v.$radius-lg;
+
+    color: rgba(17, 24, 39, 0.55);
+    font-size: 0.72rem;
+}
+
+@media (max-width: 639px) {
+    .slide {
+        grid-template-columns: 1fr;
+    }
+
+    .imageWrap {
+        min-height: 11rem;
+    }
+}

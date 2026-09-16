@@ -383,11 +383,11 @@ export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
       const item = await apiFetch<NewsItem>(`/news/${slug}/`);
       return isPublic(item)
         ? {
-            ...item,
-            imageAlt: item.imageAlt ?? item.title,
-            featured: Boolean(item.featured),
-            relatedDocumentSlugs: item.relatedDocumentSlugs ?? [],
-          }
+          ...item,
+          imageAlt: item.imageAlt ?? item.title,
+          featured: Boolean(item.featured),
+          relatedDocumentSlugs: item.relatedDocumentSlugs ?? [],
+        }
         : null;
     } catch (error) {
       if (error instanceof ApiFetchError && error.status === 404) {
@@ -417,9 +417,12 @@ export async function getFeaturedNews(limit = 1): Promise<NewsItem[]> {
     .slice(0, limit);
 }
 
-/** Actualités les plus récentes, utiles pour la landing page. */
-export async function getRecentNews(limit = 3): Promise<NewsItem[]> {
-  return (await getNews()).slice(0, limit);
+export async function getRecentNews(
+  limit = 3,
+): Promise<NewsItem[]> {
+  return (await getNews())
+    .filter((item) => !item.homeSlot)
+    .slice(0, limit);
 }
 
 type NewsIdentity = Pick<NewsItem, "id" | "slug">;
@@ -454,7 +457,9 @@ export function selectHeroNewsItems(
   items: NewsItem[],
   limit = 3,
 ): NewsItem[] {
-  const news = normalizePublicNews(items);
+  const news = normalizePublicNews(items).filter(
+    (item) => !item.homeSlot,
+  );
   const selected: NewsItem[] = [];
   const featured = news.find((item) => item.featured);
 
@@ -486,8 +491,11 @@ export function selectRemainingNewsItems(
   );
 
   return normalizePublicNews(items)
+    .filter((item) => !item.homeSlot)
     .filter((item) =>
-      newsIdentityKeys(item).every((key) => !excludedKeys.has(key)),
+      newsIdentityKeys(item).every(
+        (key) => !excludedKeys.has(key),
+      ),
     )
     .slice(0, limit);
 }
@@ -554,4 +562,30 @@ export async function getStats(): Promise<SiteStats> {
     members: rawMembers.filter(isPublic).length,
     albums: rawAlbums.filter(isPublic).length,
   };
+}
+
+
+export async function getHomeSpecialNews(): Promise<NewsItem[]> {
+  /*
+   * TEMPORAIRE :
+   * les contenus spéciaux de l'accueil utilisent le mock
+   * tant que leur prise en charge n'existe pas dans Django.
+   *
+   * Lors du branchement backend, cette fonction pourra
+   * être basculée vers une route API dédiée.
+   */
+
+  const mockItems = normalizePublicNews(rawNews);
+
+  const event = mockItems.find(
+    (item) => item.homeSlot === "upcoming_event",
+  );
+
+  const alert = mockItems.find(
+    (item) => item.homeSlot === "alert_info",
+  );
+
+  return [event, alert].filter(
+    (item): item is NewsItem => Boolean(item),
+  );
 }

@@ -36,13 +36,13 @@ export const SOCIAL_LINKS: SocialLink[] = [
         ariaLabel: "Voir notre compte TikTok",
         enabled: true,
     },
-    // {
-    //     name: "YouTube",
-    //     href: "https://www.youtube.com/",
-    //     icon: "youtube",
-    //     ariaLabel: "Voir notre chaîne YouTube",
-    //     enabled: true,
-    // },
+    {
+        name: "YouTube",
+        href: "https://www.youtube.com/@cstcsm-ecc",
+        icon: "youtube",
+        ariaLabel: "Voir notre chaîne YouTube",
+        enabled: true,
+    },
     // {
     //     name: "Instagram",
     //     href: "https://www.instagram.com/",
@@ -66,7 +66,7 @@ export const SOCIAL_LINKS: SocialLink[] = [
     // },
     {
         name: "WhatsApp",
-        href: "https://wa.me/c/2290148899999",
+        href: "https://wa.me/c/22948899999",
         icon: "whatsapp",
         ariaLabel: "Nous contacter sur WhatsApp",
         enabled: true,

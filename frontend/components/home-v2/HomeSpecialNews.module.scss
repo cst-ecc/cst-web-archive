@@ -1,0 +1,311 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.wrapper {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 0.7rem;
+}
+
+.specialBox {
+    min-width: 0;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.heading {
+    flex: 0 0 auto;
+
+    min-height: 1.8rem;
+
+    display: flex;
+    align-items: center;
+
+    margin-bottom: 0.3rem;
+
+    h2 {
+        margin: 0;
+
+        color: v.$color-blue-ink;
+
+        font-size:
+            clamp(0.88rem,
+                1.05vw,
+                1.15rem);
+
+        line-height: 1.2;
+        font-weight: 800;
+    }
+}
+
+.card {
+    position: relative;
+
+    flex: 1 1 auto;
+
+    min-width: 0;
+    min-height: 0;
+
+    display: grid;
+    grid-template-rows:
+        minmax(6.5rem, 1fr) auto;
+
+    overflow: hidden;
+
+    border:
+        1px solid v.$color-surface-line;
+
+    border-radius:
+        v.$radius-lg;
+
+    background:
+        v.$color-white;
+
+    box-shadow:
+        0 0.35rem 1.2rem rgba(12, 59, 92, 0.055);
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.card:hover {
+    transform:
+        translateY(-1px);
+
+    border-color:
+        rgba(31, 133, 206, 0.22);
+
+    box-shadow:
+        0 0.6rem 1.5rem rgba(12, 59, 92, 0.09);
+}
+
+.card[data-tone="event"] {
+    border-top:
+        3px solid v.$color-blue;
+}
+
+.card[data-tone="alert"] {
+    border-top:
+        3px solid v.$color-yellow;
+}
+
+.media {
+    position: relative;
+
+    min-height: 6.5rem;
+
+    overflow: hidden;
+
+    background:
+        v.$color-surface-muted;
+}
+
+.image {
+    object-fit: cover;
+}
+
+.pdfPreview {
+    width: 100%;
+    height: 100%;
+
+    min-height: 6.5rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 0.4rem;
+
+    background:
+        linear-gradient(145deg,
+            v.$color-blue-ink,
+            v.$color-blue-deep );
+
+    color:
+        v.$color-white;
+
+    svg {
+        width: 1.8rem;
+        height: 1.8rem;
+
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.6;
+        stroke-linejoin: round;
+    }
+
+    strong {
+        color:
+            v.$color-yellow;
+
+        font-size:
+            0.6rem;
+
+        font-weight:
+            900;
+
+        letter-spacing:
+            0.1em;
+    }
+}
+
+.mediaType {
+    position: absolute;
+
+    left: 0.45rem;
+    bottom: 0.45rem;
+
+    padding:
+        0.2rem 0.38rem;
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(5, 31, 48, 0.78);
+
+    color:
+        v.$color-white;
+
+    font-size:
+        0.45rem;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.07em;
+
+    backdrop-filter:
+        blur(5px);
+}
+
+.content {
+    min-width: 0;
+
+    padding:
+        0.55rem 0.6rem 0.65rem;
+}
+
+.date {
+    display: block;
+
+    color:
+        rgba(17, 24, 39, 0.44);
+
+    font-size:
+        0.5rem;
+}
+
+.content h3 {
+    margin-top:
+        0.28rem;
+
+    color:
+        v.$color-blue-ink;
+
+    font-size:
+        clamp(0.72rem,
+            0.78vw,
+            0.86rem);
+
+    line-height:
+        1.2;
+
+    @include m.line-clamp(2);
+}
+
+.content p {
+    margin-top:
+        0.25rem;
+
+    color:
+        rgba(17, 24, 39, 0.58);
+
+    font-size:
+        0.57rem;
+
+    line-height:
+        1.38;
+
+    @include m.line-clamp(2);
+}
+
+.readMore {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        0.28rem;
+
+    margin-top:
+        0.38rem;
+
+    color:
+        v.$color-blue;
+
+    font-size:
+        0.57rem;
+
+    font-weight:
+        800;
+
+    transition:
+        color 0.18s ease,
+        gap 0.18s ease;
+
+    &:hover {
+        gap:
+            0.4rem;
+
+        color:
+            v.$color-blue-deep;
+    }
+}
+
+@media (max-width: 639px) {
+    .wrapper {
+        height: auto;
+
+        grid-template-columns:
+            1fr;
+
+        gap:
+            1rem;
+    }
+
+    .specialBox {
+        height: auto;
+    }
+
+    .card {
+        height: auto;
+
+        grid-template-rows:
+            minmax(10rem, auto) auto;
+    }
+
+    .media {
+        min-height:
+            10rem;
+    }
+
+    .heading h2 {
+        font-size:
+            1.05rem;
+    }
+}

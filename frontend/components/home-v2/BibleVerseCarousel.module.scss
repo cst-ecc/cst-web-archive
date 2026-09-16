@@ -1,0 +1,369 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.root {
+  position: relative;
+
+  margin: 0;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   VERSET
+========================================================= */
+
+.quote {
+  position: relative;
+
+  min-width: 0;
+  margin: 0;
+
+  p,
+  cite {
+    position: relative;
+    z-index: 1;
+  }
+
+  p {
+    animation: verseFade 0.35s ease;
+  }
+
+  cite {
+    font-style: normal;
+  }
+}
+
+
+.mark {
+  position: absolute;
+
+  pointer-events: none;
+
+  font-family: Georgia, serif;
+}
+
+
+/* =========================================================
+   ZONE ACTIONS
+   navigation + réseaux sociaux
+========================================================= */
+
+.actions {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+
+  gap: 0.75rem;
+}
+
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.38rem;
+}
+
+
+.divider {
+  width: 1px;
+  height: 1.35rem;
+
+  flex: 0 0 auto;
+
+  background:
+    rgba(255, 255, 255, 0.24);
+}
+
+
+/* =========================================================
+   DOTS
+========================================================= */
+
+.dot,
+.dotActive {
+  width: 0.42rem;
+  height: 0.42rem;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  transition:
+    width 0.18s ease,
+    background-color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+
+.dot {
+  background:
+    rgba(255, 255, 255, 0.48);
+}
+
+
+.dotActive {
+  width: 1.15rem;
+
+  border-radius: 999px;
+
+  background: v.$color-yellow;
+}
+
+
+/* =========================================================
+   VARIANTE CARD
+========================================================= */
+
+.card {
+  border-radius: v.$radius-xl2;
+
+  padding:
+    clamp(1.25rem,
+      2.4vw,
+      1.8rem);
+
+  background:
+    linear-gradient(145deg,
+      v.$color-blue-ink,
+      v.$color-blue-deep );
+
+  color: v.$color-white;
+
+  box-shadow:
+    0 22px 54px rgba(12, 59, 92, 0.16);
+
+
+  .quote p {
+    font-family: v.$font-display;
+
+    font-size:
+      clamp(1.05rem,
+        1.7vw,
+        1.45rem);
+
+    line-height: 1.38;
+  }
+
+
+  .quote cite {
+    display: block;
+
+    margin-top: 0.8rem;
+
+    color: v.$color-yellow;
+
+    font-size: 0.69rem;
+    font-weight: 800;
+
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+
+  .mark {
+    top: -2.1rem;
+    right: 0.55rem;
+
+    font-size: 7rem;
+
+    color:
+      rgba(255,
+        255,
+        255,
+        0.07);
+  }
+
+
+  .actions {
+    margin-top: 0.9rem;
+  }
+}
+
+
+/* =========================================================
+   VARIANTE STRIP
+
+   Verset à gauche
+   navigation + réseaux à droite
+========================================================= */
+
+.strip {
+  min-height: 2.8rem;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr) auto;
+
+  align-items: center;
+
+  gap: 1.5rem;
+
+  padding: 0.45rem max(1.25rem,
+    calc((100vw - #{v.$max-width-content}) / 2 + 1.25rem));
+
+  background:
+    linear-gradient(90deg,
+      rgba(12, 59, 92, 0.96),
+      rgba(31, 133, 206, 0.88)),
+    url("/images/home/hero-csmo.jpg") center 62% / cover;
+
+  color: v.$color-white;
+
+
+  .quote {
+    display: flex;
+    align-items: baseline;
+
+    flex-wrap: wrap;
+
+    gap:
+      0.35rem 0.65rem;
+
+    min-width: 0;
+
+    text-align: left;
+  }
+
+
+  .quote p {
+    min-width: 0;
+
+    font-family: Georgia, serif;
+
+    font-size:
+      clamp(0.8rem,
+        1vw,
+        0.96rem);
+
+    font-style: italic;
+    line-height: 1.35;
+  }
+
+
+  .quote cite {
+    flex: 0 0 auto;
+
+    color:
+      rgba(255,
+        255,
+        255,
+        0.7);
+
+    font-size: 0.61rem;
+
+    white-space: nowrap;
+  }
+
+
+  .mark {
+    display: none;
+  }
+
+
+  .actions {
+    justify-self: end;
+  }
+}
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+@keyframes verseFade {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(0.2rem);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+
+/* =========================================================
+   TABLETTE / MOBILE
+========================================================= */
+
+@media (max-width: 767px) {
+  .strip {
+    grid-template-columns: 1fr;
+
+    gap: 0.5rem;
+
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+
+
+    .quote {
+      justify-content: center;
+
+      text-align: center;
+    }
+
+
+    .actions {
+      justify-self: center;
+
+      justify-content: center;
+    }
+  }
+}
+
+
+@media (max-width: 420px) {
+  .actions {
+    gap: 0.55rem;
+  }
+
+  .divider {
+    height: 1.15rem;
+  }
+
+  .controls {
+    gap: 0.28rem;
+  }
+
+  .dot,
+  .dotActive {
+    height: 0.36rem;
+  }
+
+  .dot {
+    width: 0.36rem;
+  }
+
+  .dotActive {
+    width: 0.95rem;
+  }
+}
+
+
+/* =========================================================
+   ACCESSIBILITÉ
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .quote p,
+  .dot,
+  .dotActive {
+    animation: none;
+    transition: none;
+  }
+}

@@ -1,0 +1,114 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.topicGrid,
+.contentGrid {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.topicGrid {
+  @include m.respond(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.contentGrid {
+  margin-top: 0.7rem;
+
+  @include m.respond(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.card {
+  min-width: 0;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  padding: 0.72rem;
+  background: v.$color-white;
+}
+
+.storyList,
+.linkList {
+  display: grid;
+  gap: 0.28rem;
+  margin-top: 0.42rem;
+}
+
+.storyList a,
+.linkList a,
+.largeAction {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border-radius: v.$radius-md;
+  padding: 0.43rem 0.48rem;
+  color: v.$color-blue-ink;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: v.$color-surface-muted;
+    transform: translateX(2px);
+  }
+
+  > span {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  strong,
+  small {
+    display: block;
+  }
+
+  strong {
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+
+  small {
+    margin-top: 0.08rem;
+    color: rgba(17, 24, 39, 0.48);
+    font-size: 0.57rem;
+    line-height: 1.25;
+  }
+
+  i {
+    margin-left: auto;
+    color: v.$color-blue;
+    font-style: normal;
+    font-size: 0.7rem;
+  }
+}
+
+.storyList a {
+  display: grid;
+  grid-template-columns: 4.35rem 1fr auto;
+}
+
+.storyThumb {
+  position: relative;
+  min-height: 2.6rem;
+  overflow: hidden;
+  border-radius: v.$radius-md;
+  background: v.$color-surface-line;
+}
+
+.coverImage {
+  object-fit: cover;
+}
+
+.detailLead {
+  margin-top: 0.5rem;
+  color: rgba(17, 24, 39, 0.6);
+  font-size: 0.66rem;
+  line-height: 1.45;
+}
+
+.largeAction {
+  margin-top: 0.42rem;
+  background: linear-gradient(135deg, rgba(218, 167, 16, 0.12), rgba(241, 233, 6, 0.08));
+}
