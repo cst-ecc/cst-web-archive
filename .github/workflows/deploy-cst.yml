@@ -132,14 +132,14 @@ jobs:
 
           cd "${APP_DIR}"
 
-          log "Synchronisation Git avec origin/main"
-          git fetch --prune origin main
+          log "Synchronisation Git avec origin/feature-v2"
+          git fetch --prune origin feature-v2
 
           # Nettoyage prudent :
           # - supprime les fichiers non suivis qui peuvent bloquer git ;
           # - protège explicitement le fichier d'environnement production.
           git clean -fd -e docker/.env.prod
-          git reset --hard origin/main
+          git reset --hard origin/feature-v2
 
           log "Vérification du fichier d'environnement"
           test -s "docker/${ENV_FILE}"
