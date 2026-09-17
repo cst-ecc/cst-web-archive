@@ -40,10 +40,6 @@ class PublicNewsSerializer(serializers.ModelSerializer):
         if obj.featured_image:
             return obj.featured_image.url
 
-        # Un flyer peut également servir de visuel principal de l'article.
-        if obj.attachment and obj.attachment_type == "image":
-            return obj.attachment.url
-
         return ""
 
     def get_relatedDocumentSlugs(self, obj):
