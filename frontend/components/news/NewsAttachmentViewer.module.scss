@@ -1,0 +1,107 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid v.$color-surface-line;
+}
+
+.heading {
+  margin-bottom: 1rem;
+
+  h2 {
+    margin-top: 0.25rem;
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    color: v.$color-blue-ink;
+  }
+}
+
+.eyebrow {
+  color: v.$color-blue;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.imageWrap,
+.previewWrap {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  background: v.$color-surface-muted;
+}
+
+.imageWrap {
+  aspect-ratio: 4 / 3;
+}
+
+.previewWrap {
+  aspect-ratio: 16 / 9;
+  margin-bottom: 1rem;
+}
+
+.image {
+  object-fit: contain;
+  background: v.$color-white;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.primaryAction,
+.secondaryAction {
+  @include m.button-base;
+}
+
+.primaryAction {
+  background: v.$color-blue;
+  color: v.$color-white;
+
+  &:hover,
+  &:focus-visible {
+    background: v.$color-blue-deep;
+  }
+}
+
+.secondaryAction {
+  border: 1px solid v.$color-surface-line;
+  background: v.$color-white;
+  color: v.$color-blue-deep;
+
+  &:hover,
+  &:focus-visible {
+    border-color: rgba(31, 133, 206, 0.3);
+    background: v.$color-surface-muted;
+  }
+}
+
+.pdfObject {
+  display: block;
+  width: 100%;
+  min-height: 42rem;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  background: v.$color-white;
+}
+
+@media (max-width: 767px) {
+  .section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .imageWrap {
+    aspect-ratio: 3 / 4;
+  }
+
+  .pdfObject {
+    display: none;
+  }
+}

@@ -6,7 +6,6 @@ import PanelHero, {
 } from "./PanelHero";
 import BibleVerseCarousel from "./BibleVerseCarousel";
 import styles from "./PanelFrame.module.scss";
-import HomeCompactFooter from "./HomeCompactFooter";
 
 type PanelFrameProps = {
   hero: Omit<PanelHeroProps, "quote" | "sideImage">;
@@ -38,7 +37,6 @@ export default function PanelFrame({
         variant="strip"
       />
 
-      <HomeCompactFooter />
     </div>
   );
 }

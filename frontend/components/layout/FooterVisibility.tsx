@@ -4,11 +4,14 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 /**
- * Le footer historique reste inchangé sur toutes les pages internes.
- * L'accueil V2 utilise un pied de page compact intégré à son panneau afin
- * d'éviter un deuxième bloc vertical et le double scroll sur desktop.
+ * Le footer global est masqué uniquement sur l'accueil :
+ * le panneau Home V2 rend déjà le même SiteFooter dans son propre flux.
  */
-export default function FooterVisibility({ children }: { children: ReactNode }) {
+export default function FooterVisibility({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const pathname = usePathname();
 
   if (pathname === "/") return null;

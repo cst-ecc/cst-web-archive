@@ -1,0 +1,83 @@
+@use "../../styles/variables" as v;
+
+.media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background: v.$color-surface-muted;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+.media:hover .image,
+.media:focus-within .image {
+  transform: scale(1.025);
+}
+
+.type {
+  position: absolute;
+  left: 0.65rem;
+  bottom: 0.65rem;
+  padding: 0.25rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(5, 31, 48, 0.82);
+  color: v.$color-white;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.pdf,
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.pdf {
+  background: linear-gradient(145deg, v.$color-blue-ink, v.$color-blue-deep);
+  color: v.$color-white;
+
+  svg {
+    width: 2.1rem;
+    height: 2.1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+  }
+
+  strong {
+    color: v.$color-yellow;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+  }
+
+  span {
+    max-width: 80%;
+    text-align: center;
+    font-size: 0.68rem;
+    opacity: 0.78;
+  }
+}
+
+.placeholder {
+  color: v.$color-blue-deep;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image {
+    transition: none;
+  }
+}

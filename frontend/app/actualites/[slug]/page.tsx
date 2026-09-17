@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
+
 import Container from "@/components/layout/Container";
 import DocumentCard from "@/components/documents/DocumentCard";
-import { getNews, getNewsBySlug, getDocumentBySlug } from "@/lib/api";
+import NewsAttachmentViewer from "@/components/news/NewsAttachmentViewer";
+import NewsMedia from "@/components/news/NewsMedia";
+import {
+  getDocumentBySlug,
+  getNews,
+  getNewsBySlug,
+} from "@/lib/api";
 import { formatDate } from "@/lib/utils";
+
 import styles from "../actu-detail.module.scss";
-import { isDjangoMediaUrl } from "@/lib/media";
 
 export const revalidate = 300;
 
@@ -22,20 +28,31 @@ export async function generateMetadata({
   params: { slug: string };
 }): Promise<Metadata> {
   const item = await getNewsBySlug(params.slug);
-  if (!item) return { title: "Actualité introuvable" };
+
+  if (!item) {
+    return { title: "Actualité introuvable" };
+  }
 
   return {
     title: item.title,
     description: item.excerpt,
-    openGraph: {
-      images: [
-        {
-          url: item.imageUrl,
-          alt: item.imageAlt ?? item.title,
-        },
-      ],
-    },
+    openGraph: item.imageUrl
+      ? {
+          images: [
+            {
+              url: item.imageUrl,
+              alt: item.imageAlt ?? item.title,
+            },
+          ],
+        }
+      : undefined,
   };
+}
+
+function articleLabel(homeSlot?: string) {
+  if (homeSlot === "upcoming_event") return "Événement à venir";
+  if (homeSlot === "alert_info") return "Alerte Info";
+  return "Actualité";
 }
 
 export default async function NewsDetailPage({
@@ -44,6 +61,7 @@ export default async function NewsDetailPage({
   params: { slug: string };
 }) {
   const item = await getNewsBySlug(params.slug);
+
   if (!item) notFound();
 
   const docs = (
@@ -54,37 +72,54 @@ export default async function NewsDetailPage({
     )
   ).filter((doc): doc is NonNullable<typeof doc> => Boolean(doc));
 
+  const displayDate = item.eventDate ?? item.date;
+  const attachmentImageAlreadyShown =
+    item.attachment?.type === "image" &&
+    (!item.imageUrl || item.attachment.url === item.imageUrl);
+
   return (
     <Container className={styles.wrapper}>
       <nav className={styles.breadcrumb} aria-label="Fil d'Ariane">
-        <Link href="/actualites">← Actualités</Link>
+        <Link href="/actualites">← Toutes les actualités</Link>
       </nav>
 
       <article className={styles.article}>
-        <time dateTime={item.date} className={styles.date}>
-          {formatDate(item.date)}
+        <p className={styles.eyebrow}>{articleLabel(item.homeSlot)}</p>
+
+        <time dateTime={displayDate} className={styles.date}>
+          {formatDate(displayDate)}
         </time>
+
         <h1 className={styles.title}>{item.title}</h1>
+        <p className={styles.excerpt}>{item.excerpt}</p>
         <div className={styles.rule} />
-        <div className={styles.imageWrap}>
-          <Image
-            src={item.imageUrl}
-            alt={item.imageAlt ?? item.title}
-            fill
-            sizes="(max-width:768px) 100vw, 768px"
-            className={styles.image}
-            priority
-            unoptimized={isDjangoMediaUrl(item.imageUrl)}
-          />
-        </div>
+
+        {item.imageUrl || item.attachment ? (
+          <div className={styles.imageWrap}>
+            <NewsMedia
+              item={item}
+              priority
+              sizes="(max-width: 768px) 100vw, 768px"
+            />
+          </div>
+        ) : null}
+
         <div className={styles.body}>
-          {item.content.split("\n\n").map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
+          {item.content
+            .split("\n\n")
+            .filter(Boolean)
+            .map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
         </div>
+
+        {item.attachment &&
+        (item.attachment.type === "pdf" || !attachmentImageAlreadyShown) ? (
+          <NewsAttachmentViewer item={item} />
+        ) : null}
       </article>
 
-      {docs.length > 0 && (
+      {docs.length > 0 ? (
         <section className={styles.relatedSection}>
           <h2 className={styles.relatedTitle}>Documents liés</h2>
           <div className={styles.relatedGrid}>
@@ -93,7 +128,7 @@ export default async function NewsDetailPage({
             ))}
           </div>
         </section>
-      )}
+      ) : null}
     </Container>
   );
 }

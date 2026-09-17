@@ -14,7 +14,7 @@ from apps.backoffice.workflow import (
 )
 from apps.core.publication import PublicationStatus
 
-from .models import News
+from .models import News, NewsHomeSlot
 
 
 class NewsWorkflowError(ValidationError):
@@ -76,7 +76,22 @@ def _validate_before_publish(news: News) -> None:
         missing.append("résumé")
     if not news.content.strip():
         missing.append("contenu")
-    if not news.featured_image:
+
+    is_special = news.home_slot in {
+        NewsHomeSlot.ALERT_INFO,
+        NewsHomeSlot.UPCOMING_EVENT,
+    }
+
+    if is_special:
+        if not news.attachment:
+            missing.append("pièce jointe")
+
+        if (
+            news.home_slot == NewsHomeSlot.UPCOMING_EVENT
+            and not news.event_date
+        ):
+            missing.append("date de l’événement")
+    elif not news.featured_image:
         missing.append("image de couverture")
 
     if missing:
@@ -84,6 +99,15 @@ def _validate_before_publish(news: News) -> None:
             "Publication impossible. Champs requis manquants : "
             + ", ".join(missing)
             + "."
+        )
+
+    if (
+        news.home_slot == NewsHomeSlot.UPCOMING_EVENT
+        and news.event_date
+        and news.event_date < timezone.localdate()
+    ):
+        raise NewsWorkflowError(
+            "La date d’un événement à venir ne peut pas être antérieure à aujourd’hui."
         )
 
 

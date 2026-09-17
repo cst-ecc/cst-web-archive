@@ -27,8 +27,6 @@ export default function LeadershipMessageCard({
       </div>
 
       <div className={styles.content}>
-        <p className={styles.eyebrow}>Le mot du Général</p>
-
         <h3>{message.title}</h3>
 
         {message.role ? (

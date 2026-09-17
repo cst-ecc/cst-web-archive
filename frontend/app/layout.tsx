@@ -5,7 +5,7 @@ import { Sora, Inter } from "next/font/google";
 import "./globals.scss";
 import { SITE } from "@/lib/constants";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import SiteFooter from "@/components/layout/SiteFooter";
 import FooterVisibility from "@/components/layout/FooterVisibility";
 import PageLoader from "@/components/layout/PageLoader";
 // import SocialFloatingLinks from "@/components/layout/SocialFloatingLinks";
@@ -92,7 +92,7 @@ export default function RootLayout({
           {children}
         </main>
         <FooterVisibility>
-          <Footer />
+          <SiteFooter />
         </FooterVisibility>
       </body>
     </html>

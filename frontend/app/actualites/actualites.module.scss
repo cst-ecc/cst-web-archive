@@ -2,7 +2,7 @@
 @use "../../styles/mixins" as m;
 
 .section {
-  padding-block: 3.5rem 5rem;
+  padding-block: 3rem 5rem;
 }
 
 .featured {
@@ -30,16 +30,6 @@
   min-height: 20rem;
   height: 100%;
   background: v.$color-surface-muted;
-}
-
-.featuredImage {
-  object-fit: cover;
-  transition: transform 0.55s ease;
-}
-
-.featuredImageLink:hover .featuredImage,
-.featuredImageLink:focus-visible .featuredImage {
-  transform: scale(1.025);
 }
 
 .featuredBody {
@@ -78,7 +68,8 @@
     font-size: 2rem;
   }
 
-  a:hover {
+  a:hover,
+  a:focus-visible {
     color: v.$color-blue;
   }
 }
@@ -100,7 +91,8 @@
   color: v.$color-blue;
   transition: gap 0.2s ease, color 0.2s ease;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     gap: 0.65rem;
     color: v.$color-blue-deep;
   }
@@ -158,4 +150,22 @@
   background: v.$color-surface;
   text-align: center;
   color: rgba(17, 24, 39, 0.65);
+}
+
+@media (max-width: 639px) {
+  .section {
+    padding-block: 2rem 3.5rem;
+  }
+
+  .featuredImageWrap {
+    min-height: 15rem;
+  }
+
+  .featuredBody {
+    padding: 1.25rem;
+  }
+
+  .archive {
+    margin-top: 2.75rem;
+  }
 }

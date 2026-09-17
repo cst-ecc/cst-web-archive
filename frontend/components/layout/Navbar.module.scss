@@ -982,3 +982,25 @@
   }
 }
 
+
+/* ------------------------------------------------------------------
+   Shell V2 partagé — correctifs responsive pages internes et accueil
+   ------------------------------------------------------------------ */
+.homeLogoLink {
+  width: auto;
+}
+
+@media (max-width: 767px) {
+  .homeLogoLink .logo {
+    width: auto;
+    height: 3rem;
+  }
+}
+
+/* Entre 1024 et 1279 px, la grille desktop V2 n'est pas encore active.
+   Le burger doit donc rester visible. */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .headerHome .burger {
+    display: inline-flex;
+  }
+}

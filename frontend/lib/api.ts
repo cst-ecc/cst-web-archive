@@ -565,27 +565,35 @@ export async function getStats(): Promise<SiteStats> {
 }
 
 
-export async function getHomeSpecialNews(): Promise<NewsItem[]> {
-  /*
-   * TEMPORAIRE :
-   * les contenus spéciaux de l'accueil utilisent le mock
-   * tant que leur prise en charge n'existe pas dans Django.
-   *
-   * Lors du branchement backend, cette fonction pourra
-   * être basculée vers une route API dédiée.
-   */
+function selectHomeSpecialNews(items: NewsItem[]): NewsItem[] {
+  const news = normalizePublicNews(items);
 
-  const mockItems = normalizePublicNews(rawNews);
-
-  const event = mockItems.find(
+  const event = news.find(
     (item) => item.homeSlot === "upcoming_event",
   );
 
-  const alert = mockItems.find(
+  const alert = news.find(
     (item) => item.homeSlot === "alert_info",
   );
 
   return [event, alert].filter(
     (item): item is NewsItem => Boolean(item),
   );
+}
+
+export async function getHomeSpecialNews(): Promise<NewsItem[]> {
+  if (USE_NEWS_API) {
+    const items = await safeApiFetch<NewsItem[]>(
+      "/news/home-special/",
+      "Actualités spéciales de l'accueil",
+    );
+
+    // [] est une réponse valide : le back-office peut n'avoir aucun contenu
+    // spécial publié. Le mock ne doit servir qu'en cas d'API indisponible.
+    if (items !== null) {
+      return selectHomeSpecialNews(items);
+    }
+  }
+
+  return selectHomeSpecialNews(rawNews);
 }

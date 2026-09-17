@@ -4,7 +4,6 @@ import PanelFrame from "./PanelFrame";
 import SectionHeading from "./SectionHeading";
 import TopicCard from "./TopicCard";
 import styles from "./UnderstandPanel.module.scss";
-import HomeCompactFooter from "./HomeCompactFooter";
 
 export default function UnderstandPanel({ onNavigate }: { onNavigate: HomeNavigate }) {
   return (

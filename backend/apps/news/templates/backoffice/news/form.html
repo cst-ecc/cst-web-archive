@@ -56,11 +56,41 @@
           </div>
         {% endif %}
 
+        {% if field.name == "attachment" and news and news.attachment %}
+          <div class="bo-current-image">
+            <span>Pièce jointe actuelle</span>
+            {% if news.attachment_type == "image" %}
+              <img
+                src="{{ news.attachment.url }}"
+                alt="{{ news.attachment_display_label }}"
+              >
+            {% elif news.attachment_type == "pdf" %}
+              <a
+                href="{{ news.attachment.url }}"
+                target="_blank"
+                rel="noopener"
+              >
+                Ouvrir le PDF actuel
+              </a>
+            {% endif %}
+            <small>
+              Cette pièce jointe sera conservée si vous ne choisissez pas un nouveau fichier.
+            </small>
+          </div>
+        {% endif %}
+
         {{ field }}
 
         {% if field.name == "featured_image" %}
           <small class="bo-help">
             Formats acceptés : JPG, PNG, WEBP. Taille maximale avant compression : 30 Mo.
+          </small>
+        {% endif %}
+
+        {% if field.name == "attachment" %}
+          <small class="bo-help">
+            Formats acceptés : PDF, JPG, PNG, WEBP.
+            Une image téléversée ici est automatiquement compressée.
           </small>
         {% endif %}
 

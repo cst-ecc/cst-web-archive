@@ -92,6 +92,19 @@ def news_create_view(request):
                     metadata={"field": "featured_image"},
                 )
 
+            if news.attachment:
+                audit_log(
+                    action=AuditAction.MEDIA_UPLOADED,
+                    actor=request.user,
+                    request=request,
+                    target=news,
+                    description="Pièce jointe d’actualité téléversée.",
+                    metadata={
+                        "field": "attachment",
+                        "type": news.attachment_type,
+                    },
+                )
+
             messages.success(request, "L’actualité a été créée en brouillon.")
             return redirect("backoffice:news_edit", pk=news.pk)
     else:
@@ -118,6 +131,7 @@ def news_edit_view(request, pk):
         raise PermissionDenied
 
     previous_image_name = news.featured_image.name if news.featured_image else ""
+    previous_attachment_name = news.attachment.name if news.attachment else ""
 
     if request.method == "POST":
         form = NewsForm(
@@ -152,6 +166,25 @@ def news_edit_view(request, pk):
                     target=updated,
                     description="Image de couverture d’actualité téléversée et compressée.",
                     metadata={"field": "featured_image"},
+                )
+
+            current_attachment_name = (
+                updated.attachment.name if updated.attachment else ""
+            )
+            if (
+                current_attachment_name
+                and current_attachment_name != previous_attachment_name
+            ):
+                audit_log(
+                    action=AuditAction.MEDIA_UPLOADED,
+                    actor=request.user,
+                    request=request,
+                    target=updated,
+                    description="Pièce jointe d’actualité téléversée.",
+                    metadata={
+                        "field": "attachment",
+                        "type": updated.attachment_type,
+                    },
                 )
 
             messages.success(request, "L’actualité a été enregistrée.")

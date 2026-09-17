@@ -4,57 +4,49 @@
 .header {
   position: relative;
   overflow: hidden;
-  background: v.$color-blue-deep;
-  color: v.$color-white;
+  border-bottom: 1px solid v.$color-surface-line;
+  background:
+    linear-gradient(180deg, rgba(31, 133, 206, 0.06), rgba(255, 255, 255, 0)),
+    v.$color-white;
 }
 
 .grid {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  opacity: 0.2;
-  background-image:
-    linear-gradient(#ffffff22 1px, transparent 1px),
-    linear-gradient(90deg, #ffffff22 1px, transparent 1px);
-  background-size: 44px 44px;
+  display: none;
 }
 
 .inner {
   position: relative;
-  padding-block: 3.5rem;
-
-  @include m.respond(sm) {
-    padding-block: 4rem;
-  }
+  padding-block: clamp(2.35rem, 5vw, 4.35rem);
 }
 
 .eyebrow {
-  margin-bottom: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  margin-bottom: 0.55rem;
+  color: v.$color-blue;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: v.$color-yellow;
 }
 
 .title {
-  font-size: 1.875rem;
+  max-width: 54rem;
+  color: v.$color-blue-ink;
+  font-size: clamp(2rem, 4vw, 3.8rem);
   font-weight: 700;
-  color: v.$color-white;
-
-  @include m.respond(sm) {
-    font-size: 2.25rem;
-  }
+  line-height: 1.05;
 }
 
 .subtitle {
-  margin-top: 0.75rem;
-  max-width: 42rem;
-  color: rgba(255, 255, 255, 0.8);
+  max-width: 46rem;
+  margin-top: 0.85rem;
+  color: rgba(17, 24, 39, 0.62);
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  line-height: 1.65;
 }
 
 .rule {
-  height: 4px;
-  width: 100%;
+  width: min(6rem, 18vw);
+  height: 3px;
+  margin-inline: auto;
   background: linear-gradient(90deg, v.$color-blue, v.$color-gold, v.$color-yellow);
 }

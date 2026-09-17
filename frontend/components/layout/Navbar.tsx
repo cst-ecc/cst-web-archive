@@ -3,44 +3,90 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState, type FocusEvent as ReactFocusEvent, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FocusEvent as ReactFocusEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
+
 import HomeSearch from "@/components/home/HomeSearch";
 import {
   HOME_NAV_LINKS,
-  NAV_LINKS,
   SITE,
   type NavItem,
   type NavLink,
 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+
 import styles from "./Navbar.module.scss";
 
-function isActiveHref(pathname: string, href: string, activeHash = "") {
+const INTERNAL_SECTION_PATHS: Record<string, string[]> = {
+  "/#cst": [
+    "/presentation",
+    "/membres",
+    "/sessions",
+  ],
+  "/#ressources": [
+    "/documents",
+    "/decisions",
+    "/rapports",
+  ],
+  "/#actualites": [
+    "/actualites",
+    "/galerie",
+    "/contact",
+  ],
+};
+
+function isActiveHref(
+  pathname: string,
+  href: string,
+  activeHash = "",
+) {
   if (href.startsWith("http")) return false;
 
   if (href.startsWith("/#")) {
-    const hash = href.slice(1);
-    return pathname === "/" && (activeHash || "#accueil") === hash;
+    if (pathname === "/") {
+      const hash = href.slice(1);
+      return (activeHash || "#accueil") === hash;
+    }
+
+    const relatedPaths = INTERNAL_SECTION_PATHS[href] ?? [];
+    return relatedPaths.some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`),
+    );
   }
 
   const pathOnly = href.split(/[?#]/)[0] || "/";
-  return pathOnly === "/" ? pathname === "/" : pathname.startsWith(pathOnly);
+  return pathOnly === "/"
+    ? pathname === "/"
+    : pathname === pathOnly || pathname.startsWith(`${pathOnly}/`);
 }
-
 
 function navigateHomePanel(href: string) {
   if (typeof window === "undefined" || !href.startsWith("/#")) return false;
   if (window.location.pathname !== "/") return false;
 
   const nextHash = href.slice(1);
+
   if (window.location.hash !== nextHash) {
     window.history.pushState(null, "", nextHash);
   }
+
   window.dispatchEvent(new Event("homepanelchange"));
 
   if (window.innerWidth < 1024) {
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    window.scrollTo({
+      top: 0,
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
   }
 
   return true;
@@ -66,7 +112,15 @@ function ExternalIndicator() {
 
 function SearchIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden
+    >
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-3.4-3.4" />
     </svg>
@@ -91,7 +145,12 @@ function DirectNavLink({
 
   if (item.external) {
     return (
-      <a href={item.href} className={className} target="_blank" rel="noopener noreferrer">
+      <a
+        href={item.href}
+        className={className}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <span>{item.label}</span>
         <ExternalIndicator />
       </a>
@@ -125,7 +184,9 @@ function NavChildLink({
     <>
       <span>
         <span className={styles.dropdownItemLabel}>{child.label}</span>
-        {child.description && <span className={styles.dropdownItemDesc}>{child.description}</span>}
+        {child.description ? (
+          <span className={styles.dropdownItemDesc}>{child.description}</span>
+        ) : null}
       </span>
       <span className={styles.dropdownArrow} aria-hidden>
         →
@@ -133,18 +194,31 @@ function NavChildLink({
     </>
   );
 
-  const className = cn(styles.dropdownItem, active && styles.dropdownItemActive);
+  const className = cn(
+    styles.dropdownItem,
+    active && styles.dropdownItemActive,
+  );
 
   if (child.external) {
     return (
-      <a href={child.href} className={className} target="_blank" rel="noopener noreferrer" onClick={onNavigate}>
+      <a
+        href={child.href}
+        className={className}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onNavigate}
+      >
         {content}
       </a>
     );
   }
 
   return (
-    <Link href={child.href} className={className} onClick={onNavigate}>
+    <Link
+      href={child.href}
+      className={className}
+      onClick={onNavigate}
+    >
       {content}
     </Link>
   );
@@ -154,23 +228,26 @@ function DropdownMenu({
   item,
   pathname,
   activeHash,
-  parentNavigates = false,
 }: {
   item: NavItem;
   pathname: string;
   activeHash: string;
-  parentNavigates?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const menuId = useId();
+
   const isGroupActive =
     isActiveHref(pathname, item.href, activeHash) ||
-    item.children?.some((child) => isActiveHref(pathname, child.href, activeHash));
+    item.children?.some((child) =>
+      isActiveHref(pathname, child.href, activeHash),
+    );
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -190,7 +267,9 @@ function DropdownMenu({
       onMouseLeave={() => setOpen(false)}
       onFocus={() => setOpen(true)}
       onBlur={(event: ReactFocusEvent<HTMLDivElement>) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setOpen(false);
+        }
       }}
       onKeyDown={(event: ReactKeyboardEvent<HTMLDivElement>) => {
         if (event.key === "Escape") {
@@ -199,49 +278,41 @@ function DropdownMenu({
         }
       }}
     >
-      {parentNavigates ? (
-        <div className={styles.dropdownSplitTrigger}>
-          <Link
-            href={item.href}
-            className={cn(triggerClassName, styles.dropdownParentLink)}
-            onClick={(event) => {
-              if (navigateHomePanel(item.href)) {
-                event.preventDefault();
-                setOpen(false);
-              }
-            }}
-          >
-            {item.label}
-          </Link>
-          <button
-            type="button"
-            className={styles.dropdownToggle}
-            onClick={() => setOpen((value) => !value)}
-            aria-expanded={open}
-            aria-controls={menuId}
-            aria-haspopup="true"
-            aria-label={`Ouvrir le menu ${item.label}`}
-          >
-            <svg className={styles.chevron} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </button>
-        </div>
-      ) : (
+      <div className={styles.dropdownSplitTrigger}>
+        <Link
+          href={item.href}
+          className={cn(triggerClassName, styles.dropdownParentLink)}
+          onClick={(event) => {
+            if (navigateHomePanel(item.href)) event.preventDefault();
+            setOpen(false);
+          }}
+        >
+          {item.label}
+        </Link>
+
         <button
           type="button"
-          className={triggerClassName}
+          className={styles.dropdownToggle}
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-controls={menuId}
           aria-haspopup="true"
+          aria-label={`Ouvrir le menu ${item.label}`}
         >
-          <span>{item.label}</span>
-          <svg className={styles.chevron} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+          <svg
+            className={styles.chevron}
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            aria-hidden
+          >
             <path d="m6 9 6 6 6-6" />
           </svg>
         </button>
-      )}
+      </div>
 
       <div id={menuId} className={styles.dropdownMenu}>
         <div className={styles.dropdownHeading}>
@@ -261,6 +332,43 @@ function DropdownMenu({
         </div>
       </div>
     </div>
+  );
+}
+
+function DesktopNavigation({
+  items,
+  pathname,
+  activeHash,
+  className,
+}: {
+  items: NavItem[];
+  pathname: string;
+  activeHash: string;
+  className?: string;
+}) {
+  return (
+    <nav
+      className={cn(styles.nav, className)}
+      aria-label="Navigation principale"
+    >
+      {items.map((item) =>
+        item.children?.length ? (
+          <DropdownMenu
+            key={item.label}
+            item={item}
+            pathname={pathname}
+            activeHash={activeHash}
+          />
+        ) : (
+          <DirectNavLink
+            key={item.label}
+            item={item}
+            pathname={pathname}
+            activeHash={activeHash}
+          />
+        ),
+      )}
+    </nav>
   );
 }
 
@@ -284,7 +392,13 @@ function MobileDirectLink({
 
   if (item.external) {
     return (
-      <a href={item.href} className={className} target="_blank" rel="noopener noreferrer" onClick={onNavigate}>
+      <a
+        href={item.href}
+        className={className}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onNavigate}
+      >
         <span>{item.label}</span>
         <ExternalIndicator />
       </a>
@@ -305,47 +419,12 @@ function MobileDirectLink({
   );
 }
 
-function DesktopNavigation({
-  items,
-  pathname,
-  activeHash,
-  className,
-  isHomePage,
-}: {
-  items: NavItem[];
-  pathname: string;
-  activeHash: string;
-  className?: string;
-  isHomePage: boolean;
-}) {
-  return (
-    <nav className={cn(styles.nav, className)} aria-label="Navigation principale">
-      {items.map((item) =>
-        item.children?.length ? (
-          <DropdownMenu
-            key={item.label}
-            item={item}
-            pathname={pathname}
-            activeHash={activeHash}
-            parentNavigates={isHomePage && item.href.startsWith("/#")}
-          />
-        ) : (
-          <DirectNavLink
-            key={item.label}
-            item={item}
-            pathname={pathname}
-            activeHash={activeHash}
-          />
-        ),
-      )}
-    </nav>
-  );
-}
-
 function LanguageSwitch() {
   return (
     <div className={styles.languageSwitch} aria-label="Choix de langue">
-      <span className={styles.languageActive} aria-current="true">FR</span>
+      <span className={styles.languageActive} aria-current="true">
+        FR
+      </span>
       <button
         type="button"
         className={styles.languagePending}
@@ -366,20 +445,18 @@ export default function Navbar() {
   const [activeMobileGroup, setActiveMobileGroup] = useState<string | null>(null);
   const [activeHash, setActiveHash] = useState("#accueil");
 
-  const isHomePage = pathname === "/";
-  const navItems = isHomePage ? HOME_NAV_LINKS : NAV_LINKS;
-  const homeLeftItems = HOME_NAV_LINKS.slice(0, 4);
-  const homeRightItems = HOME_NAV_LINKS.slice(4);
-  // La V2 utilise un bandeau blanc fixe comme dans la nouvelle direction
-  // graphique. Les pages internes étaient déjà rendues avec l’état solide.
-  const useSolidHeader = true;
+  const navItems = HOME_NAV_LINKS;
+  const leftItems = navItems.slice(0, 4);
+  const rightItems = navItems.slice(4);
 
   useEffect(() => {
     const syncHash = () => setActiveHash(window.location.hash || "#accueil");
+
     syncHash();
     window.addEventListener("hashchange", syncHash);
     window.addEventListener("popstate", syncHash);
     window.addEventListener("homepanelchange", syncHash);
+
     return () => {
       window.removeEventListener("hashchange", syncHash);
       window.removeEventListener("popstate", syncHash);
@@ -398,6 +475,7 @@ export default function Navbar() {
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
     return () => {
       document.body.style.overflow = previousOverflow;
     };
@@ -405,148 +483,134 @@ export default function Navbar() {
 
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSearchOpen(false);
+      if (event.key === "Escape") {
+        setSearchOpen(false);
+        setOpen(false);
+      }
     };
+
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, []);
 
   return (
-    <header
-      className={cn(
-        styles.header,
-        isHomePage && styles.headerHome,
-        !useSolidHeader && styles.headerHero,
-        useSolidHeader && styles.headerSolid,
-      )}
-    >
-      <div className={cn(styles.bar, isHomePage && styles.homeBar)}>
-        {isHomePage ? (
-          <>
-            <div className={styles.homeLeftTools}>
-              <LanguageSwitch />
-            </div>
+    <header className={cn(styles.header, styles.headerHome, styles.headerSolid)}>
+      <div className={cn(styles.bar, styles.homeBar)}>
+        <div className={styles.homeLeftTools}>
+          <LanguageSwitch />
+        </div>
 
-            <DesktopNavigation
-              items={homeLeftItems}
-              pathname={pathname}
-              activeHash={activeHash}
-              className={styles.homeNavLeft}
-              isHomePage
-            />
+        <DesktopNavigation
+          items={leftItems}
+          pathname={pathname}
+          activeHash={activeHash}
+          className={styles.homeNavLeft}
+        />
 
-            <Link
-              href="/#accueil"
-              className={cn(styles.logoLink, styles.homeLogoLink)}
-              aria-label={`${SITE.name} — ${SITE.fullName}`}
-              onClick={(event) => {
-                if (navigateHomePanel("/#accueil")) event.preventDefault();
-              }}
-            >
-              <Image
-                src="/logo/logo-original.png"
-                width={100}
-                height={100}
-                alt="logo ecc"
-                priority
-                className={styles.logo}
-              />
-            </Link>
+        <Link
+          href="/#accueil"
+          className={cn(styles.logoLink, styles.homeLogoLink)}
+          aria-label={`${SITE.name} — ${SITE.fullName}`}
+          onClick={(event) => {
+            if (navigateHomePanel("/#accueil")) event.preventDefault();
+          }}
+        >
+          <Image
+            src="/logo/logo-original.png"
+            width={100}
+            height={100}
+            alt="Logo de l'Église du Christianisme Céleste"
+            priority
+            className={styles.logo}
+          />
+        </Link>
 
-            <div className={styles.homeRightSide}>
-              <DesktopNavigation
-                items={homeRightItems}
-                pathname={pathname}
-                activeHash={activeHash}
-                className={styles.homeNavRight}
-                isHomePage
-              />
+        <div className={styles.homeRightSide}>
+          <DesktopNavigation
+            items={rightItems}
+            pathname={pathname}
+            activeHash={activeHash}
+            className={styles.homeNavRight}
+          />
 
-              <div className={styles.desktopTools}>
-                <button
-                  type="button"
-                  className={styles.searchButton}
-                  onClick={() => setSearchOpen((value) => !value)}
-                  aria-expanded={searchOpen}
-                  aria-controls="home-search-panel"
-                  aria-label={searchOpen ? "Fermer la recherche" : "Ouvrir la recherche"}
-                >
-                  <SearchIcon />
-                </button>
-                <a
-                  href={SITE.digitalisationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.digeccButton}
-                >
-                  DIGECC <ExternalIndicator />
-                </a>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setOpen((value) => !value)}
-                className={styles.burger}
-                aria-expanded={open}
-                aria-controls="menu-mobile"
-                aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-              >
-                <span className={styles.burgerBox} aria-hidden>
-                  <span className={cn(styles.burgerLine, open && styles.burgerLineTop)} />
-                  <span className={cn(styles.burgerLine, open && styles.burgerLineMiddle)} />
-                  <span className={cn(styles.burgerLine, open && styles.burgerLineBottom)} />
-                </span>
-              </button>
-            </div>
-          </>
-        ) : (
-          <>
-            <Link href="/" className={styles.logoLink} aria-label={`${SITE.name} — ${SITE.fullName}`}>
-              <Image src="/logo/logo-original.png" width={200} height={200} alt="logo ecc" priority className={styles.logo} />
-              <div className={styles.logoText}>
-                <span className={styles.logoTitle}>{SITE.name}</span>
-                <span className={styles.logoSubtitle}>{SITE.fullName}</span>
-              </div>
-            </Link>
-
-            <DesktopNavigation
-              items={navItems}
-              pathname={pathname}
-              activeHash={activeHash}
-              isHomePage={false}
-            />
-
+          <div className={styles.desktopTools}>
             <button
               type="button"
-              onClick={() => setOpen((value) => !value)}
-              className={styles.burger}
-              aria-expanded={open}
-              aria-controls="menu-mobile"
-              aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+              className={styles.searchButton}
+              onClick={() => setSearchOpen((value) => !value)}
+              aria-expanded={searchOpen}
+              aria-controls="site-search-panel"
+              aria-label={
+                searchOpen ? "Fermer la recherche" : "Ouvrir la recherche"
+              }
             >
-              <span className={styles.burgerBox} aria-hidden>
-                <span className={cn(styles.burgerLine, open && styles.burgerLineTop)} />
-                <span className={cn(styles.burgerLine, open && styles.burgerLineMiddle)} />
-                <span className={cn(styles.burgerLine, open && styles.burgerLineBottom)} />
-              </span>
+              <SearchIcon />
             </button>
-          </>
-        )}
+
+            <a
+              href={SITE.digitalisationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.digeccButton}
+            >
+              DIGECC <ExternalIndicator />
+            </a>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            className={styles.burger}
+            aria-expanded={open}
+            aria-controls="menu-mobile"
+            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+          >
+            <span className={styles.burgerBox} aria-hidden>
+              <span
+                className={cn(
+                  styles.burgerLine,
+                  open && styles.burgerLineTop,
+                )}
+              />
+              <span
+                className={cn(
+                  styles.burgerLine,
+                  open && styles.burgerLineMiddle,
+                )}
+              />
+              <span
+                className={cn(
+                  styles.burgerLine,
+                  open && styles.burgerLineBottom,
+                )}
+              />
+            </span>
+          </button>
+        </div>
       </div>
 
-      {isHomePage && searchOpen ? (
-        <div id="home-search-panel" className={styles.searchPanel}>
+      {searchOpen ? (
+        <div id="site-search-panel" className={styles.searchPanel}>
           <div className={styles.searchPanelInner}>
             <HomeSearch />
-            <button type="button" className={styles.searchClose} onClick={() => setSearchOpen(false)} aria-label="Fermer la recherche">
+            <button
+              type="button"
+              className={styles.searchClose}
+              onClick={() => setSearchOpen(false)}
+              aria-label="Fermer la recherche"
+            >
               ×
             </button>
           </div>
         </div>
       ) : null}
 
-      {open && (
-        <nav id="menu-mobile" className={styles.mobileNav} aria-label="Navigation mobile">
+      {open ? (
+        <nav
+          id="menu-mobile"
+          className={styles.mobileNav}
+          aria-label="Navigation mobile"
+        >
           <div className={styles.mobileNavInner}>
             {navItems.map((item) => {
               if (!item.children?.length) {
@@ -562,7 +626,6 @@ export default function Navbar() {
               }
 
               const groupIsOpen = activeMobileGroup === item.label;
-              const parentNavigates = isHomePage && item.href.startsWith("/#");
               const submenuId = `mobile-submenu-${item.label
                 .normalize("NFD")
                 .replace(/[\u0300-\u036f]/g, "")
@@ -570,87 +633,117 @@ export default function Navbar() {
                 .replace(/[^a-z0-9]+/g, "-")}`;
 
               return (
-                <div key={item.label} className={cn(styles.mobileGroup, groupIsOpen && styles.mobileGroupOpen)}>
-                  {parentNavigates ? (
-                    <div className={styles.mobileParentSplit}>
-                      <Link
-                        href={item.href}
-                        className={styles.mobileParentLink}
-                        onClick={(event) => {
-                          if (navigateHomePanel(item.href)) event.preventDefault();
-                          setOpen(false);
-                        }}
-                      >
-                        {item.label}
-                      </Link>
-                      <button
-                        type="button"
-                        className={styles.mobileParentToggle}
-                        onClick={() => setActiveMobileGroup((current) => (current === item.label ? null : item.label))}
-                        aria-expanded={groupIsOpen}
-                        aria-controls={submenuId}
-                        aria-label={`Ouvrir le menu ${item.label}`}
-                      >
-                        <svg className={styles.mobileChevron} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
-                      </button>
-                    </div>
-                  ) : (
+                <div
+                  key={item.label}
+                  className={cn(
+                    styles.mobileGroup,
+                    groupIsOpen && styles.mobileGroupOpen,
+                  )}
+                >
+                  <div className={styles.mobileParentSplit}>
+                    <Link
+                      href={item.href}
+                      className={styles.mobileParentLink}
+                      onClick={(event) => {
+                        if (navigateHomePanel(item.href)) {
+                          event.preventDefault();
+                        }
+                        setOpen(false);
+                      }}
+                    >
+                      {item.label}
+                    </Link>
+
                     <button
                       type="button"
-                      className={styles.mobileParentButton}
-                      onClick={() => setActiveMobileGroup((current) => (current === item.label ? null : item.label))}
+                      className={styles.mobileParentToggle}
+                      onClick={() =>
+                        setActiveMobileGroup((current) =>
+                          current === item.label ? null : item.label,
+                        )
+                      }
                       aria-expanded={groupIsOpen}
                       aria-controls={submenuId}
+                      aria-label={`Ouvrir le menu ${item.label}`}
                     >
-                      <span>{item.label}</span>
-                      <svg className={styles.mobileChevron} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                      <svg
+                        className={styles.mobileChevron}
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        aria-hidden
+                      >
                         <path d="m6 9 6 6 6-6" />
                       </svg>
                     </button>
-                  )}
+                  </div>
 
-                  {groupIsOpen && (
+                  {groupIsOpen ? (
                     <div id={submenuId} className={styles.mobileSubmenu}>
                       {item.children.map((child) => {
-                        const active = isActiveHref(pathname, child.href, activeHash);
-                        const className = cn(styles.mobileLink, active && styles.mobileLinkActive);
+                        const active = isActiveHref(
+                          pathname,
+                          child.href,
+                          activeHash,
+                        );
+                        const className = cn(
+                          styles.mobileLink,
+                          active && styles.mobileLinkActive,
+                        );
 
                         if (child.external) {
                           return (
-                            <a key={`${child.label}-${child.href}`} href={child.href} className={className} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
+                            <a
+                              key={`${child.label}-${child.href}`}
+                              href={child.href}
+                              className={className}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setOpen(false)}
+                            >
                               {child.label}
                             </a>
                           );
                         }
 
                         return (
-                          <Link key={`${child.label}-${child.href}`} href={child.href} onClick={() => setOpen(false)} className={className}>
+                          <Link
+                            key={`${child.label}-${child.href}`}
+                            href={child.href}
+                            className={className}
+                            onClick={() => setOpen(false)}
+                          >
                             {child.label}
                           </Link>
                         );
                       })}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               );
             })}
 
-            {isHomePage ? (
-              <div className={styles.mobileTools}>
-                <div className={styles.mobileToolsTop}>
-                  <LanguageSwitch />
-                  <a href={SITE.digitalisationUrl} target="_blank" rel="noopener noreferrer" className={styles.mobileDigecc}>
-                    DIGECC <ExternalIndicator />
-                  </a>
-                </div>
-                <HomeSearch />
+            <div className={styles.mobileTools}>
+              <div className={styles.mobileToolsTop}>
+                <LanguageSwitch />
+                <a
+                  href={SITE.digitalisationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.mobileDigecc}
+                >
+                  DIGECC <ExternalIndicator />
+                </a>
               </div>
-            ) : null}
+
+              <HomeSearch />
+            </div>
           </div>
         </nav>
-      )}
+      ) : null}
     </header>
   );
 }

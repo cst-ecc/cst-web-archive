@@ -4,9 +4,11 @@
 .card {
   @include m.card;
   @include m.card-hover;
+
   position: relative;
   display: flex;
   flex-direction: column;
+  min-width: 0;
   overflow: hidden;
 }
 
@@ -18,18 +20,8 @@
 .imageWrap {
   position: relative;
   aspect-ratio: 16 / 9;
-  background: v.$color-surface-muted;
   overflow: hidden;
-}
-
-.image {
-  object-fit: cover;
-  transition: transform 0.45s ease;
-}
-
-.imageLink:hover .image,
-.imageLink:focus-visible .image {
-  transform: scale(1.035);
+  background: v.$color-surface-muted;
 }
 
 .body {
@@ -42,8 +34,8 @@
 .date {
   font-size: 0.75rem;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: v.$color-gold;
 }
 
@@ -58,7 +50,8 @@
 .titleLink {
   transition: color 0.2s ease;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     color: v.$color-blue;
   }
 }
@@ -84,7 +77,8 @@
   color: v.$color-blue;
   transition: color 0.2s ease, gap 0.2s ease;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     color: v.$color-blue-deep;
     gap: 0.6rem;
   }

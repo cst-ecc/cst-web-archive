@@ -114,9 +114,7 @@
       v.$color-blue-ink;
 
     font-size:
-      clamp(1rem,
-        1.4vw,
-        1.35rem);
+      clamp(0.7rem, 1vw, 1rem);
 
     line-height: 1.2;
   }

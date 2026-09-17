@@ -22,6 +22,20 @@
   <h1>{{ news.title }}</h1>
   <p class="bo-news-preview__excerpt">{{ news.excerpt }}</p>
 
+  {% if news.home_slot %}
+    <p>
+      <strong>Affichage accueil :</strong>
+      {{ news.get_home_slot_display }}
+    </p>
+  {% endif %}
+
+  {% if news.event_date %}
+    <p>
+      <strong>Date de l’événement :</strong>
+      {{ news.event_date|date:"d/m/Y" }}
+    </p>
+  {% endif %}
+
   {% if news.featured_image %}
     <img
       class="bo-news-preview__image"
@@ -33,5 +47,30 @@
   <div class="bo-news-preview__content">
     {{ news.content|linebreaks }}
   </div>
+
+  {% if news.attachment %}
+    <section class="bo-news-preview__attachment">
+      <h2>Pièce jointe</h2>
+
+      {% if news.attachment_type == "image" %}
+        <img
+          class="bo-news-preview__image"
+          src="{{ news.attachment.url }}"
+          alt="{{ news.attachment_display_label }}"
+        >
+      {% elif news.attachment_type == "pdf" %}
+        <p>
+          <a
+            class="bo-btn"
+            href="{{ news.attachment.url }}"
+            target="_blank"
+            rel="noopener"
+          >
+            Ouvrir le PDF
+          </a>
+        </p>
+      {% endif %}
+    </section>
+  {% endif %}
 </article>
 {% endblock %}

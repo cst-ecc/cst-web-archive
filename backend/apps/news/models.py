@@ -28,6 +28,29 @@ def news_image_upload_to(instance, filename: str) -> str:
     return f"{dated_folder}/{token}{suffix}"
 
 
+def news_attachment_upload_to(instance, filename: str) -> str:
+    """
+    Stocke les pièces jointes d'actualité sous un nom non prédictible.
+
+    Seules les extensions autorisées par validate_news_attachment() doivent
+    atteindre ce point. Le fallback .bin reste défensif.
+    """
+    suffix = Path(filename).suffix.lower()
+    if suffix == ".jpeg":
+        suffix = ".jpg"
+    if suffix not in {".pdf", ".jpg", ".png", ".webp"}:
+        suffix = ".bin"
+
+    token = uuid.uuid4().hex
+    dated_folder = timezone.now().strftime("news/attachments/%Y/%m")
+    return f"{dated_folder}/{token}{suffix}"
+
+
+class NewsHomeSlot(models.TextChoices):
+    ALERT_INFO = "alert_info", "Alerte Info"
+    UPCOMING_EVENT = "upcoming_event", "Événement à venir"
+
+
 class NewsCategory(TimeStampedModel):
     name = models.CharField("nom", max_length=120, unique=True)
     slug = models.SlugField("slug", max_length=140, unique=True)
@@ -66,6 +89,40 @@ class News(TimeStampedModel):
 
     excerpt = models.TextField("résumé", max_length=700)
     content = models.TextField("contenu")
+
+    home_slot = models.CharField(
+        "emplacement spécial sur l’accueil",
+        max_length=30,
+        choices=NewsHomeSlot.choices,
+        blank=True,
+        default="",
+        db_index=True,
+        help_text=(
+            "Laissez vide pour une actualité classique. "
+            "Choisissez Alerte Info ou Événement à venir pour l’affichage "
+            "spécial sur l’accueil."
+        ),
+    )
+    event_date = models.DateField(
+        "date de l’événement",
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="À renseigner uniquement pour un événement à venir.",
+    )
+    attachment = models.FileField(
+        "pièce jointe",
+        upload_to=news_attachment_upload_to,
+        max_length=500,
+        blank=True,
+        help_text="PDF, JPG, PNG ou WEBP.",
+    )
+    attachment_label = models.CharField(
+        "libellé de la pièce jointe",
+        max_length=220,
+        blank=True,
+        help_text="Ex. Communiqué officiel, Flyer de l’événement…",
+    )
 
     featured_image = models.ImageField(
         "image de couverture",
@@ -159,6 +216,10 @@ class News(TimeStampedModel):
                 fields=["status", "featured", "display_order"],
                 name="news_status_feature_idx",
             ),
+            models.Index(
+                fields=["status", "home_slot", "event_date"],
+                name="news_home_slot_idx",
+            ),
         ]
         permissions = [
             ("submit_news", "Peut soumettre une actualité à validation"),
@@ -169,6 +230,27 @@ class News(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.title
+
+    @property
+    def attachment_type(self) -> str:
+        if not self.attachment:
+            return ""
+
+        suffix = Path(self.attachment.name).suffix.lower()
+        if suffix == ".pdf":
+            return "pdf"
+        if suffix in {".jpg", ".jpeg", ".png", ".webp"}:
+            return "image"
+        return ""
+
+    @property
+    def attachment_url(self) -> str:
+        return self.attachment.url if self.attachment else ""
+
+    @property
+    def attachment_display_label(self) -> str:
+        label = (self.attachment_label or "").strip()
+        return label or self.title
 
     def save(self, *args, **kwargs):
         if not self.slug:

@@ -7,7 +7,7 @@ import {
 import type { NewsItem } from "@/lib/types";
 
 import BibleVerseCarousel from "./BibleVerseCarousel";
-import HomeCompactFooter from "./HomeCompactFooter";
+import SiteFooter from "@/components/layout/SiteFooter";
 import HomeIntroHero from "./HomeIntroHero";
 import HomeSummary from "./HomeSummary";
 
@@ -46,7 +46,7 @@ export default function HomeHero({
         variant="strip"
       />
 
-      <HomeCompactFooter />
+      <SiteFooter />
     </div>
   );
 }

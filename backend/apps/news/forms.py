@@ -1,10 +1,14 @@
+from pathlib import Path
+
 from django import forms
+from django.conf import settings
 from django.utils.text import slugify
 
 from apps.core.publication import PublicationStatus
 
 from .image_processing import compress_news_cover_image
-from .models import News, NewsCategory
+from .models import News, NewsCategory, NewsHomeSlot
+from .validators import validate_news_attachment
 
 
 def _unique_category_slug(name: str) -> str:
@@ -47,6 +51,30 @@ class NewsForm(forms.ModelForm):
         ),
     )
 
+    home_slot = forms.ChoiceField(
+        label="Affichage spécial sur l’accueil",
+        required=False,
+        choices=[
+            ("", "— Actualité standard —"),
+            *NewsHomeSlot.choices,
+        ],
+        help_text=(
+            "Permet d’afficher cette actualité dans la zone "
+            "Événement à venir ou Alerte Info de l’accueil."
+        ),
+    )
+
+    event_date = forms.DateField(
+        label="Date de l’événement",
+        required=False,
+        input_formats=["%Y-%m-%d"],
+        widget=forms.DateInput(
+            format="%Y-%m-%d",
+            attrs={"type": "date"},
+        ),
+        help_text="Obligatoire à la publication pour un Événement à venir.",
+    )
+
     class Meta:
         model = News
         fields = (
@@ -56,6 +84,10 @@ class NewsForm(forms.ModelForm):
             "organ",
             "excerpt",
             "content",
+            "home_slot",
+            "event_date",
+            "attachment",
+            "attachment_label",
             "featured_image",
             "image_alt",
             "publication_date",
@@ -92,6 +124,15 @@ class NewsForm(forms.ModelForm):
         # L'image existante est conservée si aucun nouveau fichier n'est choisi,
         # et le template affiche un aperçu clair de l'image actuelle.
         self.fields["featured_image"].required = False
+        self.fields["attachment"].required = False
+        self.fields["attachment"].widget.attrs.update(
+            {
+                "accept": ".pdf,.jpg,.jpeg,.png,.webp",
+                "data-max-file-mb": str(
+                    getattr(settings, "MAX_NEWS_ATTACHMENT_MB", 30)
+                ),
+            }
+        )
 
         if user is not None and not user.has_perm("news.publish_news"):
             self.fields.pop("featured", None)
@@ -109,6 +150,26 @@ class NewsForm(forms.ModelForm):
             return compress_news_cover_image(image)
 
         return image
+
+    def clean_attachment(self):
+        attachment = self.cleaned_data.get("attachment")
+
+        # False signifie « supprimer le fichier » avec ClearableFileInput.
+        if attachment is False:
+            return attachment
+
+        # Un fichier déjà stocké n'a pas de content_type : on le conserve tel quel.
+        if not attachment or not getattr(attachment, "content_type", None):
+            return attachment
+
+        validate_news_attachment(attachment)
+
+        suffix = Path(attachment.name).suffix.lower()
+        if suffix in {".jpg", ".jpeg", ".png", ".webp"}:
+            # Réutilise la chaîne de validation/compression robuste déjà en place.
+            return compress_news_cover_image(attachment)
+
+        return attachment
 
     def _category_from_inline_creation(self):
         name = (self.cleaned_data.get("new_category_name") or "").strip()
@@ -148,6 +209,12 @@ class NewsForm(forms.ModelForm):
         inline_category = self._category_from_inline_creation()
         if inline_category is not None:
             news.category = inline_category
+
+        if news.home_slot != NewsHomeSlot.UPCOMING_EVENT:
+            news.event_date = None
+
+        if not news.attachment:
+            news.attachment_label = ""
 
         if self.user is not None and not self.user.has_perm("news.publish_news"):
             if not news.pk:
