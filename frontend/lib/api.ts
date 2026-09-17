@@ -72,7 +72,7 @@ async function apiFetch<T>(path: string): Promise<T> {
   }
 
   const res = await fetch(`${API_BASE}${path}`, {
-    next: { revalidate: 300 },
+    cache: "no-store",
     headers: { Accept: "application/json" },
   });
 

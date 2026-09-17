@@ -122,7 +122,7 @@
   justify-content: flex-end;
   gap: 0.15rem;
 
-  @include m.respond(lg) {
+  @include m.respond(xl) {
     display: flex;
   }
 }
@@ -369,7 +369,7 @@
     outline-offset: 3px;
   }
 
-  @include m.respond(lg) {
+  @include m.respond(xl) {
     display: none;
   }
 }
@@ -418,7 +418,7 @@
   border-top: 1px solid v.$color-surface-line;
   box-shadow: 0 24px 50px rgba(15, 23, 42, 0.16);
 
-  @include m.respond(lg) {
+  @include m.respond(xl) {
     display: none;
   }
 }
@@ -752,7 +752,7 @@
 .mobileToolsTop {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 1rem;
 }
 
@@ -798,21 +798,52 @@
 }
 
 .homeBar {
-  --home-logo-size: 4.6rem;
+  --home-logo-size: 5.15rem;
   --home-logo-gap: 0.65rem;
   --home-tools-gap: 1.15rem;
   --home-tools-width: 8.4rem;
   --home-menu-gap: 0.08rem;
 
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) 3rem;
   align-items: center;
-  justify-content: space-between;
 }
 
 .homeLogoLink {
+  grid-column: 2;
+  justify-self: center;
   flex: 0 0 auto;
+  width: auto;
+  padding: 0;
   z-index: 2;
+}
+
+.homeLogoLink .logo {
+  width: auto;
+  height: 5rem;
+}
+
+.mobileBurger {
+  grid-column: 1;
+  justify-self: start;
+}
+
+.mobileLanguage {
+  grid-column: 3;
+  justify-self: end;
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.35rem;
+  height: 2.2rem;
+  padding-inline: 0.45rem;
+  border: 1px solid rgba(31, 133, 206, 0.12);
+  border-radius: 999px;
+  background: v.$color-yellow;
+  color: v.$color-blue-ink;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
 }
 
 .homeNavLeft,
@@ -822,13 +853,16 @@
 }
 
 .homeRightSide {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
+  display: none;
 }
 
 /* Desktop : grille parfaitement symétrique autour du logo. */
 @include m.respond(xl) {
+  .mobileBurger,
+  .mobileLanguage {
+    display: none;
+  }
+
   .homeBar {
     display: grid;
     grid-template-columns:
@@ -916,7 +950,7 @@
 /* Desktop compact : on réduit les dimensions sans casser la symétrie. */
 @media (min-width: 1280px) and (max-width: 1450px) {
   .homeBar {
-    --home-logo-size: 3.25rem;
+    --home-logo-size: 5rem;
     --home-logo-gap: 0.38rem;
     --home-tools-gap: 0.55rem;
     --home-tools-width: 7rem;
@@ -993,14 +1027,6 @@
 @media (max-width: 767px) {
   .homeLogoLink .logo {
     width: auto;
-    height: 3rem;
-  }
-}
-
-/* Entre 1024 et 1279 px, la grille desktop V2 n'est pas encore active.
-   Le burger doit donc rester visible. */
-@media (min-width: 1024px) and (max-width: 1279px) {
-  .headerHome .burger {
-    display: inline-flex;
+    height: 5rem;
   }
 }

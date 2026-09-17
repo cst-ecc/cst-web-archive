@@ -67,8 +67,8 @@ export const DOCUMENTS: DocumentItem[] = [
   },
   {
     id: 5, slug: "acte-creation-csmo", reference: "CST/DEC/2026-003",
-    title: "Acte portant mise en place du CSMO",
-    summary: "Décision instituant le Conseil Supérieur de Mise en Œuvre (CSMO) pour assurer l'application des textes et recommandations du CST. Entré en vigueur le 23 mai 2026.",
+    title: "Acte portant mise en place du CSMo",
+    summary: "Décision instituant le Conseil Supérieur de Mise en Œuvre (CSMo) pour assurer l'application des textes et recommandations du CST. Entré en vigueur le 23 mai 2026.",
     kind: "decision", categorySlug: "decisions", date: "2026-05-23",
     fileUrl: SAMPLE_FILE, fileType: "pdf", fileSize: 678000, downloads: 201,
     featured: false, status: "publie",
@@ -167,7 +167,7 @@ export const SESSIONS: Session[] = [
 export const MEMBERS: Member[] = [
   {
     id: 1, slug: "coordonnateur-general", fullName: "Général d'Armée Aérienne Bertin BADA",
-    role: "Coordonnateur Général", responsibility: "Coordination générale du CST puis du CSMO",
+    role: "Coordonnateur Général", responsibility: "Coordination générale du CST puis du CSMo",
     photoUrl: "/images/membre.svg", bio: "", order: 1, status: "publie",
   },
   {
@@ -199,7 +199,7 @@ export const NEWS: NewsItem[] = [
   },
   {
     id: 2, slug: "installation-csmo",
-    title: "Installation officielle du CSMO",
+    title: "Installation officielle du CSMo",
     excerpt: "Le Conseil Supérieur de Mise en Œuvre a tenu sa première session du 2 au 5 juin 2026 à Cotonou.",
     content: "Le Conseil Supérieur de Mise en Œuvre a tenu sa première session du 2 au 5 juin 2026 à Cotonou. La cérémonie d'installation de ses membres s'est déroulée le 4 juin 2026, au Sofitel Cotonou, dans la salle Le Dôme.\n\nCette nouvelle phase doit permettre la vulgarisation des textes, l'installation des organes, le déploiement dans les diocèses, la mise en œuvre de la cartographie ecclésiale, la préparation du Synode et du conclave, la modernisation administrative, la digitalisation et le suivi des décisions issues du CST.",
     imageUrl: "/images/news/installation-csmo.jpg",
@@ -214,7 +214,7 @@ export const NEWS: NewsItem[] = [
     excerpt: "Du 24 au 27 mars 2026, des séances d'information ont été menées en Côte d'Ivoire pour présenter l'avancement des travaux.",
     content: "Du 24 au 27 mars 2026, des séances d'information ont été menées en Côte d'Ivoire. Cette activité s'inscrivait dans la volonté d'informer les responsables et fidèles, de présenter l'évolution des travaux, de favoriser l'appropriation du processus et de renforcer la dimension internationale de la réunification.",
     imageUrl: "/images/news/mission-cote-divoire.jpg",
-    imageAlt: "Séances d’information sur le processus CST et CSMO en Côte d’Ivoire",
+    imageAlt: "Séances d’information sur le processus CST et CSMo en Côte d’Ivoire",
     featured: false, date: "2026-03-27",
     relatedDocumentSlugs: [],
     status: "publie",
@@ -228,7 +228,7 @@ export const NEWS: NewsItem[] = [
     content:
       "Un communiqué officiel a été publié dans le cadre du processus de mise en œuvre.\n\nLe document intégral est disponible ci-dessous.",
     imageUrl: "/images/home/hero-cst.jpg",
-    imageAlt: "Communiqué officiel du CSMO",
+    imageAlt: "Communiqué officiel du CSMo",
     featured: false,
     date: "2026-09-16",
 
@@ -252,7 +252,7 @@ export const NEWS: NewsItem[] = [
     content:
       "Un nouveau rendez-vous est prévu dans le cadre de la mise en œuvre du processus.\n\nRetrouvez sur cette page le programme et les informations utiles.",
     imageUrl: "/images/home/next-event.jpg",
-    imageAlt: "Prochain événement du CSMO",
+    imageAlt: "Prochain événement du CSMo",
     featured: true,
     date: "2026-09-16",
 

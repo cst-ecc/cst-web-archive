@@ -2,12 +2,12 @@
 
 export const SITE = {
   name: "Église du Christianisme Céleste",
-  fullName: "CST & CSMO",
+  fullName: "CST & CSMo",
   processName: "La Grande Marche vers l’Unité",
   institution: "Église du Christianisme Céleste",
-  title: "CST & CSMO — La Grande Marche vers l’Unité",
+  title: "CST & CSMo — La Grande Marche vers l’Unité",
   description:
-    "Plateforme institutionnelle consacrée aux travaux du Conseil Supérieur de Transition (CST), à leur mise en œuvre par le Conseil Supérieur de Mise en Œuvre (CSMO) et aux chantiers de modernisation et de digitalisation de l'Église du Christianisme Céleste.",
+    "Plateforme institutionnelle consacrée aux travaux du Conseil Supérieur de Transition (CST), à leur mise en œuvre par le Conseil Supérieur de Mise en Œuvre (CSMo) et aux chantiers de modernisation et de digitalisation de l'Église du Christianisme Céleste.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   email: "contact@ecc.bj",
   phone: "+229 0148 899 999 | +229 01 498 999 999",
@@ -42,7 +42,7 @@ export const HOME_NAV_LINKS: NavItem[] = [
   { label: "Comprendre", href: "/#comprendre" },
   { label: "Où en sommes-nous ?", href: "/#avancement" },
   { label: "Le CST", href: "/#cst" },
-  { label: "Le CSMO", href: "/#csmo" },
+  { label: "Le CSMo", href: "/#csmo" },
   { label: "L’Église en marche", href: "/#eglise-en-marche" },
   { label: "Ressources", href: "/#ressources" },
   {
@@ -117,7 +117,7 @@ export const NAV_LINKS: NavItem[] = [
     ],
   },
   {
-    label: "CSMO",
+    label: "CSMo",
     href: "/#csmo",
     children: [
       {
@@ -188,7 +188,7 @@ export const FOOTER_GROUPS: FooterGroup[] = [
     title: "Le processus",
     links: [
       { label: "Le CST", href: "/presentation" },
-      { label: "Le CSMO", href: "/#csmo" },
+      { label: "Le CSMo", href: "/#csmo" },
       { label: "Questions fréquentes", href: "/#faq" },
       {
         label: "Digitalisation de l'ECC",

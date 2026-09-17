@@ -18,74 +18,152 @@ jobs:
   deploy:
     name: Deploy CST to VPS
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
+      # ============================================================
+      # SSH
+      # ============================================================
       - name: Prepare SSH
         shell: bash
         env:
           CST_VPS_SSH_KEY: ${{ secrets.CST_VPS_SSH_KEY }}
           CST_VPS_KNOWN_HOSTS: ${{ secrets.CST_VPS_KNOWN_HOSTS }}
-          CST_VPS_HOST: ${{ secrets.CST_VPS_HOST }}
-          CST_VPS_PORT: ${{ secrets.CST_VPS_PORT }}
         run: |
-          set -euo pipefail
+          set -Eeuo pipefail
 
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
+
+          if [ -z "${CST_VPS_SSH_KEY:-}" ]; then
+            echo "CST_VPS_SSH_KEY est vide."
+            exit 1
+          fi
+
+          if [ -z "${CST_VPS_KNOWN_HOSTS:-}" ]; then
+            echo "CST_VPS_KNOWN_HOSTS est vide."
+            echo "En production, le host SSH doit être explicitement approuvé."
+            exit 1
+          fi
 
           printf "%s\n" "$CST_VPS_SSH_KEY" > ~/.ssh/cst_vps_key
           sed -i 's/\r$//' ~/.ssh/cst_vps_key
           chmod 600 ~/.ssh/cst_vps_key
 
+          # Vérifie immédiatement que la clé privée est exploitable.
           ssh-keygen -y -f ~/.ssh/cst_vps_key > /dev/null
 
-          if [ -n "${CST_VPS_KNOWN_HOSTS:-}" ]; then
-            printf "%s\n" "$CST_VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          else
-            ssh-keyscan -p "$CST_VPS_PORT" -H "$CST_VPS_HOST" >> ~/.ssh/known_hosts
-          fi
-
+          printf "%s\n" "$CST_VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
           sed -i 's/\r$//' ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
-          
+
+      # ============================================================
+      # DEPLOY
+      # ============================================================
       - name: Deploy on VPS
         shell: bash
+        env:
+          CST_VPS_HOST: ${{ secrets.CST_VPS_HOST }}
+          CST_VPS_PORT: ${{ secrets.CST_VPS_PORT }}
+          CST_VPS_USER: ${{ secrets.CST_VPS_USER }}
         run: |
+          set -Eeuo pipefail
+
           ssh \
             -i ~/.ssh/cst_vps_key \
-            -p "${{ secrets.CST_VPS_PORT }}" \
+            -p "${CST_VPS_PORT}" \
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
             -o BatchMode=yes \
+            -o ConnectTimeout=20 \
             -o ServerAliveInterval=30 \
             -o ServerAliveCountMax=3 \
-            "${{ secrets.CST_VPS_USER }}@${{ secrets.CST_VPS_HOST }}" <<'REMOTE'
+            "${CST_VPS_USER}@${CST_VPS_HOST}" <<'REMOTE'
+
           set -Eeuo pipefail
 
+          # ========================================================
+          # CONFIGURATION
+          # ========================================================
           APP_DIR="/home/eccops/apps/cst-website"
           DOCKER_DIR="${APP_DIR}/docker"
+
           COMPOSE_FILE="docker-compose.prod.yml"
           ENV_FILE=".env.prod"
+
+          DEPLOY_BRANCH="feature-v2"
+
           LOCK_FILE="/tmp/cst-production-deploy.lock"
 
+          BACKUP_DIR="/home/eccops/backups/cst"
+          BACKUP_RETENTION_DAYS="14"
+
+          PUBLIC_URL="https://cst.ecc.bj"
+
+          # ========================================================
+          # HELPERS
+          # ========================================================
           log() {
-            echo "[CST DEPLOY] $(date '+%Y-%m-%d %H:%M:%S') — $*"
+            printf '\n[CST DEPLOY] %s — %s\n' \
+              "$(date '+%Y-%m-%d %H:%M:%S')" \
+              "$*"
+          }
+
+          compose() {
+            docker compose \
+              --env-file "${ENV_FILE}" \
+              -f "${COMPOSE_FILE}" \
+              "$@"
+          }
+
+          django() {
+            compose run \
+              --rm \
+              --no-deps \
+              cst_backend \
+              python manage.py "$@"
+          }
+
+          cleanup() {
+            # Supprime éventuellement les containers temporaires
+            # laissés par un run interrompu.
+            docker container prune -f \
+              --filter "label=com.docker.compose.project=cst_website" \
+              >/dev/null 2>&1 || true
           }
 
           on_error() {
-            log "❌ Échec du déploiement. État des containers :"
-            cd "${DOCKER_DIR}" || exit 1
-            docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" ps || true
+            exit_code=$?
 
-            log "Logs backend :"
-            docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" logs --tail=120 cst_backend || true
+            trap - ERR
 
-            log "Logs gateway :"
-            docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" logs --tail=120 cst_gateway || true
+            log "❌ Échec du déploiement — code ${exit_code}"
 
-            log "Logs frontend :"
-            docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" logs --tail=120 cst_frontend || true
+            if [ -d "${DOCKER_DIR}" ]; then
+              cd "${DOCKER_DIR}" || true
+
+              log "État Docker Compose"
+              compose ps || true
+
+              log "Migrations Django"
+              django showmigrations --plan || true
+
+              log "Logs backend"
+              compose logs --tail=150 cst_backend || true
+
+              log "Logs frontend"
+              compose logs --tail=150 cst_frontend || true
+
+              log "Logs Celery"
+              compose logs --tail=100 cst_celery_worker || true
+
+              log "Logs gateway"
+              compose logs --tail=150 cst_gateway || true
+            fi
+
+            cleanup
+
+            exit "${exit_code}"
           }
 
           trap on_error ERR
@@ -95,19 +173,57 @@ jobs:
             timeout="${2:-180}"
             elapsed=0
 
-            log "Attente healthcheck : ${container}"
+            log "Attente du container ${container}"
 
             while [ "${elapsed}" -lt "${timeout}" ]; do
-              status="$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "${container}" 2>/dev/null || true)"
+              exists="$(
+                docker inspect \
+                  --format='{{.State.Status}}' \
+                  "${container}" \
+                  2>/dev/null || true
+              )"
 
-              if [ "${status}" = "healthy" ] || [ "${status}" = "running" ]; then
-                if docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{end}}' "${container}" 2>/dev/null | grep -q "healthy"; then
-                  log "${container} est healthy"
+              if [ "${exists}" = "exited" ] || [ "${exists}" = "dead" ]; then
+                log "${container} s'est arrêté."
+                docker logs --tail=150 "${container}" || true
+                return 1
+              fi
+
+              has_health="$(
+                docker inspect \
+                  --format='{{if .State.Health}}yes{{else}}no{{end}}' \
+                  "${container}" \
+                  2>/dev/null || true
+              )"
+
+              if [ "${has_health}" = "yes" ]; then
+                health="$(
+                  docker inspect \
+                    --format='{{.State.Health.Status}}' \
+                    "${container}" \
+                    2>/dev/null || true
+                )"
+
+                if [ "${health}" = "healthy" ]; then
+                  log "✅ ${container} est healthy"
                   return 0
                 fi
 
-                if ! docker inspect --format='{{if .State.Health}}yes{{else}}no{{end}}' "${container}" 2>/dev/null | grep -q "yes"; then
-                  log "${container} est running"
+                if [ "${health}" = "unhealthy" ]; then
+                  log "❌ ${container} est unhealthy"
+                  docker logs --tail=150 "${container}" || true
+                  return 1
+                fi
+              else
+                status="$(
+                  docker inspect \
+                    --format='{{.State.Status}}' \
+                    "${container}" \
+                    2>/dev/null || true
+                )"
+
+                if [ "${status}" = "running" ]; then
+                  log "✅ ${container} est running"
                   return 0
                 fi
               fi
@@ -116,11 +232,15 @@ jobs:
               elapsed=$((elapsed + 5))
             done
 
-            log "Timeout healthcheck pour ${container}"
-            docker logs --tail=120 "${container}" || true
+            log "❌ Timeout après ${timeout}s pour ${container}"
+            docker logs --tail=150 "${container}" || true
+
             return 1
           }
 
+          # ========================================================
+          # VERROU ANTI DOUBLE DEPLOY
+          # ========================================================
           exec 9>"${LOCK_FILE}"
 
           if ! flock -n 9; then
@@ -128,97 +248,428 @@ jobs:
             exit 1
           fi
 
-          log "Démarrage du déploiement CST production"
+          log "======================================================"
+          log "Démarrage du déploiement CST Production"
+          log "======================================================"
 
+          # ========================================================
+          # 1. PRECHECK SERVEUR
+          # ========================================================
+          command -v git >/dev/null
+          command -v docker >/dev/null
+          command -v gzip >/dev/null
+          command -v flock >/dev/null
+          command -v curl >/dev/null
+
+          docker info >/dev/null
+          docker compose version
+
+          test -d "${APP_DIR}"
+          test -d "${DOCKER_DIR}"
+
+          # ========================================================
+          # 2. SYNCHRONISATION GIT
+          # ========================================================
           cd "${APP_DIR}"
 
-          log "Synchronisation Git avec origin/feature-v2"
-          git fetch --prune origin feature-v2
+          log "Révision actuellement déployée"
+          git rev-parse --short HEAD || true
 
-          # Nettoyage prudent :
-          # - supprime les fichiers non suivis qui peuvent bloquer git ;
-          # - protège explicitement le fichier d'environnement production.
-          git clean -fd -e docker/.env.prod
-          git reset --hard origin/feature-v2
+          log "Synchronisation avec origin/${DEPLOY_BRANCH}"
+          git fetch \
+            --prune \
+            origin \
+            "${DEPLOY_BRANCH}"
 
-          log "Vérification du fichier d'environnement"
-          test -s "docker/${ENV_FILE}"
+          # Le .env de production ne doit jamais être supprimé.
+          git clean \
+            -fd \
+            -e docker/.env.prod
+
+          git reset \
+            --hard \
+            "origin/${DEPLOY_BRANCH}"
+
+          DEPLOY_SHA="$(git rev-parse HEAD)"
+          DEPLOY_SHA_SHORT="$(git rev-parse --short HEAD)"
+
+          log "Nouvelle révision : ${DEPLOY_SHA_SHORT}"
+
+          # ========================================================
+          # 3. ENVIRONNEMENT
+          # ========================================================
+          test -s "${DOCKER_DIR}/${ENV_FILE}"
 
           cd "${DOCKER_DIR}"
 
           log "Validation Docker Compose"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" config > /dev/null
+          compose config >/dev/null
 
+          # ========================================================
+          # 4. INFRASTRUCTURE DB / REDIS
+          # ========================================================
           log "Démarrage PostgreSQL et Redis"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d cst_db cst_redis
+
+          compose up -d \
+            cst_db \
+            cst_redis
 
           wait_healthy cst-db 180
           wait_healthy cst-redis 120
 
-          log "Backup PostgreSQL CST"
-          mkdir -p /home/eccops/backups/cst
-          if docker ps --format '{{.Names}}' | grep -qx 'cst-db'; then
-            docker exec cst-db sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' \
-              | gzip > "/home/eccops/backups/cst/cst_$(date '+%Y%m%d_%H%M%S').sql.gz"
-          fi
+          # ========================================================
+          # 5. BACKUP POSTGRES AVANT TOUTE MIGRATION
+          # ========================================================
+          log "Backup PostgreSQL avant migration"
 
-          log "Build des images"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" build \
-            cst_backend cst_frontend cst_gateway
+          mkdir -p "${BACKUP_DIR}"
+          chmod 700 "${BACKUP_DIR}"
 
-          log "Django check"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" run --rm --no-deps cst_backend \
-            python manage.py check
+          BACKUP_FILE="${
+            BACKUP_DIR
+          }/cst_$(
+            date '+%Y%m%d_%H%M%S'
+          )_${DEPLOY_SHA_SHORT}.sql.gz"
 
-          log "Migrations Django"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" run --rm --no-deps cst_backend \
-            python manage.py migrate --noinput
+          docker exec cst-db sh -c \
+            'pg_dump \
+              --clean \
+              --if-exists \
+              --no-owner \
+              --no-privileges \
+              -U "$POSTGRES_USER" \
+              "$POSTGRES_DB"' \
+            | gzip -9 > "${BACKUP_FILE}"
 
+          test -s "${BACKUP_FILE}"
+
+          log "Backup créé : ${BACKUP_FILE}"
+
+          # Nettoyage automatique des vieux backups.
+          find "${BACKUP_DIR}" \
+            -type f \
+            -name 'cst_*.sql.gz' \
+            -mtime "+${BACKUP_RETENTION_DAYS}" \
+            -delete || true
+
+          # ========================================================
+          # 6. BUILD BACKEND EN PREMIER
+          # ========================================================
+          log "Build image backend"
+
+          compose build \
+            --pull \
+            cst_backend
+
+          # ========================================================
+          # 7. VALIDATION DJANGO
+          # ========================================================
+          log "Django system check"
+
+          django check
+
+          # --------------------------------------------------------
+          # IMPORTANT :
+          # Vérifie que models.py n'a pas changé sans migration
+          # correspondante dans Git.
+          #
+          # Nous NE lançons PAS "makemigrations" en production.
+          # --------------------------------------------------------
+          log "Recherche de migrations Django oubliées"
+
+          django makemigrations \
+            --check \
+            --dry-run
+
+          # ========================================================
+          # 8. ETAT MIGRATIONS AVANT
+          # ========================================================
+          log "Plan des migrations avant application"
+
+          django migrate --plan
+
+          log "État des migrations avant application"
+
+          django showmigrations --plan
+
+          # ========================================================
+          # 9. APPLICATION AUTOMATIQUE DES MIGRATIONS
+          # ========================================================
+          log "Application des migrations Django"
+
+          django migrate \
+            --noinput
+
+          # ========================================================
+          # 10. VERIFICATION STRICTE DES MIGRATIONS
+          # ========================================================
+          log "Vérification qu'aucune migration n'est en attente"
+
+          django migrate --check
+
+          log "État final des migrations"
+
+          django showmigrations --plan
+
+          # --------------------------------------------------------
+          # Vérification supplémentaire :
+          # si Django voit encore un changement de modèle sans
+          # migration, le déploiement s'arrête ici.
+          # --------------------------------------------------------
+          log "Deuxième contrôle du graphe des migrations"
+
+          django makemigrations \
+            --check \
+            --dry-run
+
+          # ========================================================
+          # 11. SMOKE TEST ORM / BASE DE DONNEES
+          # ========================================================
+          log "Test connexion Django → PostgreSQL"
+
+          django shell -c \
+            "from django.db import connection; connection.ensure_connection(); print('DATABASE CONNECTION OK')"
+
+          log "Test ORM Django"
+
+          django shell -c \
+            "from django.contrib.auth import get_user_model; get_user_model().objects.exists(); print('ORM OK')"
+
+          # ========================================================
+          # 12. COLLECTSTATIC
+          # ========================================================
           log "Collectstatic Django"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" run --rm --no-deps cst_backend \
-            python manage.py collectstatic --noinput
 
-          log "Recréation du backend"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d \
+          django collectstatic \
+            --noinput
+
+          # ========================================================
+          # 13. BUILD FRONTEND + GATEWAY
+          # ========================================================
+          log "Build frontend et gateway"
+
+          compose build \
+            --pull \
+            cst_frontend \
+            cst_gateway
+
+          # ========================================================
+          # 14. RECREATION BACKEND
+          # ========================================================
+          log "Mise en ligne du nouveau backend"
+
+          compose up -d \
             --force-recreate \
             --no-deps \
             cst_backend
 
           wait_healthy cst-backend 180
 
-          log "Recréation du frontend"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d \
+          # ========================================================
+          # 15. TEST DIRECT BACKEND
+          # ========================================================
+          log "Test API backend après migration"
+
+          docker exec cst-backend \
+            python manage.py check
+
+          docker exec cst-backend \
+            python manage.py migrate --check
+
+          # Vérification directe de l'endpoint health.
+          docker exec cst-backend \
+            python -c \
+            "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=10).read(); print('BACKEND HTTP OK')"
+
+          # ========================================================
+          # 16. RECREATION FRONTEND
+          # ========================================================
+          log "Mise en ligne du nouveau frontend"
+
+          compose up -d \
             --force-recreate \
             --no-deps \
             cst_frontend
 
           wait_healthy cst-frontend 180
 
-          log "Recréation de Celery et du gateway"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" up -d \
+          # ========================================================
+          # 17. CELERY
+          # ========================================================
+          log "Recréation Celery worker"
+
+          compose up -d \
             --force-recreate \
             --no-deps \
-            cst_celery_worker cst_gateway
+            cst_celery_worker
+
+          # Celery ne possède pas forcément de healthcheck.
+          sleep 5
+
+          if ! docker inspect \
+            --format='{{.State.Status}}' \
+            cst-celery-worker \
+            2>/dev/null \
+            | grep -qx "running"; then
+
+            log "Celery worker ne fonctionne pas."
+            docker logs --tail=120 cst-celery-worker || true
+            exit 1
+          fi
+
+          # ========================================================
+          # 18. GATEWAY
+          # ========================================================
+          log "Mise en ligne du nouveau gateway"
+
+          compose up -d \
+            --force-recreate \
+            --no-deps \
+            cst_gateway
 
           wait_healthy cst-gateway 180
 
-          log "Vérification communication gateway → backend"
-          docker exec cst-gateway wget -q -O /dev/null http://cst-backend:8000/api/v1/health/
+          # ========================================================
+          # 19. TESTS INTERNES
+          # ========================================================
+          log "Communication gateway → backend"
 
-          log "Vérification communication ecc-shield → cst-gateway"
-          docker exec ecc-shield wget -q -O /dev/null http://cst-gateway:8080/gateway-health
-          docker exec ecc-shield wget -q -O /dev/null http://cst-gateway:8080/api/v1/health/
+          docker exec cst-gateway \
+            wget \
+            --timeout=10 \
+            --tries=3 \
+            -q \
+            -O /dev/null \
+            http://cst-backend:8000/api/v1/health/
 
-          log "Validation configuration nginx externe"
+          log "Health du gateway"
+
+          docker exec cst-gateway \
+            wget \
+            --timeout=10 \
+            --tries=3 \
+            -q \
+            -O /dev/null \
+            http://127.0.0.1:8080/gateway-health
+
+          # ========================================================
+          # 20. ECC-SHIELD
+          # ========================================================
+          log "Validation nginx externe"
+
           docker exec ecc-shield nginx -t
 
+          log "Communication ecc-shield → cst-gateway"
+
+          docker exec ecc-shield \
+            wget \
+            --timeout=10 \
+            --tries=3 \
+            -q \
+            -O /dev/null \
+            http://cst-gateway:8080/gateway-health
+
+          docker exec ecc-shield \
+            wget \
+            --timeout=10 \
+            --tries=3 \
+            -q \
+            -O /dev/null \
+            http://cst-gateway:8080/api/v1/health/
+
+          # ========================================================
+          # 21. TESTS HTTPS PUBLICS
+          # ========================================================
           log "Test HTTPS public"
-          curl -fsSI https://cst.ecc.bj > /dev/null
-          curl -fsS https://cst.ecc.bj/api/v1/health/ > /dev/null
 
-          log "État final des containers"
-          docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" ps
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --retry 3 \
+            --retry-delay 3 \
+            --connect-timeout 10 \
+            --max-time 30 \
+            -o /dev/null \
+            "${PUBLIC_URL}/"
 
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --retry 3 \
+            --retry-delay 3 \
+            --connect-timeout 10 \
+            --max-time 30 \
+            "${PUBLIC_URL}/api/v1/health/" \
+            >/dev/null
+
+          # ========================================================
+          # 22. TEST API ACTUALITES
+          # ========================================================
+          #
+          # Cela aurait immédiatement détecté l'incident home_slot.
+          # Même si la page d'accueil possède un fallback frontend,
+          # une API backend en 500 doit faire échouer le déploiement.
+          #
+          log "Smoke test API Actualités"
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --connect-timeout 10 \
+            --max-time 30 \
+            "${PUBLIC_URL}/api/v1/news/" \
+            >/dev/null
+
+          log "Smoke test API Actualités spéciales"
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --connect-timeout 10 \
+            --max-time 30 \
+            "${PUBLIC_URL}/api/v1/news/home-special/" \
+            >/dev/null
+
+          # ========================================================
+          # 23. ETAT FINAL
+          # ========================================================
+          log "État final Docker Compose"
+
+          compose ps
+
+          log "Révision déployée : ${DEPLOY_SHA}"
+
+          # ========================================================
+          # 24. CLEANUP DOCKER PRUDENT
+          # ========================================================
+          #
+          # On ne fait PAS :
+          # docker system prune -a
+          #
+          # pour conserver les images potentiellement utiles.
+          #
+          log "Nettoyage des artefacts Docker inutilisés"
+
+          docker builder prune \
+            -f \
+            --filter "until=168h" \
+            >/dev/null 2>&1 || true
+
+          cleanup
+
+          log "======================================================"
           log "✅ Déploiement CST terminé avec succès"
+          log "Commit : ${DEPLOY_SHA_SHORT}"
+          log "Backup : ${BACKUP_FILE}"
+          log "======================================================"
+
           REMOTE
 

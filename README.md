@@ -1,6 +1,6 @@
-# CST / CSMO — Plateforme institutionnelle web
+# CST / CSMo — Plateforme institutionnelle web
 
-Plateforme web du Conseil Supérieur de Transition (CST) et du Conseil Supérieur de Mise en Œuvre (CSMO) de l’Église du Christianisme Céleste.
+Plateforme web du Conseil Supérieur de Transition (CST) et du Conseil Supérieur de Mise en Œuvre (CSMo) de l’Église du Christianisme Céleste.
 
 Ce dépôt contient désormais :
 

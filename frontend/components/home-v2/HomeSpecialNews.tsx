@@ -31,17 +31,14 @@ function SpecialNewsCard({
             ? attachment.url
             : attachment?.previewUrl;
 
-    const isAlert =
-        slot === "alert_info";
+    const isAlert = slot === "alert_info";
+    const showEventDate =
+        slot === "upcoming_event" && Boolean(item.eventDate);
 
     return (
         <article
             className={styles.card}
-            data-tone={
-                isAlert
-                    ? "alert"
-                    : "event"
-            }
+            data-tone={isAlert ? "alert" : "event"}
         >
             <div className={styles.media}>
                 {mediaUrl ? (
@@ -55,9 +52,7 @@ function SpecialNewsCard({
                         fill
                         sizes="(max-width: 639px) 100vw, 12rem"
                         className={styles.image}
-                        unoptimized={imageNeedsUnoptimized(
-                            mediaUrl,
-                        )}
+                        unoptimized={imageNeedsUnoptimized(mediaUrl)}
                     />
                 ) : attachment?.type === "pdf" ? (
                     <div
@@ -74,16 +69,11 @@ function SpecialNewsCard({
                 ) : (
                     <Image
                         src={item.imageUrl}
-                        alt={
-                            item.imageAlt ??
-                            item.title
-                        }
+                        alt={item.imageAlt ?? item.title}
                         fill
                         sizes="(max-width: 639px) 100vw, 12rem"
                         className={styles.image}
-                        unoptimized={imageNeedsUnoptimized(
-                            item.imageUrl,
-                        )}
+                        unoptimized={imageNeedsUnoptimized(item.imageUrl)}
                     />
                 )}
 
@@ -95,35 +85,30 @@ function SpecialNewsCard({
             </div>
 
             <div className={styles.content}>
-                <time
-                    className={styles.date}
-                    dateTime={
-                        item.eventDate ??
-                        item.date
-                    }
-                >
-                    {formatDate(
-                        item.eventDate ??
-                        item.date,
-                    )}
-                </time>
+                <div className={styles.topLine}>
+                    <span className={styles.badge}>
+                        {isAlert
+                            ? "Alerte Info"
+                            : "Événement à venir"}
+                    </span>
 
-                <h3>
-                    {item.title}
-                </h3>
+                    {showEventDate ? (
+                        <time dateTime={item.eventDate}>
+                            {formatDate(item.eventDate!)}
+                        </time>
+                    ) : null}
+                </div>
 
-                <p>
-                    {item.excerpt}
-                </p>
+                <h3>{item.title}</h3>
+
+                <p>{item.excerpt}</p>
 
                 <Link
                     href={`/actualites/${item.slug}`}
                     className={styles.readMore}
                 >
                     Lire la suite
-                    <span aria-hidden="true">
-                        →
-                    </span>
+                    <span aria-hidden="true">→</span>
                 </Link>
             </div>
         </article>
@@ -134,15 +119,11 @@ export default function HomeSpecialNews({
     items,
 }: HomeSpecialNewsProps) {
     const event = items.find(
-        (item) =>
-            item.homeSlot ===
-            "upcoming_event",
+        (item) => item.homeSlot === "upcoming_event",
     );
 
     const alert = items.find(
-        (item) =>
-            item.homeSlot ===
-            "alert_info",
+        (item) => item.homeSlot === "alert_info",
     );
 
     if (!event && !alert) {
@@ -154,42 +135,20 @@ export default function HomeSpecialNews({
             className={styles.wrapper}
             aria-label="Événement à venir et informations importantes"
         >
+            {/* Gauche */}
             {event ? (
-                <section
-                    className={styles.specialBox}
-                >
-                    <div
-                        className={styles.heading}
-                    >
-                        <h2>
-                            Événement à venir
-                        </h2>
-                    </div>
-
-                    <SpecialNewsCard
-                        item={event}
-                        slot="upcoming_event"
-                    />
-                </section>
+                <SpecialNewsCard
+                    item={event}
+                    slot="upcoming_event"
+                />
             ) : null}
 
+            {/* Droite */}
             {alert ? (
-                <section
-                    className={styles.specialBox}
-                >
-                    <div
-                        className={styles.heading}
-                    >
-                        <h2>
-                            Alerte Info
-                        </h2>
-                    </div>
-
-                    <SpecialNewsCard
-                        item={alert}
-                        slot="alert_info"
-                    />
-                </section>
+                <SpecialNewsCard
+                    item={alert}
+                    slot="alert_info"
+                />
             ) : null}
         </div>
     );

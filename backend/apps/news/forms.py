@@ -72,7 +72,10 @@ class NewsForm(forms.ModelForm):
             format="%Y-%m-%d",
             attrs={"type": "date"},
         ),
-        help_text="Obligatoire à la publication pour un Événement à venir.",
+        help_text=(
+            "Uniquement utilisé pour « Événement à venir ». "
+            "Laissez vide pour une Alerte Info ou une actualité standard."
+        ),
     )
 
     class Meta:

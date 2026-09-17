@@ -35,7 +35,7 @@ def send_backoffice_invitation(*, request, user: User) -> int:
         "setup_url": setup_url,
     }
 
-    subject = "Votre accès au back-office CST/CSMO"
+    subject = "Votre accès au back-office CST/CSMo"
     text_body = render_to_string("emails/backoffice_invitation.txt", context)
     html_body = render_to_string("emails/backoffice_invitation.html", context)
 

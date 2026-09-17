@@ -43,7 +43,10 @@
     {% csrf_token %}
 
     {% for field in form %}
-      <div class="bo-field {% if field.name == 'featured' %}bo-field--checkbox{% endif %}">
+      <div
+        class="bo-field {% if field.name == 'featured' %}bo-field--checkbox{% endif %}"
+        data-news-field="{{ field.name }}"
+      >
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
 
         {% if field.name == "featured_image" and news and news.featured_image %}
@@ -111,4 +114,32 @@
     <button type="submit" class="bo-btn">{{ submit_label }}</button>
   </form>
 </section>
+  <script>
+    (() => {
+      const slot = document.getElementById("id_home_slot");
+      const eventDateField = document.querySelector('[data-news-field="event_date"]');
+
+      if (!slot || !eventDateField) return;
+
+      const eventDateInput = eventDateField.querySelector("input");
+
+      const syncEventDateVisibility = () => {
+        const isUpcomingEvent = slot.value === "upcoming_event";
+
+        eventDateField.hidden = !isUpcomingEvent;
+        eventDateField.setAttribute(
+          "aria-hidden",
+          isUpcomingEvent ? "false" : "true",
+        );
+
+        if (eventDateInput) {
+          eventDateInput.disabled = !isUpcomingEvent;
+        }
+      };
+
+      slot.addEventListener("change", syncEventDateVisibility);
+      syncEventDateVisibility();
+    })();
+  </script>
 {% endblock %}
+

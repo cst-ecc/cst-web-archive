@@ -13,7 +13,7 @@ def send_login_otp_email(*, user: User, code: str) -> int:
         "recipient_email": user.email,
     }
 
-    subject = "Votre code de connexion — CST/CSMO"
+    subject = "Votre code de connexion — CST/CSMo"
     text_body = render_to_string("emails/login_otp.txt", context)
     html_body = render_to_string("emails/login_otp.html", context)
 

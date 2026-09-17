@@ -496,6 +496,36 @@ export default function Navbar() {
   return (
     <header className={cn(styles.header, styles.headerHome, styles.headerSolid)}>
       <div className={cn(styles.bar, styles.homeBar)}>
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          className={cn(styles.burger, styles.mobileBurger)}
+          aria-expanded={open}
+          aria-controls="menu-mobile"
+          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+        >
+          <span className={styles.burgerBox} aria-hidden>
+            <span
+              className={cn(
+                styles.burgerLine,
+                open && styles.burgerLineTop,
+              )}
+            />
+            <span
+              className={cn(
+                styles.burgerLine,
+                open && styles.burgerLineMiddle,
+              )}
+            />
+            <span
+              className={cn(
+                styles.burgerLine,
+                open && styles.burgerLineBottom,
+              )}
+            />
+          </span>
+        </button>
+
         <div className={styles.homeLeftTools}>
           <LanguageSwitch />
         </div>
@@ -557,36 +587,14 @@ export default function Navbar() {
             </a>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setOpen((value) => !value)}
-            className={styles.burger}
-            aria-expanded={open}
-            aria-controls="menu-mobile"
-            aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          >
-            <span className={styles.burgerBox} aria-hidden>
-              <span
-                className={cn(
-                  styles.burgerLine,
-                  open && styles.burgerLineTop,
-                )}
-              />
-              <span
-                className={cn(
-                  styles.burgerLine,
-                  open && styles.burgerLineMiddle,
-                )}
-              />
-              <span
-                className={cn(
-                  styles.burgerLine,
-                  open && styles.burgerLineBottom,
-                )}
-              />
-            </span>
-          </button>
         </div>
+
+        <span
+          className={styles.mobileLanguage}
+          aria-label="Langue actuelle : français"
+        >
+          FR
+        </span>
       </div>
 
       {searchOpen ? (
@@ -728,7 +736,6 @@ export default function Navbar() {
 
             <div className={styles.mobileTools}>
               <div className={styles.mobileToolsTop}>
-                <LanguageSwitch />
                 <a
                   href={SITE.digitalisationUrl}
                   target="_blank"

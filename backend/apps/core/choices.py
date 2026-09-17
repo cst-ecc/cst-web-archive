@@ -3,8 +3,8 @@ from django.db import models
 
 class Organ(models.TextChoices):
     CST = "cst", "CST"
-    CSMO = "csmo", "CSMO"
-    CST_CSMO = "cst_csmo", "CST & CSMO"
+    CSMO = "csmo", "CSMo"
+    CST_CSMO = "cst_csmo", "CST & CSMo"
     GENERAL = "general", "Institutionnel"
 
 
