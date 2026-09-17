@@ -73,8 +73,8 @@ class NewsForm(forms.ModelForm):
             attrs={"type": "date"},
         ),
         help_text=(
-            "Uniquement utilisé pour « Événement à venir ». "
-            "Laissez vide pour une Alerte Info ou une actualité standard."
+            "Champ facultatif, y compris pour « Événement à venir ». "
+            "Si aucune date précise n’est connue, laissez ce champ vide."
         ),
     )
 
@@ -128,6 +128,8 @@ class NewsForm(forms.ModelForm):
         # et le template affiche un aperçu clair de l'image actuelle.
         self.fields["featured_image"].required = False
         self.fields["attachment"].required = False
+        # La date reste volontairement facultative, même pour un événement à venir.
+        self.fields["event_date"].required = False
         self.fields["attachment"].widget.attrs.update(
             {
                 "accept": ".pdf,.jpg,.jpeg,.png,.webp",

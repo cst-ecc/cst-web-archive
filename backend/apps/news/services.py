@@ -72,8 +72,10 @@ def _validate_before_publish(news: News) -> None:
 
     if not news.title.strip():
         missing.append("titre")
+
     if not news.excerpt.strip():
         missing.append("résumé")
+
     if not news.content.strip():
         missing.append("contenu")
 
@@ -86,11 +88,6 @@ def _validate_before_publish(news: News) -> None:
         if not news.attachment:
             missing.append("pièce jointe")
 
-        if (
-            news.home_slot == NewsHomeSlot.UPCOMING_EVENT
-            and not news.event_date
-        ):
-            missing.append("date de l’événement")
     elif not news.featured_image:
         missing.append("image de couverture")
 
@@ -101,6 +98,8 @@ def _validate_before_publish(news: News) -> None:
             + "."
         )
 
+    # La date de l'événement est facultative.
+    # Si elle est renseignée, elle ne peut toutefois pas être passée.
     if (
         news.home_slot == NewsHomeSlot.UPCOMING_EVENT
         and news.event_date
@@ -109,7 +108,6 @@ def _validate_before_publish(news: News) -> None:
         raise NewsWorkflowError(
             "La date d’un événement à venir ne peut pas être antérieure à aujourd’hui."
         )
-
 
 @transaction.atomic
 def transition_news(
