@@ -325,11 +325,9 @@ jobs:
           mkdir -p "${BACKUP_DIR}"
           chmod 700 "${BACKUP_DIR}"
 
-          BACKUP_FILE="${
-            BACKUP_DIR
-          }/cst_$(
-            date '+%Y%m%d_%H%M%S'
-          )_${DEPLOY_SHA_SHORT}.sql.gz"
+          BACKUP_FILE="${BACKUP_DIR}/cst_$(date '+%Y%m%d_%H%M%S')_${DEPLOY_SHA_SHORT}.sql.gz"
+
+          log "Création du backup : ${BACKUP_FILE}"
 
           docker exec cst-db sh -c \
             'pg_dump \
@@ -343,9 +341,8 @@ jobs:
 
           test -s "${BACKUP_FILE}"
 
-          log "Backup créé : ${BACKUP_FILE}"
+          log "✅ Backup PostgreSQL créé : ${BACKUP_FILE}"
 
-          # Nettoyage automatique des vieux backups.
           find "${BACKUP_DIR}" \
             -type f \
             -name 'cst_*.sql.gz' \
