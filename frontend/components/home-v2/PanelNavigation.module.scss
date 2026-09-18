@@ -33,7 +33,7 @@
   background: transparent;
   color: rgba(17, 24, 39, 0.35);
   cursor: pointer;
-  font-size: 0.56rem;
+  font-size: v.$font-size-micro;
   font-weight: 800;
 }
 
@@ -61,7 +61,7 @@
   > span {
     padding-left: 0.5rem;
     color: v.$color-blue-deep;
-    font-size: 0.62rem;
+    font-size: v.$font-size-meta;
     font-weight: 800;
     letter-spacing: 0.06em;
   }

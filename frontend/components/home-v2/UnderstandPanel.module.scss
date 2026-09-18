@@ -3,7 +3,7 @@
 
 .topicGrid {
   display: grid;
-  gap: 0.65rem;
+  gap: clamp(0.65rem, 0.5rem + 0.22vw, 0.9rem);
 
   @include m.respond(md) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -18,7 +18,7 @@
   margin-top: 0.72rem;
   border: 1px solid v.$color-surface-line;
   border-radius: v.$radius-xl2;
-  padding: 0.72rem;
+  padding: clamp(0.78rem, 0.62rem + 0.24vw, 1rem);
   background: v.$color-white;
 }
 
@@ -37,7 +37,7 @@
     gap: 0.6rem;
     align-items: start;
     min-width: 0;
-    padding: 0.45rem 0.55rem;
+    padding: clamp(0.55rem, 0.45rem + 0.18vw, 0.75rem);
     border-radius: v.$radius-lg;
     background: v.$color-surface-muted;
   }
@@ -50,19 +50,19 @@
     border-radius: 50%;
     background: v.$color-blue-deep;
     color: v.$color-white;
-    font-size: 0.62rem;
+    font-size: v.$font-size-meta;
     font-weight: 900;
   }
 
   h4 {
     color: v.$color-blue-ink;
-    font-size: 0.76rem;
+    font-size: v.$font-size-card-title;
   }
 
   p {
     margin-top: 0.08rem;
     color: rgba(17, 24, 39, 0.58);
-    font-size: 0.64rem;
+    font-size: v.$font-size-small;
     line-height: 1.36;
   }
 }

@@ -3,7 +3,7 @@
 
 .layout {
   display: grid;
-  gap: 0.85rem;
+  gap: clamp(0.8rem, 0.62rem + 0.28vw, 1.15rem);
   align-items: stretch;
 
   @include m.respond(lg) {
@@ -20,7 +20,7 @@
 }
 
 .pyramidSection {
-  padding: 0.75rem;
+  padding: clamp(0.8rem, 0.65rem + 0.24vw, 1.05rem);
 }
 
 .heading {
@@ -32,7 +32,7 @@
 
   > div:first-child > span {
     color: v.$color-blue;
-    font-size: 0.56rem;
+    font-size: v.$font-size-micro;
     font-weight: 900;
     letter-spacing: 0.09em;
     text-transform: uppercase;
@@ -41,7 +41,7 @@
   h3 {
     margin-top: 0.08rem;
     color: v.$color-blue-ink;
-    font-size: clamp(1rem, 1.35vw, 1.25rem);
+    font-size: v.$font-size-section-title;
     line-height: 1.15;
   }
 }
@@ -61,7 +61,7 @@
 
   small {
     color: rgba(17, 24, 39, 0.48);
-    font-size: 0.48rem;
+    font-size: v.$font-size-micro;
     font-weight: 800;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -71,7 +71,7 @@
     margin-top: 0.06rem;
     color: v.$color-blue-ink;
     font-family: v.$font-display;
-    font-size: 0.86rem;
+    font-size: v.$font-size-card-title;
   }
 }
 
@@ -79,7 +79,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 1rem;
+  padding: clamp(0.9rem, 0.72rem + 0.28vw, 1.25rem);
   background:
     radial-gradient(circle at 100% 0%, rgba(241, 233, 6, 0.12), transparent 10rem),
     linear-gradient(145deg, rgba(31, 133, 206, 0.05), v.$color-white 58%);
@@ -103,7 +103,7 @@
 .kicker {
   margin-top: 0.75rem;
   color: v.$color-gold;
-  font-size: 0.55rem;
+  font-size: v.$font-size-micro;
   font-weight: 900;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -112,14 +112,14 @@
 .currentCard h3 {
   margin-top: 0.24rem;
   color: v.$color-blue-ink;
-  font-size: clamp(1rem, 1.3vw, 1.22rem);
+  font-size: v.$font-size-section-title;
   line-height: 1.18;
 }
 
 .description {
   margin-top: 0.55rem;
   color: rgba(17, 24, 39, 0.62);
-  font-size: 0.68rem;
+  font-size: v.$font-size-small;
   line-height: 1.48;
 }
 
@@ -145,13 +145,13 @@
   strong {
     color: v.$color-blue-ink;
     font-family: v.$font-display;
-    font-size: 0.9rem;
+    font-size: v.$font-size-card-title;
   }
 
   span {
     margin-top: 0.08rem;
     color: rgba(17, 24, 39, 0.5);
-    font-size: 0.5rem;
+    font-size: v.$font-size-micro;
     line-height: 1.2;
   }
 }
@@ -177,7 +177,7 @@
     align-items: center;
     gap: 0.28rem;
     color: rgba(17, 24, 39, 0.55);
-    font-size: 0.52rem;
+    font-size: v.$font-size-micro;
     font-weight: 700;
   }
 

@@ -54,7 +54,9 @@ $section-hero-height: clamp(13.5rem, 31dvh, 18rem);
   @include m.container;
 
   width: 100%;
+  max-width: v.$max-width-home;
   height: 100%;
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -78,7 +80,9 @@ $section-hero-height: clamp(13.5rem, 31dvh, 18rem);
 .sideImage {
   position: relative;
   width: 100%;
+  max-width: v.$max-width-home;
   height: 100%;
+  margin-inline: auto;
   aspect-ratio: 4 / 5;
   overflow: hidden;
 }
@@ -96,7 +100,7 @@ $section-hero-height: clamp(13.5rem, 31dvh, 18rem);
   margin-top: 0.42rem;
   color: v.$color-white;
   font-family: v.$font-display;
-  font-size: clamp(2.15rem, 3.55vw, 4rem);
+  font-size: clamp(2.25rem, 1.55rem + 1.55vw, 4rem);
   line-height: 0.98;
   letter-spacing: -0.04em;
   text-wrap: balance;
@@ -107,7 +111,7 @@ $section-hero-height: clamp(13.5rem, 31dvh, 18rem);
   align-items: center;
   gap: 0.55rem;
   color: v.$color-yellow;
-  font-size: 0.66rem;
+  font-size: v.$font-size-meta;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.13em;
@@ -125,7 +129,7 @@ $section-hero-height: clamp(13.5rem, 31dvh, 18rem);
   max-width: 43rem;
   margin-top: 0.6rem;
   color: rgba(255, 255, 255, 0.9);
-  font-size: clamp(0.83rem, 1vw, 1rem);
+  font-size: v.$font-size-body-fluid;
   line-height: 1.48;
 }
 
@@ -138,13 +142,13 @@ $section-hero-height: clamp(13.5rem, 31dvh, 18rem);
   margin-top: 0.65rem;
   color: rgba(255, 255, 255, 0.79);
   font-family: Georgia, serif;
-  font-size: 0.8rem;
+  font-size: v.$font-size-small;
   font-style: italic;
 
   small {
     color: v.$color-yellow;
     font-family: v.$font-body;
-    font-size: 0.62rem;
+    font-size: v.$font-size-meta;
     font-style: normal;
     font-weight: 800;
     text-transform: uppercase;
@@ -158,7 +162,7 @@ $section-hero-height: clamp(13.5rem, 31dvh, 18rem);
   bottom: 0.85rem;
   max-width: 16rem;
   color: rgba(255, 255, 255, 0.48);
-  font-size: 0.58rem;
+  font-size: v.$font-size-micro;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;

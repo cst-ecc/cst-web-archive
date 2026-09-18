@@ -3,7 +3,7 @@
 
 .dashboard {
   display: grid;
-  gap: 0.7rem;
+  gap: clamp(0.68rem, 0.52rem + 0.22vw, 0.95rem);
 
   @include m.respond(lg) {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr) minmax(15rem, 0.68fr);
@@ -41,11 +41,11 @@
 }
 
 .leadBody {
-  padding: 0.65rem;
+  padding: clamp(0.72rem, 0.56rem + 0.22vw, 0.95rem);
 
   > span {
     color: v.$color-blue;
-    font-size: 0.58rem;
+    font-size: v.$font-size-micro;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -54,14 +54,14 @@
   h3 {
     margin-top: 0.22rem;
     color: v.$color-blue-ink;
-    font-size: 0.98rem;
+    font-size: v.$font-size-card-title;
     @include m.line-clamp(2);
   }
 
   p {
     margin-top: 0.28rem;
     color: rgba(17, 24, 39, 0.58);
-    font-size: 0.65rem;
+    font-size: v.$font-size-small;
     line-height: 1.38;
     @include m.line-clamp(3);
   }
@@ -70,12 +70,12 @@
     display: inline-block;
     margin-top: 0.35rem;
     color: v.$color-blue;
-    font-size: 0.62rem;
+    font-size: v.$font-size-meta;
   }
 }
 
 .card {
-  padding: 0.72rem;
+  padding: clamp(0.78rem, 0.62rem + 0.24vw, 1rem);
 }
 
 .newsList,
@@ -92,7 +92,7 @@
   align-items: center;
   gap: 0.55rem;
   border-radius: v.$radius-md;
-  padding: 0.43rem 0.48rem;
+  padding: clamp(0.5rem, 0.4rem + 0.15vw, 0.68rem);
   color: v.$color-blue-ink;
 
   &:hover,
@@ -111,14 +111,14 @@
   }
 
   strong {
-    font-size: 0.68rem;
+    font-size: v.$font-size-small;
     line-height: 1.2;
   }
 
   small {
     margin-top: 0.08rem;
     color: rgba(17, 24, 39, 0.48);
-    font-size: 0.57rem;
+    font-size: v.$font-size-meta;
   }
 
   i {

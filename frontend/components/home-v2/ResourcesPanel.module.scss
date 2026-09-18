@@ -3,7 +3,7 @@
 
 .grid {
   display: grid;
-  gap: 0.7rem;
+  gap: clamp(0.68rem, 0.52rem + 0.22vw, 0.95rem);
 
   @include m.respond(lg) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -14,7 +14,7 @@
   min-width: 0;
   border: 1px solid v.$color-surface-line;
   border-radius: v.$radius-xl2;
-  padding: 0.72rem;
+  padding: clamp(0.78rem, 0.62rem + 0.24vw, 1rem);
   background: v.$color-white;
 
   &[data-tone="gold"] {
@@ -28,18 +28,18 @@
 
 .header {
   display: flex;
-  gap: 0.7rem;
+  gap: clamp(0.68rem, 0.52rem + 0.22vw, 0.95rem);
   align-items: center;
 
   h3 {
     color: v.$color-blue-ink;
-    font-size: 0.9rem;
+    font-size: v.$font-size-card-title;
   }
 
   p {
     margin-top: 0.1rem;
     color: rgba(17, 24, 39, 0.56);
-    font-size: 0.63rem;
+    font-size: v.$font-size-small;
     line-height: 1.35;
   }
 }
@@ -66,7 +66,7 @@
     align-items: center;
     gap: 0.55rem;
     border-radius: v.$radius-md;
-    padding: 0.43rem 0.48rem;
+    padding: clamp(0.5rem, 0.4rem + 0.15vw, 0.68rem);
     color: v.$color-blue-ink;
 
     &:hover,
@@ -85,14 +85,14 @@
     }
 
     strong {
-      font-size: 0.68rem;
+      font-size: v.$font-size-small;
       line-height: 1.2;
     }
 
     small {
       margin-top: 0.08rem;
       color: rgba(17, 24, 39, 0.48);
-      font-size: 0.57rem;
+      font-size: v.$font-size-meta;
       line-height: 1.25;
     }
 
@@ -112,7 +112,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   border-radius: v.$radius-xl2;
-  padding: 0.65rem 0.85rem;
+  padding: clamp(0.72rem, 0.56rem + 0.22vw, 0.95rem);
   background: linear-gradient(90deg, rgba(31, 133, 206, 0.09), rgba(218, 167, 16, 0.1));
 
   > div:first-child {
@@ -128,13 +128,13 @@
 
   strong {
     color: v.$color-blue-ink;
-    font-size: 0.72rem;
+    font-size: v.$font-size-small;
   }
 
   small {
     margin-top: 0.08rem;
     color: rgba(17, 24, 39, 0.54);
-    font-size: 0.6rem;
+    font-size: v.$font-size-meta;
   }
 
   > div:last-child {
@@ -149,7 +149,7 @@
     padding: 0.52rem 0.75rem;
     background: v.$color-blue-deep;
     color: v.$color-white;
-    font-size: 0.62rem;
+    font-size: v.$font-size-meta;
     font-weight: 800;
     cursor: pointer;
   }

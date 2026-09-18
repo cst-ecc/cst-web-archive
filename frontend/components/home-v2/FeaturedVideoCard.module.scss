@@ -34,13 +34,13 @@
 .content {
     align-self: center;
     min-width: 0;
-    padding: 0.6rem 0.7rem;
+    padding: clamp(0.65rem, 0.5rem + 0.24vw, 0.9rem);
 
     h3 {
         margin-top: 0.2rem;
 
         color: v.$color-blue-ink;
-        font-size: 0.75rem;
+        font-size: v.$font-size-card-title;
         line-height: 1.25;
 
         @include m.line-clamp(2);
@@ -50,7 +50,7 @@
         margin-top: 0.25rem;
 
         color: rgba(17, 24, 39, 0.56);
-        font-size: 0.6rem;
+        font-size: v.$font-size-small;
         line-height: 1.4;
 
         @include m.line-clamp(2);
@@ -63,7 +63,7 @@
     gap: 0.3rem;
 
     color: v.$color-blue;
-    font-size: 0.55rem;
+    font-size: v.$font-size-micro;
     font-weight: 800;
 
     text-transform: uppercase;
@@ -81,7 +81,7 @@
         background: v.$color-yellow;
         color: v.$color-blue-ink;
 
-        font-size: 0.48rem;
+        font-size: v.$font-size-micro;
         font-style: normal;
     }
 }

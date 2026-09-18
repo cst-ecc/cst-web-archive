@@ -16,12 +16,12 @@
 
   position: relative;
   width: var(--step-width);
-  min-height: 2.65rem;
+  min-height: clamp(2.8rem, 2.5rem + 0.4vw, 3.2rem);
   display: grid;
   grid-template-columns: 2.1rem minmax(0, 1fr) 1.65rem;
   align-items: center;
   gap: 0.55rem;
-  padding: 0.48rem 0.7rem;
+  padding: clamp(0.55rem, 0.42rem + 0.2vw, 0.72rem) clamp(0.7rem, 0.55rem + 0.22vw, 0.92rem);
   overflow: hidden;
   border: 1px solid rgba(18, 84, 127, 0.14);
   border-radius: 0.55rem;
@@ -86,7 +86,7 @@
   background: rgba(12, 59, 92, 0.08);
   color: v.$color-blue-deep;
   font-family: v.$font-display;
-  font-size: 0.62rem;
+  font-size: v.$font-size-meta;
   font-weight: 900;
 }
 
@@ -112,7 +112,7 @@
 
 .stepTitle {
   min-width: 0;
-  font-size: clamp(0.62rem, 0.82vw, 0.76rem);
+  font-size: v.$font-size-small;
   font-weight: 800;
   line-height: 1.2;
   text-wrap: balance;
@@ -127,7 +127,7 @@
   padding: 0.22rem 0.45rem;
   background: v.$color-blue-ink;
   color: v.$color-white;
-  font-size: 0.5rem;
+  font-size: v.$font-size-micro;
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -149,7 +149,7 @@
   height: 1.35rem;
   border-radius: 50%;
   color: v.$color-blue;
-  font-size: 0.72rem;
+  font-size: v.$font-size-meta;
   font-weight: 900;
 }
 
@@ -212,7 +212,7 @@
   }
 
   .stepTitle {
-    font-size: 0.76rem;
+    font-size: v.$font-size-small;
     text-wrap: pretty;
   }
 

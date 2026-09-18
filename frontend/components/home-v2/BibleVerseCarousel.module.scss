@@ -160,7 +160,7 @@
 
     color: v.$color-yellow;
 
-    font-size: 0.69rem;
+    font-size: v.$font-size-meta;
     font-weight: 800;
 
     letter-spacing: 0.08em;
@@ -196,7 +196,7 @@
 ========================================================= */
 
 .strip {
-  min-height: 2.8rem;
+  min-height: clamp(3rem, 2.8rem + 0.25vw, 3.35rem);
 
   display: grid;
 
@@ -205,10 +205,10 @@
 
   align-items: center;
 
-  gap: 1.5rem;
+  gap: clamp(1rem, 0.6rem + 0.6vw, 1.6rem);
 
-  padding: 0.45rem max(1.25rem,
-    calc((100vw - #{v.$max-width-content}) / 2 + 1.25rem));
+  padding: clamp(0.5rem, 0.35rem + 0.22vw, 0.7rem) max(1.25rem,
+    calc((100vw - #{v.$max-width-home}) / 2 + 1.25rem));
 
   background:
     linear-gradient(90deg,
@@ -240,9 +240,7 @@
     font-family: Georgia, serif;
 
     font-size:
-      clamp(0.8rem,
-        1vw,
-        0.96rem);
+      v.$font-size-body-fluid;
 
     font-style: italic;
     line-height: 1.35;
@@ -258,7 +256,7 @@
         255,
         0.7);
 
-    font-size: 0.61rem;
+    font-size: v.$font-size-meta;
 
     white-space: nowrap;
   }

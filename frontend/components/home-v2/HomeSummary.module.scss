@@ -28,20 +28,22 @@
   @include m.container;
 
   width: 100%;
+  max-width: v.$max-width-home;
   height: 100%;
+  margin-inline: auto;
 
   min-height: 0;
 
   display: grid;
 
-  gap: 1rem;
+  gap: clamp(0.9rem, 0.65rem + 0.35vw, 1.3rem);
 
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 
   @include m.respond(lg) {
     grid-template-columns:
-      minmax(0, 1.25fr) minmax(11rem, 0.42fr) minmax(20rem, 0.8fr);
+      minmax(0, 1.22fr) minmax(12.5rem, 0.46fr) minmax(21rem, 0.84fr);
   }
 }
 
@@ -114,7 +116,7 @@
       v.$color-blue-ink;
 
     font-size:
-      clamp(0.7rem, 1vw, 1rem);
+      v.$font-size-section-title;
 
     line-height: 1.2;
   }
@@ -135,7 +137,7 @@
       inherit;
 
     font-size:
-      0.68rem;
+      v.$font-size-meta;
 
     font-weight:
       800;
@@ -183,7 +185,7 @@
     repeat(2,
       minmax(0, 1fr));
 
-  gap: 0.7rem;
+  gap: clamp(0.7rem, 0.55rem + 0.25vw, 0.95rem);
 
   margin-top: 0.3rem;
 
@@ -207,7 +209,7 @@
     grid-template-columns:
       1fr;
 
-    gap: 1rem;
+    gap: clamp(0.9rem, 0.65rem + 0.35vw, 1.3rem);
 
     padding-top:
       0.8rem;
@@ -250,7 +252,7 @@
 
     button {
       font-size:
-        0.62rem;
+        v.$font-size-meta;
     }
   }
 

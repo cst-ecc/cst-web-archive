@@ -21,6 +21,17 @@ $color-surface-line: #E3EAF1;
 $font-display: var(--font-display), Georgia, serif;
 $font-body: var(--font-body), system-ui, sans-serif;
 
+// Échelle typographique fluide — Home V2 / navigation
+// Les minima évitent les textes microscopiques sur desktop compact,
+// les maxima gardent une hiérarchie stable sur les écrans très larges.
+$font-size-micro: clamp(0.72rem, 0.66rem + 0.18vw, 0.82rem);
+$font-size-meta: clamp(0.76rem, 0.70rem + 0.20vw, 0.88rem);
+$font-size-small: clamp(0.82rem, 0.75rem + 0.22vw, 0.94rem);
+$font-size-body-fluid: clamp(0.90rem, 0.82rem + 0.25vw, 1.02rem);
+$font-size-card-title: clamp(0.98rem, 0.90rem + 0.28vw, 1.16rem);
+$font-size-section-title: clamp(1.08rem, 0.98rem + 0.38vw, 1.35rem);
+$font-size-nav: clamp(0.78rem, 0.72rem + 0.18vw, 0.90rem);
+
 // Rayons / ombres
 $radius-md: 0.5rem;
 $radius-lg: 0.75rem;
@@ -32,6 +43,7 @@ $shadow-card-hover: 0 4px 10px rgba(17, 24, 39, 0.06), 0 8px 24px rgba(17, 24, 3
 
 // Mise en page
 $max-width-content: 80rem; // 1280px
+$max-width-home: 100rem; // 1600px — Home V2 immersive, sans étirement excessif
 $header-height: 4.5rem;
 
 // Breakpoints

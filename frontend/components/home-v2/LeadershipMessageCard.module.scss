@@ -25,12 +25,12 @@
 }
 
 .content {
-    padding: 0.7rem;
+    padding: clamp(0.72rem, 0.58rem + 0.24vw, 0.95rem);
 }
 
 .eyebrow {
     color: v.$color-blue;
-    font-size: 0.58rem;
+    font-size: v.$font-size-micro;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -39,21 +39,21 @@
 .content h3 {
     margin-top: 0.22rem;
     color: v.$color-blue-ink;
-    font-size: 0.82rem;
+    font-size: v.$font-size-card-title;
     line-height: 1.2;
 }
 
 .role {
     margin-top: 0.08rem;
     color: rgba(17, 24, 39, 0.48);
-    font-size: 0.58rem;
+    font-size: v.$font-size-micro;
 }
 
 .quote {
     margin: 0.45rem 0 0;
     color: rgba(17, 24, 39, 0.68);
     font-family: Georgia, serif;
-    font-size: 0.68rem;
+    font-size: v.$font-size-small;
     font-style: italic;
     line-height: 1.45;
 }

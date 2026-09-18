@@ -1,7 +1,7 @@
 @use "../../styles/variables" as v;
 
 .heading {
-  min-height: 2.2rem;
+  min-height: clamp(2.35rem, 2.15rem + 0.25vw, 2.65rem);
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -9,7 +9,7 @@
 
   > div > span {
     color: v.$color-blue;
-    font-size: 0.58rem;
+    font-size: v.$font-size-micro;
     font-weight: 900;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -18,7 +18,7 @@
   h3 {
     margin-top: 0.1rem;
     color: v.$color-blue-ink;
-    font-size: 1rem;
+    font-size: v.$font-size-section-title;
     line-height: 1.15;
   }
 
@@ -27,7 +27,7 @@
     border: 0;
     background: transparent;
     color: v.$color-blue;
-    font-size: 0.64rem;
+    font-size: v.$font-size-meta;
     font-weight: 800;
     cursor: pointer;
     white-space: nowrap;

@@ -50,7 +50,7 @@
     gap: 0.35rem;
 
     color: v.$color-white;
-    font-size: 0.56rem;
+    font-size: v.$font-size-micro;
     font-weight: 800;
 
     i {
@@ -63,17 +63,17 @@
 .body {
     align-self: center;
     min-width: 0;
-    padding: 0.75rem 0.8rem;
+    padding: clamp(0.75rem, 0.58rem + 0.28vw, 1rem);
 
     time {
         color: rgba(17, 24, 39, 0.46);
-        font-size: 0.61rem;
+        font-size: v.$font-size-meta;
     }
 
     h3 {
         margin-top: 0.3rem;
         color: v.$color-blue-ink;
-        font-size: clamp(0.95rem, 1.15vw, 1.2rem);
+        font-size: v.$font-size-card-title;
         line-height: 1.2;
 
         @include m.line-clamp(2);
@@ -82,7 +82,7 @@
     p {
         margin-top: 0.38rem;
         color: rgba(17, 24, 39, 0.6);
-        font-size: 0.69rem;
+        font-size: v.$font-size-small;
         line-height: 1.45;
 
         @include m.line-clamp(2);
@@ -96,7 +96,7 @@
         margin-top: 0.48rem;
 
         color: v.$color-blue;
-        font-size: 0.64rem;
+        font-size: v.$font-size-meta;
     }
 }
 
@@ -172,7 +172,7 @@
     border-radius: v.$radius-lg;
 
     color: rgba(17, 24, 39, 0.55);
-    font-size: 0.72rem;
+    font-size: v.$font-size-small;
 }
 
 @media (max-width: 639px) {

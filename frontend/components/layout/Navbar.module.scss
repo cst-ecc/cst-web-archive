@@ -91,7 +91,7 @@
   white-space: nowrap;
   font-family: v.$font-display;
   text-transform: uppercase;
-  font-size: 0.82rem;
+  font-size: v.$font-size-small;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--nav-text);
@@ -99,13 +99,13 @@
 
   @include m.respond(xl) {
     max-width: none;
-    font-size: 0.9rem;
+    font-size: v.$font-size-card-title;
   }
 }
 
 .logoSubtitle {
   margin-top: 0.16rem;
-  font-size: 0.64rem;
+  font-size: v.$font-size-micro;
   font-weight: 800;
   color: var(--nav-muted);
   text-transform: uppercase;
@@ -136,7 +136,7 @@
   min-height: 2.5rem;
   border-radius: v.$radius-md;
   padding: 0.48rem 0.7rem;
-  font-size: 0.76rem;
+  font-size: v.$font-size-nav;
   font-weight: 700;
   letter-spacing: 0.035em;
   text-transform: uppercase;
@@ -162,7 +162,7 @@
 
   @include m.respond(xl) {
     padding-inline: 0.82rem;
-    font-size: 0.8rem;
+    font-size: v.$font-size-nav;
   }
 }
 
@@ -262,7 +262,7 @@
 
 .dropdownEyebrow {
   font-family: v.$font-display;
-  font-size: 0.72rem;
+  font-size: v.$font-size-meta;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.09em;
@@ -270,7 +270,7 @@
 }
 
 .dropdownHint {
-  font-size: 0.67rem;
+  font-size: v.$font-size-meta;
   color: rgba(17, 24, 39, 0.42);
 }
 
@@ -310,14 +310,14 @@
 }
 
 .dropdownItemLabel {
-  font-size: 0.84rem;
+  font-size: v.$font-size-small;
   font-weight: 700;
   color: v.$color-ink;
 }
 
 .dropdownItemDesc {
   margin-top: 0.12rem;
-  font-size: 0.71rem;
+  font-size: v.$font-size-meta;
   line-height: 1.4;
   color: rgba(17, 24, 39, 0.5);
 }
@@ -447,7 +447,7 @@
   border-radius: v.$radius-lg;
   background: none;
   color: v.$color-ink;
-  font-size: 0.86rem;
+  font-size: v.$font-size-small;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -496,7 +496,7 @@
   display: block;
   padding: 0.58rem 0.6rem;
   border-radius: v.$radius-md;
-  font-size: 0.86rem;
+  font-size: v.$font-size-small;
   font-weight: 500;
   color: rgba(17, 24, 39, 0.82);
 
@@ -602,7 +602,7 @@
   height: 1.9rem;
   padding-inline: 0.42rem;
   border-radius: 999px;
-  font-size: 0.67rem;
+  font-size: v.$font-size-meta;
   font-weight: 800;
   letter-spacing: 0.04em;
 }
@@ -649,7 +649,7 @@
   padding: 0.55rem 0.82rem;
   background: v.$color-yellow;
   color: v.$color-blue-ink;
-  font-size: 0.71rem;
+  font-size: v.$font-size-meta;
   font-weight: 900;
   letter-spacing: 0.035em;
   box-shadow: 0 8px 20px rgba(241, 233, 6, 0.14);
@@ -716,7 +716,7 @@
   border: 0;
   background: transparent;
   color: v.$color-ink;
-  font-size: 0.86rem;
+  font-size: v.$font-size-small;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -789,7 +789,8 @@
    ------------------------------------------------------------------ */
 .headerHome {
   .bar {
-    max-width: 100rem;
+    max-width: v.$max-width-home;
+    margin-inline: auto;
   }
 
   .logoText {
@@ -841,7 +842,7 @@
   border-radius: 999px;
   background: v.$color-yellow;
   color: v.$color-blue-ink;
-  font-size: 0.68rem;
+  font-size: v.$font-size-micro;
   font-weight: 900;
   letter-spacing: 0.04em;
 }
@@ -937,7 +938,7 @@
   .headerHome .dropdownTrigger {
     min-height: 2.35rem;
     padding: 0.42rem 0.5rem;
-    font-size: 0.66rem;
+    font-size: v.$font-size-nav;
     letter-spacing: 0.01em;
     white-space: nowrap;
   }
@@ -961,7 +962,7 @@
   .headerHome .dropdownTrigger {
     min-height: 2.2rem;
     padding-inline: 0.34rem;
-    font-size: 0.58rem;
+    font-size: 0.78rem;
     letter-spacing: 0;
   }
 
@@ -985,7 +986,7 @@
     min-width: 1.55rem;
     height: 1.65rem;
     padding-inline: 0.25rem;
-    font-size: 0.56rem;
+    font-size: 0.75rem;
   }
 
   .searchButton {
@@ -996,7 +997,7 @@
   .digeccButton {
     min-height: 2.05rem;
     padding: 0.4rem 0.5rem;
-    font-size: 0.58rem;
+    font-size: 0.78rem;
   }
 }
 
@@ -1012,7 +1013,7 @@
   .headerHome .navLink,
   .headerHome .dropdownTrigger {
     padding-inline: 0.62rem;
-    font-size: 0.7rem;
+    font-size: v.$font-size-nav;
   }
 }
 
