@@ -1,4 +1,5 @@
 import HomeV2 from "@/components/home-v2/HomeV2";
+import HomeStructuredData from "@/components/seo/HomeStructuredData";
 import {
   getRecentNews,
   getHomeSpecialNews,
@@ -16,9 +17,13 @@ export default async function HomePage() {
   ]);
 
   return (
-    <HomeV2
-      newsItems={newsItems}
-      specialNewsItems={specialNewsItems}
-    />
+    <> 
+    <HomeStructuredData />
+      <HomeV2
+        newsItems={newsItems}
+        specialNewsItems={specialNewsItems}
+      /> 
+    </>
+
   );
 }

@@ -26,24 +26,21 @@ const body = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
+
   title: {
     default: SITE.title,
     template: `%s — ${SITE.name}`,
   },
+
   description: SITE.description,
   applicationName: SITE.name,
-  keywords: [
-    "CST",
-    "CSMO",
-    "Conseil Supérieur de Transition",
-    "Conseil Supérieur de Mise en Œuvre",
-    "Église du Christianisme Céleste",
-    "Grande Marche vers l'Unité",
-    "réunification",
-    "mise en œuvre",
-    "gouvernance",
-    "digitalisation ECC",
-  ],
+
+  /**
+   * Google n'utilise pas meta keywords comme signal de classement.
+   * On peut donc l'omettre et privilégier le contenu réel des pages,
+   * les titres, descriptions, H1 et données structurées.
+   */
+
   openGraph: {
     type: "website",
     locale: SITE.locale,
@@ -53,21 +50,36 @@ export const metadata: Metadata = {
     description: SITE.description,
     images: [
       {
-        url: "/og-image.svg",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: `${SITE.fullName} — ${SITE.processName}`,
       },
     ],
   },
+
   twitter: {
     card: "summary_large_image",
     title: SITE.title,
     description: SITE.description,
-    images: ["/og-image.svg"],
+    images: ["/og-image.jpg"],
   },
-  robots: { index: true, follow: true },
-  icons: { icon: "/favicon.ico" },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export const viewport: Viewport = {
@@ -83,14 +95,19 @@ export default function RootLayout({
     <html lang="fr" className={`${display.variable} ${body.variable}`}>
       <body className={styles.body}>
         <PageLoader />
+
         <a href="#contenu" className="skip-link">
           Aller au contenu
         </a>
+
         <Navbar />
+
         {/* <SocialFloatingLinks /> */}
+
         <main id="contenu" className={styles.main}>
           {children}
         </main>
+
         <FooterVisibility>
           <SiteFooter />
         </FooterVisibility>
