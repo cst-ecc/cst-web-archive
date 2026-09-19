@@ -314,3 +314,47 @@
   color: v.$color-blue-ink;
   margin-bottom: 1rem;
 }
+
+/* ---------- Mot du Coordonnateur ---------- */
+.leadershipSection {
+  scroll-margin-top: calc(v.$header-height + 1.5rem);
+  margin-top: 3rem;
+  padding: clamp(1.5rem, 1.1rem + 1vw, 2.5rem);
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  background: linear-gradient(145deg, v.$color-white, v.$color-surface-muted);
+}
+
+.leadershipHeading {
+  max-width: 52rem;
+}
+
+.leadershipEyebrow {
+  color: v.$color-blue;
+  font-size: v.$font-size-meta;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.leadershipTitle {
+  margin-top: 0.35rem;
+  color: v.$color-blue-ink;
+  font-family: v.$font-display;
+  font-size: clamp(1.45rem, 1.15rem + 1vw, 2.15rem);
+  line-height: 1.15;
+}
+
+.leadershipRole {
+  margin-top: 0.4rem;
+  color: rgba(17, 24, 39, 0.6);
+  font-size: v.$font-size-small;
+}
+
+.leadershipText {
+  max-width: 68rem;
+  margin-top: 1.35rem;
+  color: rgba(17, 24, 39, 0.8);
+  font-size: v.$font-size-body-fluid;
+  line-height: 1.8;
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import PageHeader from "@/components/layout/PageHeader";
 import Container from "@/components/layout/Container";
 import { SITE } from "@/lib/constants";
+import { HOME_LEADERSHIP_MESSAGE } from "@/lib/home-v2";
 import styles from "../pages.module.scss";
 
 export const metadata: Metadata = {
@@ -68,6 +69,29 @@ export default function PresentationPage() {
             communes, légitimes et fonctionnelles.
           </p>
         </div>
+
+        <section
+          id="mot-du-coordonnateur"
+          className={styles.leadershipSection}
+          aria-labelledby="mot-du-coordonnateur-title"
+        >
+          <div className={styles.leadershipHeading}>
+            <p className={styles.leadershipEyebrow}>Message institutionnel</p>
+            <h2
+              id="mot-du-coordonnateur-title"
+              className={styles.leadershipTitle}
+            >
+              Mot du Coordonnateur Général
+            </h2>
+            <p className={styles.leadershipRole}>
+              {HOME_LEADERSHIP_MESSAGE.title} — {HOME_LEADERSHIP_MESSAGE.role}
+            </p>
+          </div>
+
+          <div className={styles.leadershipText}>
+            <p>{HOME_LEADERSHIP_MESSAGE.text}</p>
+          </div>
+        </section>
 
         {/* Missions */}
         <div className={styles.grid2} style={{ marginTop: "3rem" }}>

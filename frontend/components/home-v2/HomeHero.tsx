@@ -7,6 +7,7 @@ import {
 import type { NewsItem } from "@/lib/types";
 
 import BibleVerseCarousel from "./BibleVerseCarousel";
+import AlertTicker from "./AlertTicker";
 import SiteFooter from "@/components/layout/SiteFooter";
 import HomeIntroHero from "./HomeIntroHero";
 import HomeSummary from "./HomeSummary";
@@ -26,11 +27,21 @@ export default function HomeHero({
   specialNewsItems,
   onNavigate,
 }: HomeHeroProps) {
+  const alert = specialNewsItems.find(
+    (item) =>
+      item.homeSlot === "alert_info" &&
+      item.status === "publie",
+  );
+
   return (
     <div className={styles.overview}>
       <HomeIntroHero
         onNavigate={onNavigate}
       />
+
+      {alert ? (
+        <AlertTicker item={alert} />
+      ) : null}
 
       <HomeSummary
         newsItems={newsItems}

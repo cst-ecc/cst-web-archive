@@ -1,0 +1,136 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.card {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-lg;
+  background: v.$color-white;
+}
+
+.link {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.9fr) minmax(0, 1.1fr);
+  color: inherit;
+  transition: background-color 0.18s ease;
+
+  &:focus-visible {
+    outline: 3px solid rgba(31, 133, 206, 0.28);
+    outline-offset: -3px;
+  }
+}
+
+.imageWrap {
+  position: relative;
+  min-height: 8rem;
+  overflow: hidden;
+  background: v.$color-surface-muted;
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.link:hover .image {
+  transform: scale(1.02);
+}
+
+.imageOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 58%, rgba(5, 31, 48, 0.38));
+}
+
+.imageFallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, v.$color-blue-ink, v.$color-blue-deep);
+
+  span {
+    color: v.$color-yellow;
+    font-size: v.$font-size-meta;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+.body {
+  align-self: center;
+  min-width: 0;
+  padding: clamp(0.75rem, 0.58rem + 0.28vw, 1rem);
+
+  time {
+    color: rgba(17, 24, 39, 0.46);
+    font-size: v.$font-size-meta;
+  }
+
+  h3 {
+    margin-top: 0.3rem;
+    color: v.$color-blue-ink;
+    font-size: v.$font-size-card-title;
+    line-height: 1.2;
+    @include m.line-clamp(2);
+  }
+
+  p {
+    margin-top: 0.38rem;
+    color: rgba(17, 24, 39, 0.6);
+    font-size: v.$font-size-small;
+    line-height: 1.45;
+    @include m.line-clamp(2);
+  }
+
+  strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.48rem;
+    color: v.$color-blue;
+    font-size: v.$font-size-meta;
+    transition: color 0.18s ease, gap 0.18s ease;
+  }
+}
+
+.link:hover .body strong,
+.link:focus-visible .body strong {
+  gap: 0.45rem;
+  color: v.$color-blue-deep;
+}
+
+.empty {
+  display: grid;
+  place-items: center;
+  min-height: 8rem;
+  height: 100%;
+  border: 1px dashed v.$color-surface-line;
+  border-radius: v.$radius-lg;
+  color: rgba(17, 24, 39, 0.55);
+  font-size: v.$font-size-small;
+}
+
+@media (max-width: 639px) {
+  .link {
+    grid-template-columns: 1fr;
+  }
+
+  .imageWrap {
+    min-height: 11rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image,
+  .body strong,
+  .link {
+    transition: none;
+  }
+}

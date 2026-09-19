@@ -209,16 +209,6 @@ function SpecialNewsCard({
                 ) : (
                     <EmptyMediaPlaceholder />
                 )}
-
-                {media.type !== "none" ? (
-                    <span
-                        className={styles.mediaType}
-                    >
-                        {media.type === "pdf"
-                            ? "PDF"
-                            : "IMAGE"}
-                    </span>
-                ) : null}
             </div>
 
             <div className={styles.content}>

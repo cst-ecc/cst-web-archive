@@ -6,7 +6,7 @@ import LeadershipMessageCard, {
   type LeadershipMessage,
 } from "./LeadershipMessageCard";
 
-import NewsCarousel from "./NewsCarousel";
+import LatestNewsCard from "./LatestNewsCard";
 
 import FeaturedVideoCard, {
   type FeaturedVideo,
@@ -31,32 +31,40 @@ export default function HomeSummary({
   leadershipMessage,
   featuredVideo,
 }: HomeSummaryProps) {
+  const eventItems = specialNewsItems.filter(
+    (item) => item.homeSlot === "upcoming_event",
+  );
+
+  const latestNews = [...newsItems]
+    .filter(
+      (item) =>
+        item.status === "publie" &&
+        !item.homeSlot,
+    )
+    .sort((a, b) => b.date.localeCompare(a.date))[0] ?? null;
+
+  const hasEvent = eventItems.length > 0;
+
   return (
     <section
       className={styles.section}
       aria-label="Actualités et informations du processus"
     >
-      <div className={styles.inner}>
+      <div
+        className={styles.inner}
+        data-has-event={hasEvent ? "true" : "false"}
+      >
         {/* =====================================================
-            ACTUALITÉS + VIDÉO
+            DERNIÈRE ACTUALITÉ + VIDÉO
         ====================================================== */}
         <div className={styles.newsColumn}>
           <div className={styles.heading}>
             <h2>À la une</h2>
-
-            <button
-              type="button"
-              onClick={() =>
-                onNavigate("actualites")
-              }
-            >
-              Toutes les actualités →
-            </button>
           </div>
 
           <div className={styles.newsContent}>
-            <NewsCarousel
-              items={newsItems}
+            <LatestNewsCard
+              item={latestNews}
             />
 
             <FeaturedVideoCard
@@ -81,13 +89,16 @@ export default function HomeSummary({
         </div>
 
         {/* =====================================================
-            ALERTE INFO + ÉVÉNEMENT
+            ÉVÉNEMENT À VENIR
+            L'Alerte Info est désormais affichée dans le bandeau.
         ====================================================== */}
-        <div className={styles.specialNewsColumn}>
-          <HomeSpecialNews
-            items={specialNewsItems}
-          />
-        </div>
+        {hasEvent ? (
+          <div className={styles.specialNewsColumn}>
+            <HomeSpecialNews
+              items={eventItems}
+            />
+          </div>
+        ) : null}
       </div>
     </section>
   );

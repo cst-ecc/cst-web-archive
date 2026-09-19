@@ -8,6 +8,7 @@ import Navbar from "@/components/layout/Navbar";
 import SiteFooter from "@/components/layout/SiteFooter";
 import FooterVisibility from "@/components/layout/FooterVisibility";
 import PageLoader from "@/components/layout/PageLoader";
+import GlobalAlertTicker from "@/components/layout/GlobalAlertTicker";
 // import SocialFloatingLinks from "@/components/layout/SocialFloatingLinks";
 import styles from "./layout.module.scss";
 
@@ -101,6 +102,8 @@ export default function RootLayout({
         </a>
 
         <Navbar />
+
+        <GlobalAlertTicker />
 
         {/* <SocialFloatingLinks /> */}
 

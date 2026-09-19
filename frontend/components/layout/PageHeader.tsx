@@ -1,4 +1,5 @@
 import Container from "./Container";
+import SiteAlertTicker from "./SiteAlertTicker";
 import styles from "./PageHeader.module.scss";
 
 /** Bandeau d'en-tête des pages internes. */
@@ -12,14 +13,18 @@ export default function PageHeader({
   eyebrow?: string;
 }) {
   return (
-    <header className={styles.header}>
-      <div aria-hidden className={styles.grid} />
-      <Container className={styles.inner}>
-        {eyebrow && <p className={styles.eyebrow}>{eyebrow}</p>}
-        <h1 className={styles.title}>{title}</h1>
-        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
-      </Container>
-      <div className={styles.rule} />
-    </header>
+    <>
+      <header className={styles.header}>
+        <div aria-hidden className={styles.grid} />
+        <Container className={styles.inner}>
+          {eyebrow && <p className={styles.eyebrow}>{eyebrow}</p>}
+          <h1 className={styles.title}>{title}</h1>
+          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        </Container>
+        <div className={styles.rule} />
+      </header>
+
+      <SiteAlertTicker />
+    </>
   );
 }

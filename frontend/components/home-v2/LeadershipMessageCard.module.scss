@@ -1,4 +1,5 @@
 @use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
 
 .card {
     height: 100%;
@@ -56,6 +57,23 @@
     font-size: v.$font-size-small;
     font-style: italic;
     line-height: 1.45;
+
+    @include m.line-clamp(5);
+}
+
+.readMore {
+    width: fit-content;
+    margin-top: 0.55rem;
+    padding: 0.42rem 0;
+    color: v.$color-blue;
+    font-size: v.$font-size-meta;
+    font-weight: 800;
+
+    &:hover,
+    &:focus-visible {
+        color: v.$color-blue-deep;
+        background: transparent;
+    }
 }
 
 @media (max-width: 1023px) {

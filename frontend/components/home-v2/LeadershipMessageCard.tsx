@@ -1,4 +1,7 @@
 import Image from "next/image";
+
+import Button from "@/components/ui/Button";
+
 import styles from "./LeadershipMessageCard.module.scss";
 
 export type LeadershipMessage = {
@@ -7,6 +10,8 @@ export type LeadershipMessage = {
   title: string;
   role?: string;
   text: string;
+  excerpt?: string;
+  href?: string;
 };
 
 export default function LeadershipMessageCard({
@@ -34,8 +39,18 @@ export default function LeadershipMessageCard({
         ) : null}
 
         <blockquote className={styles.quote}>
-          {message.text}
+          {message.excerpt ?? message.text}
         </blockquote>
+
+        {message.href ? (
+          <Button
+            href={message.href}
+            variant="ghost"
+            className={styles.readMore}
+          >
+            Lire la suite <span aria-hidden="true">→</span>
+          </Button>
+        ) : null}
       </div>
     </article>
   );

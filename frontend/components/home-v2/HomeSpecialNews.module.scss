@@ -8,7 +8,7 @@
 
     display: grid;
     grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+        repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
 
     gap: clamp(0.7rem, 0.55rem + 0.22vw, 0.95rem);
 }

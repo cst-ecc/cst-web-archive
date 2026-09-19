@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Container from "@/components/layout/Container";
+import SiteAlertTicker from "@/components/layout/SiteAlertTicker";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { getDocumentBySlug, getDocuments } from "@/lib/api";
@@ -35,7 +36,9 @@ export default async function DocumentDetailPage({
   if (!doc) notFound();
 
   return (
-    <Container className={styles.wrapper}>
+    <>
+      <SiteAlertTicker />
+      <Container className={styles.wrapper}>
       <nav className={styles.breadcrumb} aria-label="Fil d'Ariane">
         <Link href="/documents">Bibliothèque</Link>
         <span className={styles.breadcrumbSep} aria-hidden>/</span>
@@ -87,6 +90,7 @@ export default async function DocumentDetailPage({
           </Button>
         </aside>
       </div>
-    </Container>
+      </Container>
+    </>
   );
 }

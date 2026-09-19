@@ -7,7 +7,7 @@
 
 .breadcrumb {
   margin-bottom: 1.5rem;
-  font-size: 0.84rem;
+  font-size: v.$font-size-meta;
   color: rgba(17, 24, 39, 0.58);
 
   a:hover,
@@ -21,17 +21,21 @@
   margin-inline: auto;
 }
 
+.articleHeader {
+  min-width: 0;
+}
+
 .eyebrow {
   margin-bottom: 0.45rem;
   color: v.$color-blue;
-  font-size: 0.7rem;
+  font-size: v.$font-size-meta;
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
 .date {
-  font-size: 0.75rem;
+  font-size: v.$font-size-meta;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -50,7 +54,7 @@
   max-width: 44rem;
   margin-top: 1rem;
   color: rgba(17, 24, 39, 0.68);
-  font-size: 1rem;
+  font-size: v.$font-size-body-fluid;
   line-height: 1.75;
 }
 
@@ -75,7 +79,7 @@
 .body {
   margin-top: 2rem;
   color: rgba(17, 24, 39, 0.82);
-  font-size: 1rem;
+  font-size: v.$font-size-body-fluid;
   line-height: 1.85;
 
   p {
@@ -93,7 +97,7 @@
 .relatedTitle {
   margin-bottom: 1.25rem;
   color: v.$color-blue-ink;
-  font-size: 1.25rem;
+  font-size: v.$font-size-section-title;
   font-weight: 600;
 }
 
@@ -103,6 +107,80 @@
 
   @include m.respond(sm) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Grand desktop : composition éditoriale plus large, sans lignes interminables. */
+@include m.respond(xl) {
+  .wrapper {
+    max-width: v.$max-width-home;
+    margin-inline: auto;
+    padding-block: 3rem 5rem;
+  }
+
+  .breadcrumb {
+    margin-bottom: 2rem;
+  }
+
+  .article {
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  .articleHeader {
+    max-width: 76rem;
+    margin-inline: auto;
+  }
+
+  .title {
+    font-size: clamp(2.65rem, 2rem + 1.55vw, 4rem);
+  }
+
+  .excerpt {
+    max-width: 62rem;
+    font-size: clamp(1.05rem, 0.98rem + 0.18vw, 1.18rem);
+    line-height: 1.75;
+  }
+
+  .imageWrap {
+    width: 100%;
+    max-width: 94rem;
+    margin: 2.2rem auto 0;
+    aspect-ratio: 16 / 8.25;
+  }
+
+  .body {
+    width: 100%;
+    max-width: 92rem;
+    margin: 2.5rem auto 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2.25rem, 1.5rem + 1.4vw, 4rem);
+    row-gap: 1.55rem;
+    font-size: clamp(1rem, 0.96rem + 0.16vw, 1.1rem);
+    line-height: 1.82;
+
+    p {
+      min-width: 0;
+      margin: 0;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(227, 234, 241, 0.9);
+    }
+
+    p:only-child,
+    p:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      max-width: 70rem;
+    }
+  }
+
+  .relatedSection {
+    max-width: 94rem;
+    margin-top: 4.25rem;
+  }
+
+  .relatedGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -120,5 +198,16 @@
     margin-top: 1.5rem;
     font-size: 0.96rem;
     line-height: 1.78;
+  }
+}
+
+.attachmentWrap {
+  min-width: 0;
+}
+
+@include m.respond(xl) {
+  .attachmentWrap {
+    max-width: 76rem;
+    margin-inline: auto;
   }
 }

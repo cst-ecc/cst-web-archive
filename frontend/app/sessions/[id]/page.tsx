@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import Container from "@/components/layout/Container";
+import SiteAlertTicker from "@/components/layout/SiteAlertTicker";
 import Badge from "@/components/ui/Badge";
 import DocumentCard from "@/components/documents/DocumentCard";
 import { getSessions, getDocumentBySlug } from "@/lib/api";
@@ -36,7 +37,9 @@ export default async function SessionDetailPage({ params }: { params: { id: stri
   ).filter((d): d is NonNullable<typeof d> => Boolean(d));
 
   return (
-    <Container className={styles.wrapper}>
+    <>
+      <SiteAlertTicker />
+      <Container className={styles.wrapper}>
       <nav className={styles.breadcrumb} aria-label="Fil d'Ariane">
         <Link href="/sessions">Sessions</Link>
         <span className={styles.breadcrumbSep} aria-hidden>/</span>
@@ -73,6 +76,7 @@ export default async function SessionDetailPage({ params }: { params: { id: stri
           </div>
         </section>
       )}
-    </Container>
+      </Container>
+    </>
   );
 }

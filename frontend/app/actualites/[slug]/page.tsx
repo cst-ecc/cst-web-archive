@@ -84,15 +84,17 @@ export default async function NewsDetailPage({
       </nav>
 
       <article className={styles.article}>
-        <p className={styles.eyebrow}>{articleLabel(item.homeSlot)}</p>
+        <header className={styles.articleHeader}>
+          <p className={styles.eyebrow}>{articleLabel(item.homeSlot)}</p>
 
-        <time dateTime={displayDate} className={styles.date}>
-          {formatDate(displayDate)}
-        </time>
+          <time dateTime={displayDate} className={styles.date}>
+            {formatDate(displayDate)}
+          </time>
 
-        <h1 className={styles.title}>{item.title}</h1>
-        <p className={styles.excerpt}>{item.excerpt}</p>
-        <div className={styles.rule} />
+          <h1 className={styles.title}>{item.title}</h1>
+          <p className={styles.excerpt}>{item.excerpt}</p>
+          <div className={styles.rule} />
+        </header>
 
         {item.imageUrl || item.attachment ? (
           <div className={styles.imageWrap}>
@@ -115,7 +117,9 @@ export default async function NewsDetailPage({
 
         {item.attachment &&
         (item.attachment.type === "pdf" || !attachmentImageAlreadyShown) ? (
-          <NewsAttachmentViewer item={item} />
+          <div className={styles.attachmentWrap}>
+            <NewsAttachmentViewer item={item} />
+          </div>
         ) : null}
       </article>
 
