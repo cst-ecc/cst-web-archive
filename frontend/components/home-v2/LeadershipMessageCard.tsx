@@ -38,9 +38,9 @@ export default function LeadershipMessageCard({
           <p className={styles.role}>{message.role}</p>
         ) : null}
 
-        <blockquote className={styles.quote}>
+        {/* <blockquote className={styles.quote}>
           {message.excerpt ?? message.text}
-        </blockquote>
+        </blockquote> */}
 
         {message.href ? (
           <Button

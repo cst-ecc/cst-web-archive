@@ -227,11 +227,11 @@ function SpecialNewsCard({
                     {item.title}
                 </h3>
 
-                {item.excerpt ? (
+                {/* {item.excerpt ? (
                     <p>
                         {item.excerpt}
                     </p>
-                ) : null}
+                ) : null} */}
 
                 <Link
                     href={`/actualites/${item.slug}`}

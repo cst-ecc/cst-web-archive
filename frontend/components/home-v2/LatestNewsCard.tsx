@@ -54,7 +54,7 @@ export default function LatestNewsCard({
 
           <h3>{item.title}</h3>
 
-          <p>{item.excerpt}</p>
+          {/* <p>{item.excerpt}</p> */}
 
           <strong>
             Lire la suite <span aria-hidden="true">→</span>
