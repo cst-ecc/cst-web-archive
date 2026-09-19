@@ -4,10 +4,13 @@
 .card {
   @include m.card;
   @include m.card-hover;
+
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 1.25rem;
+  min-width: 0;
+  height: 100%;
+  padding: clamp(1rem, 0.82rem + 0.3vw, 1.3rem);
 }
 
 .top {
@@ -15,19 +18,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .number {
   font-family: v.$font-display;
-  font-size: 0.875rem;
+  font-size: v.$font-size-small;
   font-weight: 700;
   color: v.$color-gold;
 }
 
 .title {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: clamp(1.02rem, 0.95rem + 0.22vw, 1.18rem);
+  font-weight: 650;
+  line-height: 1.35;
   color: v.$color-blue-ink;
+  @include m.line-clamp(3);
 }
 
 .titleLink {
@@ -39,23 +45,27 @@
 }
 
 .theme {
-  margin-top: 0.25rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+  margin-top: 0.3rem;
+  font-size: v.$font-size-small;
+  font-weight: 550;
+  line-height: 1.4;
   color: v.$color-blue;
 }
 
 .summary {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
+  @include m.editorial-copy;
+  @include m.line-clamp(3);
+
+  margin-top: 0.55rem;
+  font-size: v.$font-size-small;
+  line-height: 1.52;
   color: rgba(17, 24, 39, 0.7);
-  @include m.line-clamp(2);
 }
 
 .dates {
-  margin-top: 1rem;
+  margin-top: auto;
   border-top: 1px solid v.$color-surface-line;
-  padding-top: 0.75rem;
-  font-size: 0.75rem;
+  padding-top: 0.8rem;
+  font-size: v.$font-size-meta;
   color: rgba(17, 24, 39, 0.6);
 }

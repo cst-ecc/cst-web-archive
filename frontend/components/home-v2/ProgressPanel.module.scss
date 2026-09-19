@@ -117,6 +117,8 @@
 }
 
 .description {
+  @include m.editorial-copy;
+
   margin-top: 0.55rem;
   color: rgba(17, 24, 39, 0.62);
   font-size: v.$font-size-small;

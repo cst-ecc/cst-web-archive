@@ -2,8 +2,8 @@
 @use "../../styles/mixins" as m;
 
 .section {
-  margin-top: 2.5rem;
-  padding-top: 2rem;
+  margin-top: clamp(2rem, 1.6rem + 0.8vw, 2.75rem);
+  padding-top: clamp(1.5rem, 1.2rem + 0.6vw, 2rem);
   border-top: 1px solid v.$color-surface-line;
 }
 
@@ -12,14 +12,15 @@
 
   h2 {
     margin-top: 0.25rem;
-    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-size: clamp(1.15rem, 1.02rem + 0.45vw, 1.55rem);
+    line-height: 1.25;
     color: v.$color-blue-ink;
   }
 }
 
 .eyebrow {
   color: v.$color-blue;
-  font-size: 0.68rem;
+  font-size: v.$font-size-meta;
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -28,6 +29,8 @@
 .imageWrap,
 .previewWrap {
   position: relative;
+  width: 100%;
+  min-height: clamp(18rem, 45vw, 40rem);
   overflow: hidden;
   border: 1px solid v.$color-surface-line;
   border-radius: v.$radius-xl2;
@@ -85,7 +88,7 @@
 .pdfObject {
   display: block;
   width: 100%;
-  min-height: 42rem;
+  min-height: clamp(32rem, 68vh, 48rem);
   border: 1px solid v.$color-surface-line;
   border-radius: v.$radius-xl2;
   background: v.$color-white;
@@ -95,6 +98,11 @@
   .section {
     margin-top: 2rem;
     padding-top: 1.5rem;
+  }
+
+  .imageWrap,
+  .previewWrap {
+    min-height: 16rem;
   }
 
   .imageWrap {

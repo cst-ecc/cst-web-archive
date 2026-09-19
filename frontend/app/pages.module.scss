@@ -3,21 +3,26 @@
 
 /* ---------------------------------------------------------------
    Styles partagés pour les pages (app/*)
-   Un seul fichier évite la multiplication de modules quasi identiques.
    --------------------------------------------------------------- */
 
-.section {
-  padding-block: 3rem;
+.section,
+.sectionMuted {
+  width: 100%;
+  max-width: v.$max-width-home;
+  margin-inline: auto;
+  padding-block: clamp(2.25rem, 1.8rem + 0.8vw, 3.25rem);
 }
 
 .sectionMuted {
-  padding-block: 3rem;
   background: v.$color-surface-muted;
 }
 
 .prose {
-  max-width: 48rem;
-  line-height: 1.7;
+  @include m.editorial-copy;
+
+  max-width: 58rem;
+  font-size: v.$font-size-body-fluid;
+  line-height: 1.78;
   color: rgba(17, 24, 39, 0.8);
 
   p + p {
@@ -25,45 +30,42 @@
   }
 }
 
-.grid2 {
-  display: grid;
-  gap: 1.25rem;
-
-  @include m.respond(sm) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.grid3 {
-  display: grid;
-  gap: 1.25rem;
-
-  @include m.respond(sm) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @include m.respond(lg) {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
+.grid2,
+.grid3,
 .grid4 {
   display: grid;
-  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  gap: clamp(0.95rem, 0.75rem + 0.35vw, 1.35rem);
+  align-items: stretch;
+}
 
-  @include m.respond(sm) {
-    grid-template-columns: repeat(2, 1fr);
+@include m.respond(sm) {
+  .grid2,
+  .grid3,
+  .grid4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  @include m.respond(lg) {
-    grid-template-columns: repeat(3, 1fr);
+}
+
+@include m.respond(lg) {
+  .grid3,
+  .grid4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  @include m.respond(xl) {
-    grid-template-columns: repeat(4, 1fr);
+}
+
+@include m.respond(xl) {
+  .grid4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 .missionCard {
   @include m.card;
-  padding: 1.5rem;
+
+  height: 100%;
+  min-width: 0;
+  padding: clamp(1.15rem, 0.92rem + 0.4vw, 1.55rem);
 }
 
 .missionRule {
@@ -75,14 +77,17 @@
 }
 
 .missionTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: clamp(1.05rem, 0.98rem + 0.2vw, 1.18rem);
+  font-weight: 650;
   color: v.$color-blue-ink;
 }
 
 .missionText {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
+  @include m.editorial-copy;
+
+  margin-top: 0.55rem;
+  font-size: v.$font-size-small;
+  line-height: 1.58;
   color: rgba(17, 24, 39, 0.7);
 }
 
@@ -91,69 +96,70 @@
   gap: 2rem;
 
   @include m.respond(lg) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.72fr);
   }
 }
 
 .sideInfo {
   @include m.card;
-  padding: 1.5rem;
+  padding: clamp(1.25rem, 1rem + 0.4vw, 1.6rem);
   align-self: start;
 }
 
 .sideTitle {
-  font-size: 1.125rem;
+  font-size: v.$font-size-card-title;
   font-weight: 600;
   color: v.$color-blue-ink;
 }
 
 .sideText {
+  @include m.editorial-copy;
+
   margin-top: 0.5rem;
-  font-size: 0.875rem;
+  font-size: v.$font-size-small;
+  line-height: 1.55;
   color: rgba(17, 24, 39, 0.7);
 }
 
 .sideEmail {
   display: inline-block;
   margin-top: 0.75rem;
-  font-size: 0.875rem;
+  font-size: v.$font-size-small;
   font-weight: 600;
   color: v.$color-blue;
 }
 
-/* ---------- Détail document ---------- */
+/* ---------- Détail document (anciens styles partagés conservés) ---------- */
 .docDetail {
   display: grid;
   gap: 2rem;
 
   @include m.respond(lg) {
-    grid-template-columns: 1fr 22rem;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
   }
 }
 
 .docContent {
-  max-width: 48rem;
+  max-width: 58rem;
 }
 
 .docTitle {
-  font-size: 1.5rem;
+  font-size: clamp(1.5rem, 1.2rem + 0.8vw, 2rem);
   font-weight: 700;
   color: v.$color-blue-ink;
-
-  @include m.respond(sm) {
-    font-size: 1.875rem;
-  }
 }
 
 .docMeta {
   margin-top: 0.5rem;
-  font-size: 0.875rem;
+  font-size: v.$font-size-small;
   color: rgba(17, 24, 39, 0.6);
 }
 
 .docSummary {
+  @include m.editorial-copy;
+
   margin-top: 1.5rem;
-  line-height: 1.7;
+  line-height: 1.78;
   color: rgba(17, 24, 39, 0.8);
 }
 
@@ -175,7 +181,7 @@
 }
 
 .ficheLabel {
-  font-size: 0.75rem;
+  font-size: v.$font-size-meta;
   color: rgba(17, 24, 39, 0.5);
 }
 
@@ -188,13 +194,13 @@
   width: 100%;
 }
 
-/* ---------- Détail actualité ---------- */
+/* ---------- Détail actualité (anciens styles partagés conservés) ---------- */
 .actuDetail {
   display: grid;
   gap: 2rem;
 
   @include m.respond(lg) {
-    grid-template-columns: 1fr 20rem;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 20rem);
   }
 }
 
@@ -212,25 +218,23 @@
 
 .actuTitle {
   margin-top: 1.5rem;
-  font-size: 1.5rem;
+  font-size: clamp(1.5rem, 1.2rem + 0.8vw, 2rem);
   font-weight: 700;
   color: v.$color-blue-ink;
-
-  @include m.respond(sm) {
-    font-size: 1.875rem;
-  }
 }
 
 .actuDate {
   margin-top: 0.5rem;
-  font-size: 0.875rem;
+  font-size: v.$font-size-small;
   color: rgba(17, 24, 39, 0.6);
 }
 
 .actuBody {
+  @include m.editorial-copy;
+
   margin-top: 1.5rem;
-  max-width: 48rem;
-  line-height: 1.7;
+  max-width: 58rem;
+  line-height: 1.78;
   color: rgba(17, 24, 39, 0.8);
 
   p + p {
@@ -250,7 +254,7 @@
   gap: 0.75rem;
 }
 
-/* ---------- Détail session ---------- */
+/* ---------- Détail session (anciens styles partagés conservés) ---------- */
 .sessionHeader {
   display: flex;
   flex-wrap: wrap;
@@ -260,13 +264,9 @@
 }
 
 .sessionTitle {
-  font-size: 1.5rem;
+  font-size: clamp(1.5rem, 1.2rem + 0.8vw, 2rem);
   font-weight: 700;
   color: v.$color-blue-ink;
-
-  @include m.respond(sm) {
-    font-size: 1.875rem;
-  }
 }
 
 .sessionNumber {
@@ -277,22 +277,24 @@
 
 .sessionMeta {
   margin-top: 0.75rem;
-  font-size: 0.875rem;
+  font-size: v.$font-size-small;
   color: rgba(17, 24, 39, 0.6);
 }
 
 .sessionSummary {
+  @include m.editorial-copy;
+
   margin-top: 1.5rem;
-  max-width: 48rem;
-  line-height: 1.7;
+  max-width: 58rem;
+  line-height: 1.78;
   color: rgba(17, 24, 39, 0.8);
 }
 
 .sessionImages {
   margin-top: 2rem;
   display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
 }
 
 .sessionImageWrap {
@@ -352,9 +354,17 @@
 }
 
 .leadershipText {
-  max-width: 68rem;
+  @include m.editorial-copy;
+
+  max-width: 72rem;
   margin-top: 1.35rem;
   color: rgba(17, 24, 39, 0.8);
   font-size: v.$font-size-body-fluid;
-  line-height: 1.8;
+  line-height: 1.82;
+}
+
+@include m.respond(xl) {
+  .prose {
+    max-width: 68rem;
+  }
 }

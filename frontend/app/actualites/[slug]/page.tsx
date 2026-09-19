@@ -6,6 +6,7 @@ import Container from "@/components/layout/Container";
 import DocumentCard from "@/components/documents/DocumentCard";
 import NewsAttachmentViewer from "@/components/news/NewsAttachmentViewer";
 import NewsMedia from "@/components/news/NewsMedia";
+import SiteAlertTicker from "@/components/layout/SiteAlertTicker";
 import {
   getDocumentBySlug,
   getNews,
@@ -51,7 +52,7 @@ export async function generateMetadata({
 
 function articleLabel(homeSlot?: string) {
   if (homeSlot === "upcoming_event") return "Événement à venir";
-  if (homeSlot === "alert_info") return "Alerte Info";
+  if (homeSlot === "alert_info") return "Dernier INFO";
   return "Actualité";
 }
 
@@ -77,6 +78,14 @@ export default async function NewsDetailPage({
     item.attachment?.type === "image" &&
     (!item.imageUrl || item.attachment.url === item.imageUrl);
 
+  const paragraphs = item.content
+    .split("\n\n")
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  const useEditorialColumns =
+    paragraphs.length >= 4 && item.content.trim().length >= 1800;
+
   return (
     <Container className={styles.wrapper}>
       <nav className={styles.breadcrumb} aria-label="Fil d'Ariane">
@@ -96,23 +105,25 @@ export default async function NewsDetailPage({
           <div className={styles.rule} />
         </header>
 
+        <SiteAlertTicker />
+
         {item.imageUrl || item.attachment ? (
           <div className={styles.imageWrap}>
             <NewsMedia
               item={item}
               priority
-              sizes="(max-width: 768px) 100vw, 768px"
+              sizes="(max-width: 767px) 100vw, (max-width: 1279px) 90vw, 1440px"
             />
           </div>
         ) : null}
 
-        <div className={styles.body}>
-          {item.content
-            .split("\n\n")
-            .filter(Boolean)
-            .map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
+        <div
+          className={styles.body}
+          data-editorial-columns={useEditorialColumns ? "true" : "false"}
+        >
+          {paragraphs.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
         </div>
 
         {item.attachment &&

@@ -46,16 +46,29 @@
 
   @include m.respond(lg) {
     grid-template-columns:
-      minmax(0, 1.4fr)
-      minmax(13rem, 0.54fr)
-      minmax(18rem, 0.74fr);
+      minmax(0, 1.55fr)
+      minmax(11.5rem, 0.48fr)
+      minmax(15.5rem, 0.64fr);
 
     grid-template-rows: minmax(0, 1fr);
+  }
+
+  @include m.respond(xl) {
+    grid-template-columns:
+      minmax(0, 1.45fr)
+      minmax(13rem, 0.54fr)
+      minmax(18rem, 0.74fr);
   }
 }
 
 .inner[data-has-event="false"] {
   @include m.respond(lg) {
+    grid-template-columns:
+      minmax(0, 1.72fr)
+      minmax(12.5rem, 0.58fr);
+  }
+
+  @include m.respond(xl) {
     grid-template-columns:
       minmax(0, 1.62fr)
       minmax(14rem, 0.68fr);
@@ -241,5 +254,27 @@
 
   .newsContent {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 720px) {
+  .inner {
+    column-gap: 0.75rem;
+    row-gap: 0.35rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .heading {
+    min-height: 1.45rem;
+  }
+
+  .newsContent,
+  .messageContent {
+    margin-top: 0.18rem;
+  }
+
+  .messageColumn {
+    padding-inline: 0.65rem;
   }
 }

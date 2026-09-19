@@ -21,7 +21,9 @@
 }
 
 .headerHero {
-  background: linear-gradient(180deg, rgba(7, 37, 58, 0.78), rgba(12, 59, 92, 0.62));
+  background: linear-gradient(180deg,
+      rgba(7, 37, 58, 0.78),
+      rgba(12, 59, 92, 0.62));
   border-bottom-color: rgba(255, 255, 255, 0.08);
   backdrop-filter: saturate(125%) blur(10px);
 }
@@ -41,6 +43,7 @@
 
 .bar {
   @include m.container;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -51,6 +54,7 @@
 /* ------------------------------------------------------------------
    Identité
    ------------------------------------------------------------------ */
+
 .logoLink {
   display: flex;
   align-items: center;
@@ -59,6 +63,7 @@
   border-radius: v.$radius-md;
   height: 100%;
   width: 100%;
+
   &:focus-visible {
     outline: 3px solid var(--nav-focus-ring);
     outline-offset: 4px;
@@ -97,7 +102,11 @@
   color: var(--nav-text);
   transition: color 0.2s ease;
 
-  @include m.respond(xl) {
+  /*
+   * Le texte institutionnel du logo ne s'agrandit que
+   * lorsque l'écran dispose réellement de suffisamment d'espace.
+   */
+  @media (min-width: 1600px) {
     max-width: none;
     font-size: v.$font-size-card-title;
   }
@@ -116,13 +125,18 @@
 /* ------------------------------------------------------------------
    Navigation desktop
    ------------------------------------------------------------------ */
+
 .nav {
   display: none;
   align-items: center;
   justify-content: flex-end;
   gap: 0.15rem;
+  min-width: 0;
 
-  @media (min-width: 1440px) {
+  /*
+   * Le desktop commence désormais à 1280px.
+   */
+  @media (min-width: 1280px) {
     display: flex;
   }
 }
@@ -160,7 +174,10 @@
     outline-offset: 3px;
   }
 
-  @include m.respond(xl) {
+  /*
+   * On ne réaugmente les espacements qu'à partir de 1600px.
+   */
+  @media (min-width: 1600px) {
     padding-inline: 0.82rem;
     font-size: v.$font-size-nav;
   }
@@ -186,6 +203,10 @@
     transform: translateY(-1px);
   }
 }
+
+/* ------------------------------------------------------------------
+   Dropdown
+   ------------------------------------------------------------------ */
 
 .dropdown {
   position: relative;
@@ -326,7 +347,9 @@
   flex: 0 0 auto;
   font-size: 0.95rem;
   color: rgba(18, 84, 127, 0.42);
-  transition: transform 0.12s ease, color 0.12s ease;
+  transition:
+    transform 0.12s ease,
+    color 0.12s ease;
 }
 
 .dropdownItem:hover .dropdownArrow,
@@ -346,6 +369,7 @@
 /* ------------------------------------------------------------------
    Burger
    ------------------------------------------------------------------ */
+
 .burger {
   display: inline-flex;
   align-items: center;
@@ -369,7 +393,10 @@
     outline-offset: 3px;
   }
 
-  @media (min-width: 1440px) {
+  /*
+   * À partir de 1280px le menu complet doit être visible.
+   */
+  @media (min-width: 1280px) {
     display: none;
   }
 }
@@ -387,11 +414,22 @@
   height: 2px;
   border-radius: 999px;
   background: currentColor;
-  transition: transform 0.2s ease, opacity 0.16s ease, top 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.16s ease,
+    top 0.2s ease;
 
-  &:nth-child(1) { top: 0; }
-  &:nth-child(2) { top: calc(50% - 1px); }
-  &:nth-child(3) { top: calc(100% - 2px); }
+  &:nth-child(1) {
+    top: 0;
+  }
+
+  &:nth-child(2) {
+    top: calc(50% - 1px);
+  }
+
+  &:nth-child(3) {
+    top: calc(100% - 2px);
+  }
 }
 
 .burgerLineTop {
@@ -411,6 +449,7 @@
 /* ------------------------------------------------------------------
    Mobile
    ------------------------------------------------------------------ */
+
 .mobileNav {
   max-height: calc(100vh - #{v.$header-height});
   overflow-y: auto;
@@ -418,13 +457,17 @@
   border-top: 1px solid v.$color-surface-line;
   box-shadow: 0 24px 50px rgba(15, 23, 42, 0.16);
 
-  @media (min-width: 1440px) {
+  /*
+   * Le panneau mobile disparaît dès 1280px.
+   */
+  @media (min-width: 1280px) {
     display: none;
   }
 }
 
 .mobileNavInner {
   @include m.container;
+
   display: grid;
   gap: 0.38rem;
   padding-block: 0.85rem 1.35rem;
@@ -517,18 +560,9 @@
   background: rgba(31, 133, 206, 0.08);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .header,
-  .dropdownMenu,
-  .dropdownItem,
-  .chevron,
-  .mobileChevron,
-  .burgerLine,
-  .navLink,
-  .dropdownTrigger {
-    transition: none;
-  }
-}
+/* ------------------------------------------------------------------
+   Dropdown split trigger
+   ------------------------------------------------------------------ */
 
 .dropdownSplitTrigger {
   display: inline-flex;
@@ -547,6 +581,7 @@
 }
 
 .dropdownParentLink {
+
   &:hover,
   &:focus-visible {
     background: transparent;
@@ -577,6 +612,10 @@
   }
 }
 
+/* ------------------------------------------------------------------
+   Outils desktop
+   ------------------------------------------------------------------ */
+
 .desktopTools {
   display: none;
   align-items: center;
@@ -590,7 +629,9 @@
   gap: 0.12rem;
   min-height: 2.35rem;
   padding: 0.18rem;
-  border: 1px solid color-mix(in srgb, var(--nav-text) 18%, transparent);
+  border: 1px solid color-mix(in srgb,
+      var(--nav-text) 18%,
+      transparent);
   border-radius: 999px;
 }
 
@@ -653,14 +694,22 @@
   font-weight: 900;
   letter-spacing: 0.035em;
   box-shadow: 0 8px 20px rgba(241, 233, 6, 0.14);
-  transition: transform 0.16s ease, background-color 0.16s ease;
+  transition:
+    transform 0.16s ease,
+    background-color 0.16s ease;
 
   &:hover,
   &:focus-visible {
-    background: mix(v.$color-white, v.$color-yellow, 18%);
+    background: mix(v.$color-white,
+        v.$color-yellow,
+        18%);
     transform: translateY(-1px);
   }
 }
+
+/* ------------------------------------------------------------------
+   Recherche
+   ------------------------------------------------------------------ */
 
 .searchPanel {
   position: absolute;
@@ -677,6 +726,7 @@
 
 .searchPanelInner {
   @include m.container;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -702,6 +752,10 @@
   line-height: 1;
   cursor: pointer;
 }
+
+/* ------------------------------------------------------------------
+   Mobile — parents et outils
+   ------------------------------------------------------------------ */
 
 .mobileParentSplit {
   display: grid;
@@ -764,17 +818,51 @@
   color: rgba(17, 24, 39, 0.45);
 }
 
+/*
+ * Sous 1280px seulement.
+ */
 @media (max-width: 1279px) {
   .searchPanel {
     display: none;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .digeccButton,
-  .mobileDigecc,
+/* ------------------------------------------------------------------
+   Desktop compact générique : 1280 → 1439px
+   ------------------------------------------------------------------ */
+
+@media (min-width: 1280px) and (max-width: 1439px) {
+  .nav {
+    gap: 0;
+  }
+
+  .navLink,
+  .dropdownTrigger {
+    min-height: 2.2rem;
+    padding: 0.38rem 0.26rem;
+    font-size: 0.75rem;
+    line-height: 1.15;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .dropdownSplitTrigger .dropdownTrigger {
+    padding-right: 0.12rem;
+  }
+
   .dropdownToggle {
-    transition: none;
+    min-width: 1.25rem;
+    height: 2.2rem;
+    margin-left: -0.08rem;
+    padding-inline: 0.08rem;
+  }
+
+  /*
+   * Sur cette largeur, le texte institutionnel à côté
+   * du logo est masqué pour préserver tous les menus.
+   */
+  .logoText {
+    display: none;
   }
 }
 
@@ -782,11 +870,10 @@
    Accueil V2 — navigation équilibrée autour du logo
 
    Structure desktop :
-   Langue | espace | menus gauche | logo | menus droite | espace | Recherche + DIGECC
-
-   Les deux espaces sont identiques. Les deux groupes de menus partent du logo
-   avec exactement la même distance. Les outils ne déplacent jamais le logo.
+   Langue | espace | menus gauche | logo | menus droite |
+   espace | Recherche + DIGECC
    ------------------------------------------------------------------ */
+
 .headerHome {
   .bar {
     max-width: v.$max-width-home;
@@ -857,8 +944,12 @@
   display: none;
 }
 
-/* Desktop : grille parfaitement symétrique autour du logo. */
-@media (min-width: 1440px) {
+/* ------------------------------------------------------------------
+   Accueil — desktop dès 1280px
+   ------------------------------------------------------------------ */
+
+@media (min-width: 1280px) {
+
   .mobileBurger,
   .mobileLanguage {
     display: none;
@@ -867,16 +958,9 @@
   .homeBar {
     display: grid;
     grid-template-columns:
-      var(--home-tools-width)
-      var(--home-tools-gap)
-      minmax(0, 1fr)
-      var(--home-logo-gap)
-      var(--home-logo-size)
-      var(--home-logo-gap)
-      minmax(0, 1fr)
-      var(--home-tools-gap)
-      var(--home-tools-width);
+      var(--home-tools-width) var(--home-tools-gap) minmax(0, 1fr) var(--home-logo-gap) var(--home-logo-size) var(--home-logo-gap) minmax(0, 1fr) var(--home-tools-gap) var(--home-tools-width);
     align-items: center;
+    min-width: 0;
   }
 
   .homeLeftTools {
@@ -884,14 +968,15 @@
     display: flex;
     align-items: center;
     justify-self: start;
+    min-width: 0;
   }
 
   .homeNavLeft,
   .homeNavRight {
     position: static;
-    min-width: 0;
     display: flex;
     align-items: center;
+    min-width: 0;
     gap: var(--home-menu-gap);
     transform: none;
   }
@@ -905,6 +990,7 @@
   .homeLogoLink {
     grid-column: 5;
     justify-self: center;
+    width: auto;
     padding: 0;
   }
 
@@ -919,7 +1005,9 @@
     justify-content: flex-start;
   }
 
-  /* Le wrapper n'intervient pas dans la géométrie desktop. */
+  /*
+   * Le wrapper n'intervient pas dans la géométrie desktop.
+   */
   .homeRightSide {
     display: contents;
   }
@@ -930,18 +1018,10 @@
     display: flex;
     align-items: center;
     justify-self: end;
+    min-width: 0;
     gap: 0.32rem;
     transform: none;
     z-index: 3;
-  }
-
-  .headerHome .navLink,
-  .headerHome .dropdownTrigger {
-    min-height: 2.35rem;
-    padding: 0.42rem 0.5rem;
-    font-size: v.$font-size-nav;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
   }
 
   .headerHome .burger {
@@ -949,22 +1029,102 @@
   }
 }
 
-/* Desktop compact : priorité à la lisibilité, sans collision avec DIGECC. */
-@media (min-width: 1440px) and (max-width: 1599px) {
+/* ------------------------------------------------------------------
+   Accueil — desktop très compact : 1280 → 1439px
+   ------------------------------------------------------------------ */
+
+@media (min-width: 1280px) and (max-width: 1439px) {
   .homeBar {
-    --home-logo-size: 4.65rem;
-    --home-logo-gap: 0.35rem;
-    --home-tools-gap: 0.55rem;
-    --home-tools-width: 6.8rem;
+    --home-logo-size: 4rem;
+    --home-logo-gap: 0.18rem;
+    --home-tools-gap: 0.22rem;
+    --home-tools-width: 5.85rem;
     --home-menu-gap: 0;
   }
 
   .headerHome .navLink,
   .headerHome .dropdownTrigger {
-    min-height: 2.25rem;
-    padding-inline: 0.32rem;
-    font-size: v.$font-size-nav;
+    min-height: 2.15rem;
+    padding: 0.34rem 0.2rem;
+    font-size: 0.72rem;
+    line-height: 1.1;
     letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .headerHome .dropdownSplitTrigger {
+    min-width: 0;
+  }
+
+  .headerHome .dropdownSplitTrigger .dropdownTrigger {
+    padding-right: 0.08rem;
+  }
+
+  .headerHome .dropdownToggle {
+    min-width: 1.15rem;
+    height: 2.15rem;
+    margin-left: -0.04rem;
+    padding: 0 0.06rem;
+  }
+
+  .homeLeftTools {
+    gap: 0;
+  }
+
+  .desktopTools {
+    gap: 0.08rem;
+  }
+
+  .languageSwitch {
+    min-height: 1.95rem;
+    padding: 0.06rem;
+  }
+
+  .languageActive,
+  .languagePending {
+    min-width: 1.45rem;
+    height: 1.65rem;
+    padding-inline: 0.16rem;
+    font-size: 0.68rem;
+  }
+
+  .searchButton {
+    width: 1.95rem;
+    height: 1.95rem;
+  }
+
+  .digeccButton {
+    min-height: 1.95rem;
+    padding: 0.36rem 0.4rem;
+    font-size: 0.7rem;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Accueil — desktop intermédiaire : 1440 → 1599px
+   ------------------------------------------------------------------ */
+
+@media (min-width: 1440px) and (max-width: 1599px) {
+  .homeBar {
+    --home-logo-size: 4.55rem;
+    --home-logo-gap: 0.35rem;
+    --home-tools-gap: 0.5rem;
+    --home-tools-width: 6.8rem;
+    --home-menu-gap: 0.02rem;
+  }
+
+  .headerHome .navLink,
+  .headerHome .dropdownTrigger {
+    min-height: 2.25rem;
+    padding-inline: 0.31rem;
+    font-size: clamp(0.76rem,
+        0.64vw,
+        0.82rem);
+    line-height: 1.12;
+    letter-spacing: 0;
+    white-space: nowrap;
   }
 
   .dropdownToggle {
@@ -1003,7 +1163,10 @@
   }
 }
 
-/* Grands écrans : davantage d'air, toujours de manière symétrique. */
+/* ------------------------------------------------------------------
+   Accueil — grands écrans : >= 1600px
+   ------------------------------------------------------------------ */
+
 @media (min-width: 1600px) {
   .homeBar {
     --home-logo-gap: 0.9rem;
@@ -1019,10 +1182,10 @@
   }
 }
 
-
 /* ------------------------------------------------------------------
    Shell V2 partagé — correctifs responsive pages internes et accueil
    ------------------------------------------------------------------ */
+
 .homeLogoLink {
   width: auto;
 }
@@ -1031,5 +1194,26 @@
   .homeLogoLink .logo {
     width: auto;
     height: 5rem;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion
+   ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .header,
+  .dropdownMenu,
+  .dropdownItem,
+  .chevron,
+  .mobileChevron,
+  .burgerLine,
+  .navLink,
+  .dropdownTrigger,
+  .digeccButton,
+  .mobileDigecc,
+  .dropdownToggle {
+    transition: none;
   }
 }

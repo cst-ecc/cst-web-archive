@@ -46,6 +46,12 @@ $max-width-content: 80rem; // 1280px
 $max-width-home: 100rem; // 1600px — Home V2 immersive, sans étirement excessif
 $header-height: 4.5rem;
 
+// Home V2 — hauteur commune des Hero (Accueil + panneaux).
+// Un seul réglage évite les ruptures visuelles entre Accueil, Comprendre,
+// Où en sommes-nous ?, CST, CSMO, etc.
+$home-v2-hero-height: clamp(17rem, 32dvh, 19rem);
+$home-v2-hero-mobile-min-height: clamp(24rem, 58svh, 30rem);
+
 // Breakpoints
 $bp-sm: 640px;
 $bp-md: 768px;

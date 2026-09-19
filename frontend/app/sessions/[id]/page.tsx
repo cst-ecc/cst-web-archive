@@ -62,7 +62,7 @@ export default async function SessionDetailPage({ params }: { params: { id: stri
         <div className={styles.images}>
           {session.imageUrls.map((url) => (
             <div key={url} className={styles.imageWrap}>
-              <Image src={url} alt="" fill sizes="(max-width:768px) 100vw, 33vw" className={styles.image} />
+              <Image src={url} alt="" fill sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw" className={styles.image} />
             </div>
           ))}
         </div>

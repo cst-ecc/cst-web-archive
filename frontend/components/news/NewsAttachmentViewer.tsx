@@ -29,7 +29,7 @@ export default function NewsAttachmentViewer({
             src={attachment.url}
             alt={attachment.label ?? item.imageAlt ?? item.title}
             fill
-            sizes="(max-width: 768px) 100vw, 768px"
+            sizes="(max-width: 767px) 100vw, (max-width: 1279px) 90vw, 1248px"
             className={styles.image}
             unoptimized={shouldBypassNextImageOptimization(attachment.url)}
           />
@@ -53,7 +53,7 @@ export default function NewsAttachmentViewer({
             src={attachment.previewUrl}
             alt={attachment.label ?? item.title}
             fill
-            sizes="(max-width: 768px) 100vw, 768px"
+            sizes="(max-width: 767px) 100vw, (max-width: 1279px) 90vw, 1248px"
             className={styles.image}
             unoptimized={shouldBypassNextImageOptimization(
               attachment.previewUrl,

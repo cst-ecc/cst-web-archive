@@ -1,20 +1,19 @@
 @use "../../styles/variables" as v;
 @use "../../styles/mixins" as m;
 
-$section-hero-height: clamp(13.5rem, 31dvh, 18rem);
-
 .hero {
   position: relative;
   isolation: isolate;
-  min-height: 22rem;
+  min-height: v.$home-v2-hero-mobile-min-height;
   overflow: hidden;
   display: flex;
   align-items: center;
   color: v.$color-white;
 
   @include m.respond(lg) {
-    height: $section-hero-height;
+    height: v.$home-v2-hero-height;
     min-height: 0;
+    flex: 0 0 v.$home-v2-hero-height;
   }
 }
 
@@ -64,31 +63,34 @@ $section-hero-height: clamp(13.5rem, 31dvh, 18rem);
   padding-bottom: 1rem;
 }
 
-/* Seulement lorsqu'une image secondaire est fournie */
+/* Seulement lorsqu'une image secondaire est fournie (CST / CSMO). */
 .innerWithImage {
   display: grid;
-  grid-template-columns: 10rem minmax(0, 1fr);
+  grid-template-columns: clamp(7.5rem, 10vw, 10.5rem) minmax(0, 1fr);
   align-items: center;
-  gap: 2rem;
+  gap: clamp(1.25rem, 1.2rem + 0.8vw, 2.5rem);
 
   @include m.respond(lg) {
-    grid-template-columns: 12rem minmax(0, 1fr);
-    gap: 2.5rem;
+    grid-template-columns: clamp(8rem, 9vw, 11rem) minmax(0, 1fr);
   }
 }
 
+/*
+ * Le logo institutionnel doit rester entièrement contenu dans le Hero.
+ * On n'utilise plus toute la hauteur disponible et on évite tout recadrage.
+ */
 .sideImage {
   position: relative;
-  width: 100%;
-  max-width: v.$max-width-home;
-  height: 100%;
-  margin-inline: auto;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
+  width: clamp(6.5rem, 8vw, 9rem);
+  height: clamp(6.5rem, 8vw, 9rem);
+  justify-self: center;
+  align-self: center;
+  overflow: visible;
 }
 
 .sideImageContent {
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
 }
 
 .content {
@@ -100,8 +102,8 @@ $section-hero-height: clamp(13.5rem, 31dvh, 18rem);
   margin-top: 0.42rem;
   color: v.$color-white;
   font-family: v.$font-display;
-  font-size: clamp(2.25rem, 1.55rem + 1.55vw, 4rem);
-  line-height: 0.98;
+  font-size: clamp(2rem, 1.6rem + 1.1vw, 3.25rem);
+  line-height: 1;
   letter-spacing: -0.04em;
   text-wrap: balance;
 }
@@ -168,28 +170,86 @@ $section-hero-height: clamp(13.5rem, 31dvh, 18rem);
   text-transform: uppercase;
 }
 
+/* Tablette / petit desktop : logo plus compact, toujours intégralement visible. */
 @media (max-width: 1023px) {
   .innerWithImage {
-    grid-template-columns: 8rem minmax(0, 1fr);
-    gap: 1.25rem;
+    grid-template-columns: clamp(6.5rem, 14vw, 8rem) minmax(0, 1fr);
+    gap: 1.1rem;
+  }
+
+  .sideImage {
+    width: clamp(5.75rem, 12vw, 7rem);
+    height: clamp(5.75rem, 12vw, 7rem);
+  }
+
+  .innerWithImage .content h2 {
+    font-size: clamp(1.75rem, 3.6vw, 2.35rem);
+    line-height: 1.04;
   }
 }
 
+/*
+ * Téléphone : le logo CST / CSMO reste visible et est centré au-dessus
+ * du texte. Toute l'image reste contenue dans le Hero.
+ */
 @media (max-width: 639px) {
   .hero {
-    min-height: 24rem;
+    min-height: v.$home-v2-hero-mobile-min-height;
   }
 
   .innerWithImage {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    align-content: center;
+    justify-items: center;
+    gap: clamp(0.45rem, 1.8vw, 0.7rem);
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
   }
 
   .sideImage {
-    display: none;
+    display: block;
+    width: clamp(4.6rem, 19vw, 5.8rem);
+    height: clamp(4.6rem, 19vw, 5.8rem);
+    margin-inline: auto;
   }
 
-  .content h2 {
-    font-size: clamp(2.15rem, 11vw, 3.2rem);
+  .innerWithImage .content {
+    width: 100%;
+    text-align: center;
+  }
+
+  .innerWithImage .eyebrow {
+    justify-content: center;
+    font-size: clamp(0.62rem, 2.6vw, 0.72rem);
+    letter-spacing: 0.08em;
+  }
+
+  .innerWithImage .eyebrow::before {
+    width: 1.35rem;
+  }
+
+  .innerWithImage .content h2 {
+    max-width: 19ch;
+    margin-inline: auto;
+    margin-top: 0.3rem;
+    font-size: clamp(1.45rem, 6vw, 1.95rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  .innerWithImage .subtitle {
+    max-width: 34rem;
+    margin-top: 0.45rem;
+    margin-inline: auto;
+    font-size: clamp(0.88rem, 3.35vw, 1rem);
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  /* Les autres Hero sans logo gardent leur comportement actuel. */
+  .inner:not(.innerWithImage) .content h2 {
+    font-size: clamp(2rem, 10vw, 3rem);
   }
 
   .alt {

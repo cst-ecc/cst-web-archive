@@ -86,12 +86,12 @@
 
 .storyList a {
   display: grid;
-  grid-template-columns: 4.35rem 1fr auto;
+  grid-template-columns: clamp(4.5rem, 5vw, 5.6rem) minmax(0, 1fr) auto;
 }
 
 .storyThumb {
   position: relative;
-  min-height: 2.6rem;
+  min-height: clamp(3.4rem, 4vw, 4.6rem);
   overflow: hidden;
   border-radius: v.$radius-md;
   background: v.$color-surface-line;
@@ -102,6 +102,8 @@
 }
 
 .detailLead {
+  @include m.editorial-copy;
+
   margin-top: 0.5rem;
   color: rgba(17, 24, 39, 0.6);
   font-size: v.$font-size-small;

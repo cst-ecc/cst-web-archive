@@ -14,7 +14,7 @@
 
 .imageWrap {
     position: relative;
-    min-height: 8.5rem;
+    min-height: clamp(9.5rem, 12vw, 13rem);
     flex: 1 1 auto;
     overflow: hidden;
     background: v.$color-surface-muted;
@@ -51,6 +51,8 @@
 }
 
 .quote {
+    @include m.editorial-copy;
+
     margin: 0.45rem 0 0;
     color: rgba(17, 24, 39, 0.68);
     font-family: Georgia, serif;
@@ -84,4 +86,14 @@
     .imageWrap {
         min-height: 13rem;
     }
+}
+
+@media (min-width: 1024px) and (max-height: 720px) {
+  .imageWrap {
+    min-height: 7rem;
+  }
+
+  .content {
+    padding-block: 0.55rem;
+  }
 }

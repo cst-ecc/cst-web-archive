@@ -10,7 +10,7 @@ export default function MemberCard({ member }: { member: Member }) {
           src={member.photoUrl}
           alt={member.fullName}
           fill
-          sizes="(max-width:768px) 50vw, 25vw"
+          sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 25vw"
           className={styles.photo}
         />
       </div>

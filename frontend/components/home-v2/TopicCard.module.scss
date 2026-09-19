@@ -1,10 +1,11 @@
 @use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
 
 .card {
   height: 100%;
   min-width: 0;
   display: grid;
-  grid-template-columns: 3.15rem 1fr;
+  grid-template-columns: clamp(2.8rem, 3vw, 3.35rem) minmax(0, 1fr);
   gap: clamp(0.7rem, 0.55rem + 0.25vw, 0.95rem);
   align-items: center;
   border: 1px solid rgba(31, 133, 206, 0.12);
@@ -34,6 +35,8 @@
   }
 
   p {
+    @include m.editorial-copy;
+
     margin-top: 0.18rem;
     color: rgba(17, 24, 39, 0.61);
     font-size: v.$font-size-small;

@@ -198,7 +198,7 @@ function SpecialNewsCard({
                         src={media.url}
                         alt={imageAlt}
                         fill
-                        sizes="(max-width: 639px) 100vw, 12rem"
+                        sizes="(max-width: 639px) 100vw, (max-width: 1023px) 100vw, (max-width: 1279px) 16rem, 20rem"
                         className={styles.image}
                         unoptimized={imageNeedsUnoptimized(
                             media.url,

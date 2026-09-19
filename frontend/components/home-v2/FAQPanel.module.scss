@@ -114,6 +114,8 @@
 }
 
 .answerText {
+  @include m.editorial-copy;
+
   display: grid;
   gap: 0.45rem;
   margin-top: 0.65rem;

@@ -53,7 +53,7 @@ export default function PanelHero({
               src={sideImage.src}
               alt={sideImage.alt}
               fill
-              sizes="(max-width: 1023px) 40vw, 18rem"
+              sizes="(max-width: 639px) 6rem, (max-width: 1023px) 8rem, 12rem"
               className={styles.sideImageContent}
               unoptimized={imageNeedsUnoptimized(sideImage.src)}
             />

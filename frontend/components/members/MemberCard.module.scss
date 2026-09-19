@@ -3,43 +3,67 @@
 
 .card {
   @include m.card;
+
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
   overflow: hidden;
 }
 
 .photoWrap {
   position: relative;
+  width: 100%;
   aspect-ratio: 4 / 3;
+  min-height: clamp(11rem, 20vw, 15rem);
   background: v.$color-surface-muted;
 }
 
 .photo {
   object-fit: cover;
+  object-position: center top;
 }
 
 .body {
-  padding: 1rem;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  padding: clamp(0.95rem, 0.78rem + 0.25vw, 1.2rem);
 }
 
 .name {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.12rem);
+  font-weight: 650;
+  line-height: 1.3;
   color: v.$color-blue-ink;
 }
 
 .role {
-  font-size: 0.875rem;
-  font-weight: 500;
+  margin-top: 0.1rem;
+  font-size: v.$font-size-small;
+  font-weight: 600;
   color: v.$color-blue;
 }
 
 .responsibility {
-  margin-top: 0.125rem;
-  font-size: 0.75rem;
+  margin-top: 0.2rem;
+  font-size: v.$font-size-meta;
+  line-height: 1.4;
   color: rgba(17, 24, 39, 0.6);
 }
 
 .bio {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
+  @include m.editorial-copy;
+
+  margin-top: 0.55rem;
+  font-size: v.$font-size-small;
+  line-height: 1.55;
   color: rgba(17, 24, 39, 0.7);
+}
+
+@media (min-width: 1280px) {
+  .photoWrap {
+    min-height: 13rem;
+  }
 }

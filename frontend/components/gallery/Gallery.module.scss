@@ -27,6 +27,8 @@
 }
 
 .albumDescription {
+  @include m.editorial-copy;
+
   margin-top: 0.3rem;
   max-width: 48rem;
   font-size: 0.875rem;

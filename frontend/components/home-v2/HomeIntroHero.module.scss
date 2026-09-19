@@ -1,13 +1,10 @@
 @use "../../styles/variables" as v;
 @use "../../styles/mixins" as m;
 
-/* Réglage unique de la hauteur du Hero principal sur desktop. */
-$home-hero-height: clamp(16rem, 33dvh, 21rem);
-
 .hero {
   position: relative;
   isolation: isolate;
-  min-height: 28rem;
+  min-height: v.$home-v2-hero-mobile-min-height;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -19,9 +16,10 @@ $home-hero-height: clamp(16rem, 33dvh, 21rem);
   }
 
   @include m.respond(lg) {
-    height: $home-hero-height;
+    height: v.$home-v2-hero-height;
     min-height: 0;
-    flex: 0 0 $home-hero-height;
+    flex: 0 0 v.$home-v2-hero-height;
+    padding-block: 1rem;
   }
 }
 
@@ -59,7 +57,7 @@ $home-hero-height: clamp(16rem, 33dvh, 21rem);
   justify-content: space-between;
   gap: 2rem;
   width: 100%;
-  margin-top: clamp(0.85rem, 0.65rem + 0.35vw, 1.15rem);
+  margin-top: clamp(0.65rem, 0.5rem + 0.25vw, 0.9rem);
 }
 
 .eyebrow {
@@ -88,8 +86,8 @@ $home-hero-height: clamp(16rem, 33dvh, 21rem);
   margin-top: 0.55rem;
   color: v.$color-white;
   font-family: v.$font-display;
-  font-size: clamp(2rem, 1.5rem + 1.65vw, 3.45rem);
-  line-height: 1;
+  font-size: clamp(1.9rem, 1.5rem + 1vw, 2.7rem);
+  line-height: 0.98;
   letter-spacing: -0.045em;
   text-wrap: balance;
 
@@ -110,7 +108,7 @@ $home-hero-height: clamp(16rem, 33dvh, 21rem);
   margin: 0;
   color: rgba(255, 255, 255, 0.9);
   font-size: v.$font-size-body-fluid;
-  line-height: 1.5;
+  line-height: 1.42;
 }
 
 .actions {
@@ -125,7 +123,7 @@ $home-hero-height: clamp(16rem, 33dvh, 21rem);
 .primary,
 .secondary {
   @include m.button-base;
-  min-height: 2.8rem;
+  min-height: 2.55rem;
   padding-inline: clamp(1.05rem, 0.8rem + 0.4vw, 1.35rem);
   font-size: v.$font-size-small;
 }
@@ -145,7 +143,7 @@ $home-hero-height: clamp(16rem, 33dvh, 21rem);
 
 @media (max-width: 1023px) {
   .hero {
-    min-height: clamp(28rem, 68svh, 36rem);
+    min-height: v.$home-v2-hero-mobile-min-height;
   }
 
   .bottomRow {

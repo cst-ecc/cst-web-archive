@@ -8,7 +8,7 @@ import Navbar from "@/components/layout/Navbar";
 import SiteFooter from "@/components/layout/SiteFooter";
 import FooterVisibility from "@/components/layout/FooterVisibility";
 import PageLoader from "@/components/layout/PageLoader";
-import GlobalAlertTicker from "@/components/layout/GlobalAlertTicker";
+import AlertTickerProvider from "@/components/layout/AlertTickerProvider";
 // import SocialFloatingLinks from "@/components/layout/SocialFloatingLinks";
 import styles from "./layout.module.scss";
 
@@ -101,19 +101,19 @@ export default function RootLayout({
           Aller au contenu
         </a>
 
-        <Navbar />
+        <AlertTickerProvider>
+          <Navbar />
 
-        <GlobalAlertTicker />
+          {/* <SocialFloatingLinks /> */}
 
-        {/* <SocialFloatingLinks /> */}
+          <main id="contenu" className={styles.main}>
+            {children}
+          </main>
 
-        <main id="contenu" className={styles.main}>
-          {children}
-        </main>
-
-        <FooterVisibility>
-          <SiteFooter />
-        </FooterVisibility>
+          <FooterVisibility>
+            <SiteFooter />
+          </FooterVisibility>
+        </AlertTickerProvider>
       </body>
     </html>
   );

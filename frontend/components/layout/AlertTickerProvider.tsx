@@ -15,21 +15,23 @@ type AlertTickerContextValue = {
   alert: NewsItem | null;
 };
 
+type AlertTickerResponse = {
+  alert: NewsItem | null;
+};
+
 const AlertTickerContext = createContext<AlertTickerContextValue>({
   alert: null,
 });
 
-const ALERT_ENDPOINT = "/api/v1/news/home-special/";
-
-function selectAlert(items: NewsItem[]): NewsItem | null {
-  return (
-    items.find(
-      (item) =>
-        item.homeSlot === "alert_info" &&
-        item.status === "publie",
-    ) ?? null
-  );
-}
+/*
+ * Cette route Next s'exécute côté serveur et relaie la donnée publique
+ * « Dernier INFO » depuis la source déjà utilisée par le site.
+ *
+ * On évite ainsi de faire dépendre le navigateur de l'URL interne Docker
+ * du backend Django. Le même bandeau peut donc être utilisé sur tous les
+ * panneaux de la Home V2 et sur les pages internes.
+ */
+const ALERT_ENDPOINT = "/site-alert";
 
 export default function AlertTickerProvider({
   children,
@@ -55,13 +57,13 @@ export default function AlertTickerProvider({
           return;
         }
 
-        const payload = (await response.json()) as unknown;
+        const payload = (await response.json()) as AlertTickerResponse;
 
-        if (!Array.isArray(payload)) {
+        if (!payload || !("alert" in payload)) {
           return;
         }
 
-        setAlert(selectAlert(payload as NewsItem[]));
+        setAlert(payload.alert ?? null);
       } catch (error) {
         if (
           error instanceof DOMException &&

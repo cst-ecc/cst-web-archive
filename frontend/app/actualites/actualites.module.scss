@@ -2,11 +2,15 @@
 @use "../../styles/mixins" as m;
 
 .section {
-  padding-block: 3rem 5rem;
+  width: 100%;
+  max-width: v.$max-width-home;
+  margin-inline: auto;
+  padding-block: clamp(2.25rem, 1.7rem + 1vw, 3.25rem) clamp(3.5rem, 2.8rem + 1.4vw, 5rem);
 }
 
 .featured {
   display: grid;
+  min-width: 0;
   overflow: hidden;
   border: 1px solid v.$color-surface-line;
   border-radius: v.$radius-xl2;
@@ -14,8 +18,8 @@
   box-shadow: v.$shadow-card;
 
   @include m.respond(lg) {
-    grid-template-columns: minmax(0, 1.35fr) minmax(22rem, 0.75fr);
-    min-height: 31rem;
+    grid-template-columns: minmax(0, 1.28fr) minmax(20rem, 0.72fr);
+    min-height: clamp(24rem, 34vw, 31rem);
   }
 }
 
@@ -27,25 +31,30 @@
 
 .featuredImageWrap {
   position: relative;
-  min-height: 20rem;
+  min-height: clamp(16rem, 32vw, 22rem);
   height: 100%;
   background: v.$color-surface-muted;
+
+  @include m.respond(lg) {
+    min-height: 100%;
+  }
 }
 
 .featuredBody {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 1.75rem;
+  min-width: 0;
+  padding: clamp(1.25rem, 0.95rem + 0.8vw, 2.25rem);
 
-  @include m.respond(lg) {
-    padding: 2.5rem;
+  @media (min-width: 1440px) {
+    padding: clamp(2rem, 1.4rem + 0.8vw, 2.75rem);
   }
 }
 
 .kicker,
 .archiveEyebrow {
-  font-size: 0.72rem;
+  font-size: v.$font-size-meta;
   font-weight: 750;
   text-transform: uppercase;
   letter-spacing: 0.09em;
@@ -54,19 +63,15 @@
 
 .date {
   margin-top: 0.65rem;
-  font-size: 0.78rem;
+  font-size: v.$font-size-meta;
   color: rgba(17, 24, 39, 0.58);
 }
 
 .featuredTitle {
   margin-top: 0.5rem;
-  font-size: 1.65rem;
-  line-height: 1.22;
+  font-size: clamp(1.55rem, 1.2rem + 1vw, 2.2rem);
+  line-height: 1.2;
   color: v.$color-blue-ink;
-
-  @include m.respond(sm) {
-    font-size: 2rem;
-  }
 
   a:hover,
   a:focus-visible {
@@ -75,8 +80,11 @@
 }
 
 .featuredExcerpt {
+  @include m.editorial-copy;
+
   margin-top: 1rem;
-  line-height: 1.75;
+  font-size: v.$font-size-body-fluid;
+  line-height: 1.72;
   color: rgba(17, 24, 39, 0.7);
 }
 
@@ -86,7 +94,7 @@
   align-self: flex-start;
   gap: 0.45rem;
   margin-top: 1.35rem;
-  font-size: 0.88rem;
+  font-size: v.$font-size-small;
   font-weight: 750;
   color: v.$color-blue;
   transition: gap 0.2s ease, color 0.2s ease;
@@ -99,7 +107,7 @@
 }
 
 .archive {
-  margin-top: 4rem;
+  margin-top: clamp(2.75rem, 2rem + 1.2vw, 4rem);
 }
 
 .archiveHead {
@@ -112,12 +120,8 @@
 
 .archiveTitle {
   margin-top: 0.25rem;
-  font-size: 1.55rem;
+  font-size: clamp(1.45rem, 1.2rem + 0.7vw, 1.9rem);
   color: v.$color-blue-ink;
-
-  @include m.respond(sm) {
-    font-size: 1.85rem;
-  }
 
   &::after {
     content: "";
@@ -132,7 +136,9 @@
 
 .grid {
   display: grid;
-  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  gap: clamp(0.95rem, 0.72rem + 0.4vw, 1.35rem);
+  align-items: stretch;
 
   @include m.respond(sm) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -140,6 +146,10 @@
 
   @include m.respond(lg) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (min-width: 1440px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -162,7 +172,7 @@
   }
 
   .featuredBody {
-    padding: 1.25rem;
+    padding: 1.2rem;
   }
 
   .archive {

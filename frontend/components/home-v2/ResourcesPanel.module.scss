@@ -37,6 +37,8 @@
   }
 
   p {
+    @include m.editorial-copy;
+
     margin-top: 0.1rem;
     color: rgba(17, 24, 39, 0.56);
     font-size: v.$font-size-small;

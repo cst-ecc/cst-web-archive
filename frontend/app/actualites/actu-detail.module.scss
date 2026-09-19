@@ -2,11 +2,14 @@
 @use "../../styles/mixins" as m;
 
 .wrapper {
-  padding-block: 2.5rem 4.5rem;
+  width: 100%;
+  max-width: v.$max-width-home;
+  margin-inline: auto;
+  padding-block: clamp(1.75rem, 1.2rem + 1vw, 3rem) clamp(3.5rem, 2.8rem + 1.4vw, 5rem);
 }
 
 .breadcrumb {
-  margin-bottom: 1.5rem;
+  margin-bottom: clamp(1.25rem, 1rem + 0.5vw, 2rem);
   font-size: v.$font-size-meta;
   color: rgba(17, 24, 39, 0.58);
 
@@ -17,12 +20,14 @@
 }
 
 .article {
-  max-width: 50rem;
+  width: 100%;
+  max-width: 58rem;
   margin-inline: auto;
 }
 
 .articleHeader {
   min-width: 0;
+  max-width: 56rem;
 }
 
 .eyebrow {
@@ -45,13 +50,16 @@
 .title {
   margin-top: 0.55rem;
   color: v.$color-blue-ink;
-  font-size: clamp(1.9rem, 4vw, 3.2rem);
+  font-size: clamp(1.9rem, 1.25rem + 2.3vw, 3.25rem);
   font-weight: 700;
   line-height: 1.08;
+  text-wrap: balance;
 }
 
 .excerpt {
-  max-width: 44rem;
+  @include m.editorial-copy;
+
+  max-width: 52rem;
   margin-top: 1rem;
   color: rgba(17, 24, 39, 0.68);
   font-size: v.$font-size-body-fluid;
@@ -68,8 +76,10 @@
 
 .imageWrap {
   position: relative;
-  margin-top: 1.75rem;
+  width: 100%;
+  margin-top: clamp(1.4rem, 1rem + 0.8vw, 2.2rem);
   aspect-ratio: 16 / 9;
+  min-height: clamp(16rem, 48vw, 34rem);
   overflow: hidden;
   border: 1px solid v.$color-surface-line;
   border-radius: v.$radius-xl2;
@@ -77,18 +87,32 @@
 }
 
 .body {
-  margin-top: 2rem;
+  @include m.editorial-copy;
+
+  width: 100%;
+  max-width: 54rem;
+  margin: clamp(1.5rem, 1.15rem + 0.8vw, 2.35rem) auto 0;
   color: rgba(17, 24, 39, 0.82);
   font-size: v.$font-size-body-fluid;
-  line-height: 1.85;
+  line-height: 1.86;
 
   p {
-    margin-bottom: 1.15rem;
+    break-inside: avoid;
+  }
+
+  p + p {
+    margin-top: 1.2rem;
   }
 }
 
+.attachmentWrap {
+  min-width: 0;
+  max-width: 62rem;
+  margin: 2rem auto 0;
+}
+
 .relatedSection {
-  max-width: 50rem;
+  max-width: 58rem;
   margin: 3.5rem auto 0;
   padding-top: 2rem;
   border-top: 1px solid v.$color-surface-line;
@@ -103,79 +127,78 @@
 
 .relatedGrid {
   display: grid;
-  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  gap: clamp(0.95rem, 0.72rem + 0.4vw, 1.35rem);
 
   @include m.respond(sm) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* Grand desktop : composition éditoriale plus large, sans lignes interminables. */
 @include m.respond(xl) {
-  .wrapper {
-    max-width: v.$max-width-home;
-    margin-inline: auto;
-    padding-block: 3rem 5rem;
-  }
-
-  .breadcrumb {
-    margin-bottom: 2rem;
-  }
-
   .article {
     max-width: none;
     margin-inline: 0;
   }
 
   .articleHeader {
-    max-width: 76rem;
+    max-width: 78rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .excerpt {
+    max-width: 66rem;
+    margin-inline: auto;
+    font-size: clamp(1.05rem, 0.98rem + 0.18vw, 1.18rem);
+    line-height: 1.78;
+  }
+
+  .rule {
     margin-inline: auto;
   }
 
   .title {
-    font-size: clamp(2.65rem, 2rem + 1.55vw, 4rem);
-  }
-
-  .excerpt {
-    max-width: 62rem;
-    font-size: clamp(1.05rem, 0.98rem + 0.18vw, 1.18rem);
-    line-height: 1.75;
+    max-width: 74rem;
+    margin-inline: auto;
+    font-size: clamp(2.7rem, 2rem + 1.6vw, 4.05rem);
   }
 
   .imageWrap {
-    width: 100%;
-    max-width: 94rem;
-    margin: 2.2rem auto 0;
-    aspect-ratio: 16 / 8.25;
+    max-width: 90rem;
+    margin-inline: auto;
+    aspect-ratio: 16 / 8.5;
+    min-height: 30rem;
   }
 
   .body {
-    width: 100%;
-    max-width: 92rem;
-    margin: 2.5rem auto 0;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: clamp(2.25rem, 1.5rem + 1.4vw, 4rem);
-    row-gap: 1.55rem;
+    max-width: 72rem;
     font-size: clamp(1rem, 0.96rem + 0.16vw, 1.1rem);
-    line-height: 1.82;
+    line-height: 1.86;
+  }
+
+  .body[data-editorial-columns="true"] {
+    max-width: 88rem;
+    column-count: 2;
+    column-gap: clamp(2.5rem, 1.5rem + 1.5vw, 4.5rem);
+    column-rule: 1px solid rgba(227, 234, 241, 0.95);
 
     p {
-      min-width: 0;
-      margin: 0;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(227, 234, 241, 0.9);
+      margin: 0 0 1.35rem;
     }
 
-    p:only-child,
-    p:last-child:nth-child(odd) {
-      grid-column: 1 / -1;
-      max-width: 70rem;
+    p + p {
+      margin-top: 0;
     }
   }
 
+  .attachmentWrap {
+    max-width: 78rem;
+    margin-top: 2.5rem;
+  }
+
   .relatedSection {
-    max-width: 94rem;
+    max-width: 90rem;
     margin-top: 4.25rem;
   }
 
@@ -184,30 +207,24 @@
   }
 }
 
-@media (max-width: 639px) {
-  .wrapper {
-    padding-block: 1.75rem 3.5rem;
+@media (min-width: 1600px) {
+  .imageWrap {
+    max-width: 94rem;
   }
 
+  .body[data-editorial-columns="true"] {
+    max-width: 92rem;
+  }
+}
+
+@media (max-width: 639px) {
   .imageWrap {
-    margin-top: 1.35rem;
     aspect-ratio: 4 / 3;
+    min-height: 14rem;
   }
 
   .body {
-    margin-top: 1.5rem;
     font-size: 0.96rem;
-    line-height: 1.78;
-  }
-}
-
-.attachmentWrap {
-  min-width: 0;
-}
-
-@include m.respond(xl) {
-  .attachmentWrap {
-    max-width: 76rem;
-    margin-inline: auto;
+    line-height: 1.8;
   }
 }

@@ -2,9 +2,8 @@
 @use "../../styles/mixins" as m;
 
 .shell {
-  position: sticky;
-  top: v.$header-height;
-  z-index: 35;
+  position: relative;
+  z-index: 2;
 
   width: 100%;
   min-width: 0;

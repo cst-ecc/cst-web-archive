@@ -5,6 +5,7 @@ import PanelHero, {
   type PanelSideImage,
 } from "./PanelHero";
 import BibleVerseCarousel from "./BibleVerseCarousel";
+import SiteAlertTicker from "@/components/layout/SiteAlertTicker";
 import styles from "./PanelFrame.module.scss";
 
 type PanelFrameProps = {
@@ -27,6 +28,8 @@ export default function PanelFrame({
         quote={verse}
         sideImage={sideImage}
       />
+
+      <SiteAlertTicker />
 
       <div className={styles.body}>
         {children}

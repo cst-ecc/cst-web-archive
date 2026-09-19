@@ -27,7 +27,7 @@
   border-radius: 999px;
   background: rgba(5, 31, 48, 0.82);
   color: v.$color-white;
-  font-size: 0.6rem;
+  font-size: v.$font-size-micro;
   font-weight: 800;
   letter-spacing: 0.08em;
 }
@@ -56,7 +56,7 @@
 
   strong {
     color: v.$color-yellow;
-    font-size: 0.68rem;
+    font-size: v.$font-size-meta;
     font-weight: 900;
     letter-spacing: 0.1em;
   }
@@ -64,14 +64,14 @@
   span {
     max-width: 80%;
     text-align: center;
-    font-size: 0.68rem;
+    font-size: v.$font-size-meta;
     opacity: 0.78;
   }
 }
 
 .placeholder {
   color: v.$color-blue-deep;
-  font-size: 0.72rem;
+  font-size: v.$font-size-meta;
   font-weight: 800;
   letter-spacing: 0.08em;
 }

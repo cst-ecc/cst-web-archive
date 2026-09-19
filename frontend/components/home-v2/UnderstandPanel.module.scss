@@ -60,6 +60,8 @@
   }
 
   p {
+    @include m.editorial-copy;
+
     margin-top: 0.08rem;
     color: rgba(17, 24, 39, 0.58);
     font-size: v.$font-size-small;

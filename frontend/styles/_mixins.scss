@@ -81,3 +81,10 @@
     opacity: 0.5;
   }
 }
+
+@mixin editorial-copy {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
