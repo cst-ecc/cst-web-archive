@@ -24,7 +24,7 @@ services:
         NEXT_PUBLIC_GALLERY_SOURCE: ${NEXT_PUBLIC_GALLERY_SOURCE:-api}
         NEXT_PUBLIC_DOCUMENTS_SOURCE: ${NEXT_PUBLIC_DOCUMENTS_SOURCE:-api}
 
-    image: cst-frontend:latest
+    image: ${CST_FRONTEND_IMAGE:-cst-frontend:latest}
     container_name: cst-frontend
 
     env_file:
@@ -143,7 +143,7 @@ services:
       context: ../backend
       dockerfile: Dockerfile
 
-    image: cst-backend:latest
+    image: ${CST_BACKEND_IMAGE:-cst-backend:latest}
     container_name: cst-backend
 
     env_file:
@@ -167,12 +167,41 @@ services:
       cst_redis:
         condition: service_healthy
 
+    # Les opérations de release (migrations / collectstatic) sont exécutées
+    # par docker/scripts/release-backend.sh avant l'activation du conteneur.
     command: >
-      sh -c "python manage.py collectstatic --noinput && exec gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120 --access-logfile - --error-logfile -"
+      gunicorn config.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers 3
+      --timeout 120
+      --access-logfile -
+      --error-logfile -
 
     restart: unless-stopped
+
+    security_opt:
+      - no-new-privileges:true
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=5).read()"
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
   cst_celery_worker:
-    image: cst-backend:latest
+    image: ${CST_BACKEND_IMAGE:-cst-backend:latest}
     container_name: cst-celery-worker
 
     env_file:
@@ -214,7 +243,7 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
 
-    image: cst-gateway:latest
+    image: ${CST_GATEWAY_IMAGE:-cst-gateway:latest}
     container_name: cst-gateway
 
     expose:
