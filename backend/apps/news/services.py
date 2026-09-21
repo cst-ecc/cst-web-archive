@@ -85,8 +85,11 @@ def _validate_before_publish(news: News) -> None:
     }
 
     if is_special:
-        if not news.attachment:
-            missing.append("pièce jointe")
+        # Les cartes spéciales de la Home savent afficher soit la pièce jointe
+        # (flyer/PDF), soit l'image de couverture. On n'impose donc pas une
+        # pièce jointe lorsqu'une couverture est déjà disponible.
+        if not news.attachment and not news.featured_image:
+            missing.append("image de couverture ou pièce jointe")
 
     elif not news.featured_image:
         missing.append("image de couverture")

@@ -121,8 +121,13 @@ class PublicHomeSpecialNewsView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        base = public_news_queryset().exclude(attachment="")
+        base = public_news_queryset()
 
+        # Un événement à venir peut être publié avec une image de couverture
+        # OU une pièce jointe. La date de l'événement est volontairement
+        # facultative dans le back-office :
+        # - si des événements datés existent, on affiche le plus proche ;
+        # - sinon, on retient le dernier événement publié sans date.
         event = (
             base.filter(
                 home_slot=NewsHomeSlot.UPCOMING_EVENT,
@@ -136,6 +141,20 @@ class PublicHomeSpecialNewsView(APIView):
             )
             .first()
         )
+
+        if event is None:
+            event = (
+                base.filter(
+                    home_slot=NewsHomeSlot.UPCOMING_EVENT,
+                    event_date__isnull=True,
+                )
+                .order_by(
+                    "display_order",
+                    "-publication_date",
+                    "-published_at",
+                )
+                .first()
+            )
 
         alert = (
             base.filter(home_slot=NewsHomeSlot.ALERT_INFO)

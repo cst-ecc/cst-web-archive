@@ -8,7 +8,7 @@ from apps.accounts.models import User
 from apps.core.publication import PublicationStatus
 from apps.documents.models import Document, DocumentKind
 from apps.documents.tests.helpers import test_pdf
-from apps.news.models import News, NewsCategory
+from apps.news.models import News, NewsCategory, NewsHomeSlot
 
 from .helpers import test_image
 
@@ -178,6 +178,37 @@ class PublicNewsApiTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual([item["slug"] for item in response.json()], [published.slug])
+
+
+    def test_home_special_returns_upcoming_event_with_cover_without_attachment(self):
+        event = self._news(
+            title="Rencontre à venir",
+            status=PublicationStatus.PUBLISHED,
+            home_slot=NewsHomeSlot.UPCOMING_EVENT,
+            event_date=timezone.localdate(),
+        )
+
+        response = self.client.get(reverse("news_api:home-special"))
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual([item["slug"] for item in payload], [event.slug])
+        self.assertEqual(payload[0]["homeSlot"], NewsHomeSlot.UPCOMING_EVENT)
+
+    def test_home_special_returns_latest_undated_upcoming_event_when_no_dated_event_exists(self):
+        event = self._news(
+            title="Événement sans date précise",
+            status=PublicationStatus.PUBLISHED,
+            home_slot=NewsHomeSlot.UPCOMING_EVENT,
+            event_date=None,
+        )
+
+        response = self.client.get(reverse("news_api:home-special"))
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual([item["slug"] for item in payload], [event.slug])
+        self.assertNotIn("eventDate", payload[0])
 
     def test_draft_detail_is_not_public(self):
         news = self._news(

@@ -5,7 +5,7 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.accounts.roles import GROUP_EDITOR, GROUP_MANAGER
 from apps.core.publication import PublicationStatus
-from apps.news.models import News, NewsCategory
+from apps.news.models import News, NewsCategory, NewsHomeSlot
 from apps.news.permissions import assign_news_permissions
 from apps.news.services import NewsWorkflowError, transition_news
 
@@ -160,6 +160,23 @@ class NewsWorkflowTests(TestCase):
         draft.refresh_from_db()
         self.assertTrue(current.featured)
         self.assertTrue(draft.featured)
+
+
+    def test_upcoming_event_can_be_published_with_cover_without_attachment(self):
+        self.news.home_slot = NewsHomeSlot.UPCOMING_EVENT
+        self.news.status = PublicationStatus.PENDING
+        self.news.save(update_fields=["home_slot", "status", "updated_at"])
+
+        published = transition_news(
+            news=self.news,
+            action="publish",
+            user=self.manager,
+            request=self.request,
+        )
+
+        self.assertEqual(published.status, PublicationStatus.PUBLISHED)
+        self.assertEqual(published.home_slot, NewsHomeSlot.UPCOMING_EVENT)
+        self.assertFalse(bool(published.attachment))
 
     def test_session_cannot_be_published_without_session_metadata(self):
         session_category = NewsCategory.objects.get(slug="sessions")
