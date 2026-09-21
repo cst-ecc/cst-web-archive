@@ -25,7 +25,7 @@ const AlertTickerContext = createContext<AlertTickerContextValue>({
 
 /*
  * Cette route Next s'exécute côté serveur et relaie la donnée publique
- * « Dernier INFO » depuis la source déjà utilisée par le site.
+ * « Dernière INFO » depuis la source déjà utilisée par le site.
  *
  * On évite ainsi de faire dépendre le navigateur de l'URL interne Docker
  * du backend Django. Le même bandeau peut donc être utilisé sur tous les

@@ -4,16 +4,17 @@
 .hero {
   position: relative;
   isolation: isolate;
-  min-height: v.$home-v2-hero-mobile-min-height;
+  width: 100%;
+  height: v.$home-hero-height-mobile;
+  min-height: v.$home-hero-height-mobile;
   overflow: hidden;
   display: flex;
   align-items: center;
   color: v.$color-white;
 
   @include m.respond(lg) {
-    height: v.$home-v2-hero-height;
-    min-height: 0;
-    flex: 0 0 v.$home-v2-hero-height;
+    height: v.$home-hero-height;
+    min-height: v.$home-hero-height;
   }
 }
 
@@ -30,6 +31,7 @@
 
 .cover {
   object-fit: cover;
+  object-position: center;
 }
 
 .overlay {
@@ -59,33 +61,47 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  padding-top: clamp(1.1rem, 3vw, 2rem);
+  padding-bottom: clamp(1.1rem, 3vw, 2rem);
 }
 
-/* Seulement lorsqu'une image secondaire est fournie (CST / CSMO). */
 .innerWithImage {
   display: grid;
-  grid-template-columns: clamp(7.5rem, 10vw, 10.5rem) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(1.25rem, 1.2rem + 0.8vw, 2.5rem);
+  grid-template-columns: 1fr;
+  align-content: center;
+  justify-items: center;
+  gap: clamp(0.7rem, 2.4vw, 1.3rem);
+  text-align: center;
+
+  @include m.respond(md) {
+    grid-template-columns: clamp(7rem, 13vw, 10rem) minmax(0, 1fr);
+    justify-items: stretch;
+    align-items: center;
+    gap: clamp(1.2rem, 2.2vw, 2rem);
+    text-align: left;
+  }
 
   @include m.respond(lg) {
-    grid-template-columns: clamp(8rem, 9vw, 11rem) minmax(0, 1fr);
+    grid-template-columns: clamp(8.5rem, 10vw, 11rem) minmax(0, 1fr);
+    gap: clamp(1.5rem, 2vw, 2.5rem);
   }
 }
 
-/*
- * Le logo institutionnel doit rester entièrement contenu dans le Hero.
- * On n'utilise plus toute la hauteur disponible et on évite tout recadrage.
- */
 .sideImage {
   position: relative;
-  width: clamp(6.5rem, 8vw, 9rem);
-  height: clamp(6.5rem, 8vw, 9rem);
-  justify-self: center;
-  align-self: center;
-  overflow: visible;
+  width: clamp(5rem, 18vw, 7.5rem);
+  aspect-ratio: 1 / 1;
+  flex: 0 0 auto;
+
+  @include m.respond(md) {
+    width: 100%;
+    max-width: 10rem;
+    aspect-ratio: 1 / 1;
+  }
+
+  @include m.respond(lg) {
+    max-width: 11rem;
+  }
 }
 
 .sideImageContent {
@@ -98,29 +114,33 @@
 }
 
 .content h2 {
-  max-width: 19ch;
-  margin-top: 0.42rem;
+  max-width: 21ch;
+  margin-top: 0.38rem;
   color: v.$color-white;
   font-family: v.$font-display;
-  font-size: clamp(2rem, 1.6rem + 1.1vw, 3.25rem);
-  line-height: 1;
-  letter-spacing: -0.04em;
+  font-size: clamp(1.75rem, 1.28rem + 2.2vw, 3.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.038em;
   text-wrap: balance;
+
+  @include m.respond(lg) {
+    font-size: clamp(2.05rem, 1.55rem + 1.45vw, 3.6rem);
+  }
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.5rem;
   color: v.$color-yellow;
   font-size: v.$font-size-meta;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.11em;
 
   &::before {
     content: "";
-    width: 2rem;
+    width: 1.75rem;
     height: 2px;
     border-radius: 999px;
     background: v.$color-yellow;
@@ -128,11 +148,11 @@
 }
 
 .subtitle {
-  max-width: 43rem;
-  margin-top: 0.6rem;
+  max-width: 46rem;
+  margin-top: 0.55rem;
   color: rgba(255, 255, 255, 0.9);
-  font-size: v.$font-size-body-fluid;
-  line-height: 1.48;
+  font-size: clamp(0.88rem, 0.82rem + 0.22vw, 1rem);
+  line-height: 1.5;
 }
 
 .quote {
@@ -141,7 +161,7 @@
   align-items: baseline;
   gap: 0.25rem 0.6rem;
   max-width: 43rem;
-  margin-top: 0.65rem;
+  margin-top: 0.6rem;
   color: rgba(255, 255, 255, 0.79);
   font-family: Georgia, serif;
   font-size: v.$font-size-small;
@@ -170,89 +190,43 @@
   text-transform: uppercase;
 }
 
-/* Tablette / petit desktop : logo plus compact, toujours intégralement visible. */
-@media (max-width: 1023px) {
-  .innerWithImage {
-    grid-template-columns: clamp(6.5rem, 14vw, 8rem) minmax(0, 1fr);
-    gap: 1.1rem;
-  }
-
-  .sideImage {
-    width: clamp(5.75rem, 12vw, 7rem);
-    height: clamp(5.75rem, 12vw, 7rem);
-  }
-
-  .innerWithImage .content h2 {
-    font-size: clamp(1.75rem, 3.6vw, 2.35rem);
-    line-height: 1.04;
-  }
-}
-
-/*
- * Téléphone : le logo CST / CSMO reste visible et est centré au-dessus
- * du texte. Toute l'image reste contenue dans le Hero.
- */
-@media (max-width: 639px) {
-  .hero {
-    min-height: v.$home-v2-hero-mobile-min-height;
-  }
-
-  .innerWithImage {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    align-content: center;
-    justify-items: center;
-    gap: clamp(0.45rem, 1.8vw, 0.7rem);
-    padding-top: 0.8rem;
-    padding-bottom: 0.8rem;
-  }
-
-  .sideImage {
-    display: block;
-    width: clamp(4.6rem, 19vw, 5.8rem);
-    height: clamp(4.6rem, 19vw, 5.8rem);
-    margin-inline: auto;
-  }
-
+@media (max-width: 767px) {
   .innerWithImage .content {
-    width: 100%;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  .innerWithImage .eyebrow {
-    justify-content: center;
-    font-size: clamp(0.62rem, 2.6vw, 0.72rem);
-    letter-spacing: 0.08em;
-  }
-
-  .innerWithImage .eyebrow::before {
-    width: 1.35rem;
-  }
-
-  .innerWithImage .content h2 {
-    max-width: 19ch;
+  .innerWithImage .subtitle,
+  .innerWithImage .quote {
     margin-inline: auto;
-    margin-top: 0.3rem;
-    font-size: clamp(1.45rem, 6vw, 1.95rem);
-    line-height: 1.05;
-    letter-spacing: -0.03em;
   }
 
-  .innerWithImage .subtitle {
-    max-width: 34rem;
-    margin-top: 0.45rem;
-    margin-inline: auto;
-    font-size: clamp(0.88rem, 3.35vw, 1rem);
-    line-height: 1.4;
-    text-align: center;
-  }
-
-  /* Les autres Hero sans logo gardent leur comportement actuel. */
-  .inner:not(.innerWithImage) .content h2 {
-    font-size: clamp(2rem, 10vw, 3rem);
+  .content h2 {
+    max-width: 18ch;
   }
 
   .alt {
     display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero {
+    height: 29rem;
+    min-height: 29rem;
+  }
+
+  .content h2 {
+    font-size: clamp(1.65rem, 8.4vw, 2.35rem);
+  }
+
+  .subtitle {
+    font-size: 0.88rem;
+    line-height: 1.42;
+  }
+
+  .sideImage {
+    width: 5.25rem;
   }
 }

@@ -1,0 +1,178 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.viewer,
+.viewerCompact {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  background: v.$color-white;
+  box-shadow: v.$shadow-card;
+}
+
+.viewer:fullscreen,
+.viewerCompact:fullscreen {
+  border: 0;
+  border-radius: 0;
+  background: v.$color-white;
+
+  .frameWrap {
+    height: calc(100vh - 3.5rem);
+  }
+}
+
+.toolbar {
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid v.$color-surface-line;
+  background: v.$color-surface-muted;
+}
+
+.toolbarText {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.format {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.6rem;
+  min-height: 1.7rem;
+  padding-inline: 0.45rem;
+  border-radius: 999px;
+  background: v.$color-blue;
+  color: v.$color-white;
+  font-size: v.$font-size-micro;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.hint {
+  color: rgba(17, 24, 39, 0.62);
+  font-size: v.$font-size-small;
+  font-weight: 600;
+}
+
+.fullscreenButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.25rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-lg;
+  background: v.$color-white;
+  color: v.$color-blue-deep;
+  font: inherit;
+  font-size: v.$font-size-meta;
+  font-weight: 650;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(31, 133, 206, 0.35);
+    color: v.$color-blue;
+  }
+
+  @include m.focus-ring;
+}
+
+.frameWrap {
+  position: relative;
+  width: 100%;
+  height: clamp(34rem, 72vh, 58rem);
+  min-height: 30rem;
+  background: #eef2f6;
+}
+
+.viewerCompact .frameWrap {
+  height: clamp(31rem, 68vh, 48rem);
+}
+
+.frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: v.$color-white;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: v.$color-surface-muted;
+  color: rgba(17, 24, 39, 0.7);
+  font-size: v.$font-size-small;
+}
+
+.spinner {
+  width: 1.3rem;
+  height: 1.3rem;
+  border: 2px solid rgba(31, 133, 206, 0.18);
+  border-top-color: v.$color-blue;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.error {
+  @include m.card;
+
+  display: grid;
+  gap: 0.4rem;
+  padding: clamp(1.25rem, 1rem + 0.5vw, 1.75rem);
+  color: rgba(17, 24, 39, 0.72);
+
+  strong {
+    color: v.$color-blue-ink;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 767px) {
+  .toolbar {
+    min-height: 3.25rem;
+    gap: 0.65rem;
+    padding-inline: 0.65rem;
+  }
+
+  .hint {
+    display: none;
+  }
+
+  .fullscreenButton {
+    min-height: 2.15rem;
+  }
+
+  .frameWrap,
+  .viewerCompact .frameWrap {
+    height: 72svh;
+    min-height: 28rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .fullscreenButton {
+    span {
+      display: none;
+    }
+  }
+}

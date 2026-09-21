@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
+import SiteAlertTicker from "@/components/layout/SiteAlertTicker";
+import SiteFooter from "@/components/layout/SiteFooter";
 import type { BibleVerse } from "@/lib/home-v2";
 import PanelHero, {
   type PanelHeroProps,
   type PanelSideImage,
 } from "./PanelHero";
 import BibleVerseCarousel from "./BibleVerseCarousel";
-import SiteAlertTicker from "@/components/layout/SiteAlertTicker";
 import styles from "./PanelFrame.module.scss";
 
 type PanelFrameProps = {
@@ -40,6 +41,7 @@ export default function PanelFrame({
         variant="strip"
       />
 
+      <SiteFooter />
     </div>
   );
 }

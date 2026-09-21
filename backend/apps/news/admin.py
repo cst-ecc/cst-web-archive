@@ -23,6 +23,7 @@ class NewsAdmin(admin.ModelAdmin):
         "updated_at",
     )
     list_filter = ("status", "organ", "featured", "category")
+    filter_horizontal = ("documents",)
     search_fields = ("title", "excerpt", "content", "slug")
     readonly_fields = (
         "slug",

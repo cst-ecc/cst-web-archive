@@ -8,22 +8,8 @@
   padding-block: clamp(2.25rem, 1.7rem + 1vw, 3.5rem) clamp(3.5rem, 2.8rem + 1.4vw, 5rem);
 }
 
-.breadcrumb {
+.backRow {
   margin-bottom: clamp(1.25rem, 1rem + 0.5vw, 2rem);
-  font-size: v.$font-size-meta;
-  color: rgba(17, 24, 39, 0.6);
-
-  a:hover {
-    color: v.$color-blue;
-  }
-}
-
-.breadcrumbSep {
-  margin-inline: 0.5rem;
-}
-
-.breadcrumbCurrent {
-  color: rgba(17, 24, 39, 0.8);
 }
 
 .layout {
@@ -121,9 +107,18 @@
   text-transform: uppercase;
 }
 
-.downloadButton {
+.readButton {
   margin-top: 1.5rem;
   width: 100%;
+}
+
+.unavailable {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid v.$color-surface-line;
+  color: rgba(17, 24, 39, 0.58);
+  font-size: v.$font-size-meta;
+  line-height: 1.5;
 }
 
 @include m.respond(xl) {

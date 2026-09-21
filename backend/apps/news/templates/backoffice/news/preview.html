@@ -29,11 +29,30 @@
     </p>
   {% endif %}
 
+  {% if news.category %}
+    <p><strong>Catégorie :</strong> {{ news.category.name }}</p>
+  {% endif %}
+
+  {% if news.featured %}
+    <p><strong>À la une :</strong> Oui{% if news.status != "publie" %} (à la publication){% endif %}</p>
+  {% endif %}
+
   {% if news.event_date %}
     <p>
       <strong>Date de l’événement :</strong>
       {{ news.event_date|date:"d/m/Y" }}
     </p>
+  {% endif %}
+
+  {% if news.category.slug == "sessions" %}
+    <section class="bo-news-preview__attachment">
+      <h2>Informations de session</h2>
+      {% if news.session_number is not None %}<p><strong>Numéro :</strong> {{ news.session_number }}</p>{% endif %}
+      {% if news.session_theme %}<p><strong>Thème :</strong> {{ news.session_theme }}</p>{% endif %}
+      {% if news.session_location %}<p><strong>Lieu :</strong> {{ news.session_location }}</p>{% endif %}
+      {% if news.session_start_date %}<p><strong>Début :</strong> {{ news.session_start_date|date:"d/m/Y" }}</p>{% endif %}
+      {% if news.session_end_date %}<p><strong>Fin :</strong> {{ news.session_end_date|date:"d/m/Y" }}</p>{% endif %}
+    </section>
   {% endif %}
 
   {% if news.featured_image %}
@@ -48,9 +67,27 @@
     {{ news.content|linebreaks }}
   </div>
 
+  {% if news.documents.all %}
+    <section class="bo-news-preview__attachment">
+      <h2>Documents associés</h2>
+      <ul>
+        {% for document in news.documents.all %}
+          <li>
+            <a href="{% url 'backoffice:document_preview' document.pk %}">
+              {{ document.title }}
+            </a>
+            — {{ document.get_kind_display }} · {{ document.get_status_display }}
+          </li>
+        {% empty %}
+          <li>Aucun document associé.</li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
   {% if news.attachment %}
     <section class="bo-news-preview__attachment">
-      <h2>Pièce jointe</h2>
+      <h2>Pièce jointe historique</h2>
 
       {% if news.attachment_type == "image" %}
         <img

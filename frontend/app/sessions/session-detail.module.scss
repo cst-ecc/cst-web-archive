@@ -5,25 +5,15 @@
   width: 100%;
   max-width: v.$max-width-home;
   margin-inline: auto;
-  padding-block: clamp(2.25rem, 1.7rem + 1vw, 3.5rem) clamp(3.5rem, 2.8rem + 1.4vw, 5rem);
+  padding-block: clamp(1.75rem, 1.2rem + 1vw, 3rem) clamp(3.5rem, 2.8rem + 1.4vw, 5rem);
 }
 
-.breadcrumb {
+.backRow {
   margin-bottom: clamp(1.25rem, 1rem + 0.5vw, 2rem);
-  font-size: v.$font-size-meta;
-  color: rgba(17, 24, 39, 0.6);
-
-  a:hover {
-    color: v.$color-blue;
-  }
 }
 
-.breadcrumbSep {
-  margin-inline: 0.5rem;
-}
-
-.breadcrumbCurrent {
-  color: rgba(17, 24, 39, 0.8);
+.header {
+  max-width: 76rem;
 }
 
 .badges {
@@ -36,32 +26,32 @@
 
 .title {
   max-width: 74rem;
-  font-size: clamp(1.65rem, 1.25rem + 1.2vw, 2.8rem);
-  font-weight: 700;
-  line-height: 1.15;
   color: v.$color-blue-ink;
+  font-size: clamp(1.75rem, 1.25rem + 1.35vw, 3rem);
+  font-weight: 700;
+  line-height: 1.14;
   text-wrap: balance;
 }
 
 .theme {
   max-width: 70rem;
-  margin-top: 0.35rem;
-  font-size: v.$font-size-body-fluid;
-  font-weight: 550;
-  line-height: 1.45;
+  margin-top: 0.45rem;
   color: v.$color-blue;
+  font-size: v.$font-size-body-fluid;
+  font-weight: 600;
+  line-height: 1.48;
 }
 
 .dates {
-  margin-top: 0.35rem;
-  font-size: v.$font-size-small;
+  margin-top: 0.4rem;
   color: rgba(17, 24, 39, 0.6);
+  font-size: v.$font-size-small;
 }
 
 .rule {
-  margin-top: 1rem;
-  height: 4px;
   width: 6rem;
+  height: 4px;
+  margin-top: 1rem;
   border-radius: 999px;
   background: linear-gradient(90deg, v.$color-blue, v.$color-gold, v.$color-yellow);
 }
@@ -69,11 +59,11 @@
 .summary {
   @include m.editorial-copy;
 
-  margin-top: 1.5rem;
-  max-width: 68rem;
+  max-width: 70rem;
+  margin-top: 1.4rem;
+  color: rgba(17, 24, 39, 0.8);
   font-size: v.$font-size-body-fluid;
   line-height: 1.82;
-  color: rgba(17, 24, 39, 0.8);
 }
 
 .images {
@@ -85,18 +75,15 @@
   @include m.respond(sm) {
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
   }
-
-  @media (min-width: 1440px) {
-    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  }
 }
 
 .imageWrap {
   position: relative;
   min-width: 0;
   aspect-ratio: 16 / 9;
-  min-height: clamp(11rem, 20vw, 17rem);
+  min-height: clamp(12rem, 20vw, 18rem);
   overflow: hidden;
+  border: 1px solid v.$color-surface-line;
   border-radius: v.$radius-xl2;
   background: v.$color-surface-muted;
 }
@@ -111,11 +98,37 @@
   border-top: 1px solid v.$color-surface-line;
 }
 
-.docsTitle {
+.docsHeading {
   margin-bottom: 1.25rem;
-  font-size: v.$font-size-section-title;
-  font-weight: 600;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.docsEyebrow {
+  color: v.$color-blue;
+  font-size: v.$font-size-meta;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.docsTitle {
+  margin-top: 0.2rem;
   color: v.$color-blue-ink;
+  font-size: v.$font-size-section-title;
+  font-weight: 650;
+}
+
+.docsCount {
+  flex: 0 0 auto;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  background: v.$color-surface-muted;
+  color: rgba(17, 24, 39, 0.58);
+  font-size: v.$font-size-meta;
+  font-weight: 650;
 }
 
 .docsGrid {
@@ -136,11 +149,15 @@
   }
 }
 
-@include m.respond(xl) {
-  .title {
-    font-size: clamp(2.15rem, 1.55rem + 1.15vw, 3rem);
-  }
+.emptyDocs {
+  @include m.card;
 
+  padding: clamp(1.25rem, 1rem + 0.5vw, 1.75rem);
+  color: rgba(17, 24, 39, 0.62);
+  font-size: v.$font-size-small;
+}
+
+@include m.respond(xl) {
   .summary {
     max-width: 76rem;
     font-size: clamp(1rem, 0.96rem + 0.15vw, 1.1rem);
@@ -150,10 +167,28 @@
 
 @media (max-width: 639px) {
   .wrapper {
-    padding-block: 1.75rem 3.5rem;
+    padding-block: 1.5rem 3.5rem;
+  }
+
+  .docsHeading {
+    align-items: flex-start;
   }
 
   .imageWrap {
     min-height: 13rem;
+  }
+}
+
+.content {
+  max-width: 76rem;
+  margin-top: clamp(1.75rem, 1.3rem + 0.8vw, 2.5rem);
+  padding-top: clamp(1.5rem, 1.2rem + 0.5vw, 2rem);
+  border-top: 1px solid v.$color-surface-line;
+  color: rgba(17, 24, 39, 0.82);
+  font-size: v.$font-size-body-fluid;
+  line-height: 1.82;
+
+  p + p {
+    margin-top: 1.15rem;
   }
 }

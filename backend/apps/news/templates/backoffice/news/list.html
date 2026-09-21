@@ -37,6 +37,15 @@
       {% endfor %}
     </select>
 
+    <select name="category" aria-label="Filtrer par catégorie">
+      <option value="">Toutes les catégories</option>
+      {% for category in category_choices %}
+        <option value="{{ category.slug }}" {% if category_filter == category.slug %}selected{% endif %}>
+          {{ category.name }}
+        </option>
+      {% endfor %}
+    </select>
+
     <noscript>
       <button type="submit" class="bo-btn bo-btn--soft">Filtrer</button>
     </noscript>
@@ -47,6 +56,8 @@
       <thead>
         <tr>
           <th>Actualité</th>
+          <th>Catégorie</th>
+          <th>Documents</th>
           <th>Statut</th>
           <th>Auteur</th>
           <th>Date</th>
@@ -61,6 +72,8 @@
               <strong>{{ item.title }}</strong>
               <span>{{ item.excerpt|truncatechars:90 }}</span>
             </td>
+            <td>{{ item.category.name|default:"—" }}</td>
+            <td>{{ item.documents.count }}</td>
             <td>
               <span class="bo-status bo-status--{{ item.status }}">
                 {{ item.get_status_display }}
@@ -74,7 +87,15 @@
               {% endif %}
             </td>
             <td>{{ item.publication_date|date:"d/m/Y"|default:"—" }}</td>
-            <td>{% if item.featured %}Oui{% else %}—{% endif %}</td>
+            <td>
+              {% if item.featured and item.status == "publie" %}
+                <strong>À la une</strong>
+              {% elif item.featured %}
+                Prévue à la publication
+              {% else %}
+                —
+              {% endif %}
+            </td>
             <td class="bo-table__actions">
               <a href="{% url 'backoffice:news_preview' item.pk %}">Aperçu</a>
               {% if item.status != "archive" %}
@@ -87,7 +108,7 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="6" class="bo-empty">Aucune actualité trouvée.</td>
+            <td colspan="8" class="bo-empty">Aucune actualité trouvée.</td>
           </tr>
         {% endfor %}
       </tbody>
@@ -97,13 +118,13 @@
   {% if page_obj.paginator.num_pages > 1 %}
     <nav class="bo-pagination" aria-label="Pagination">
       {% if page_obj.has_previous %}
-        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&page={{ page_obj.previous_page_number }}">
+        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&category={{ category_filter|urlencode }}&page={{ page_obj.previous_page_number }}">
           Précédent
         </a>
       {% endif %}
       <span>Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
       {% if page_obj.has_next %}
-        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&page={{ page_obj.next_page_number }}">
+        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&category={{ category_filter|urlencode }}&page={{ page_obj.next_page_number }}">
           Suivant
         </a>
       {% endif %}

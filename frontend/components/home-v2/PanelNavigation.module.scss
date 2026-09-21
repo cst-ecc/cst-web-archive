@@ -5,7 +5,7 @@
   display: none;
 
   @include m.respond(lg) {
-    position: absolute;
+    position: fixed;
     z-index: 10;
     right: 1rem;
     top: 50%;
@@ -44,10 +44,10 @@
 }
 
 .controls {
-  position: absolute;
+  position: fixed;
   z-index: 11;
   right: 1rem;
-  bottom: 4.35rem;
+  bottom: 1.25rem;
   display: flex;
   align-items: center;
   gap: 0.7rem;

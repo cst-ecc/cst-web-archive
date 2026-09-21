@@ -51,49 +51,6 @@
   background: v.$color-white;
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.primaryAction,
-.secondaryAction {
-  @include m.button-base;
-}
-
-.primaryAction {
-  background: v.$color-blue;
-  color: v.$color-white;
-
-  &:hover,
-  &:focus-visible {
-    background: v.$color-blue-deep;
-  }
-}
-
-.secondaryAction {
-  border: 1px solid v.$color-surface-line;
-  background: v.$color-white;
-  color: v.$color-blue-deep;
-
-  &:hover,
-  &:focus-visible {
-    border-color: rgba(31, 133, 206, 0.3);
-    background: v.$color-surface-muted;
-  }
-}
-
-.pdfObject {
-  display: block;
-  width: 100%;
-  min-height: clamp(32rem, 68vh, 48rem);
-  border: 1px solid v.$color-surface-line;
-  border-radius: v.$radius-xl2;
-  background: v.$color-white;
-}
-
 @media (max-width: 767px) {
   .section {
     margin-top: 2rem;
@@ -107,9 +64,5 @@
 
   .imageWrap {
     aspect-ratio: 3 / 4;
-  }
-
-  .pdfObject {
-    display: none;
   }
 }

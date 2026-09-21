@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import Container from "@/components/layout/Container";
+import SiteAlertTicker from "@/components/layout/SiteAlertTicker";
 import DocumentCard from "@/components/documents/DocumentCard";
 import NewsAttachmentViewer from "@/components/news/NewsAttachmentViewer";
 import NewsMedia from "@/components/news/NewsMedia";
-import SiteAlertTicker from "@/components/layout/SiteAlertTicker";
+import BackButton from "@/components/navigation/BackButton";
 import {
   getDocumentBySlug,
   getNews,
@@ -50,10 +50,10 @@ export async function generateMetadata({
   };
 }
 
-function articleLabel(homeSlot?: string) {
-  if (homeSlot === "upcoming_event") return "Événement à venir";
-  if (homeSlot === "alert_info") return "Dernier INFO";
-  return "Actualité";
+function articleLabel(item: { homeSlot?: string; category?: { name: string } }) {
+  if (item.homeSlot === "upcoming_event") return "Événement à venir";
+  if (item.homeSlot === "alert_info") return "Dernière INFO";
+  return item.category?.name ?? "Actualité";
 }
 
 export default async function NewsDetailPage({
@@ -65,13 +65,15 @@ export default async function NewsDetailPage({
 
   if (!item) notFound();
 
-  const docs = (
-    await Promise.all(
-      (item.relatedDocumentSlugs ?? []).map((slug) =>
-        getDocumentBySlug(slug),
-      ),
-    )
-  ).filter((doc): doc is NonNullable<typeof doc> => Boolean(doc));
+  const docs = item.documents?.length
+    ? item.documents
+    : (
+        await Promise.all(
+          (item.relatedDocumentSlugs ?? []).map((slug) =>
+            getDocumentBySlug(slug),
+          ),
+        )
+      ).filter((doc): doc is NonNullable<typeof doc> => Boolean(doc));
 
   const displayDate = item.eventDate ?? item.date;
   const attachmentImageAlreadyShown =
@@ -87,14 +89,16 @@ export default async function NewsDetailPage({
     paragraphs.length >= 4 && item.content.trim().length >= 1800;
 
   return (
-    <Container className={styles.wrapper}>
-      <nav className={styles.breadcrumb} aria-label="Fil d'Ariane">
-        <Link href="/actualites">← Toutes les actualités</Link>
-      </nav>
+    <>
+      <SiteAlertTicker />
+      <Container className={styles.wrapper}>
+      <div className={styles.backRow}>
+        <BackButton fallbackHref="/actualites" label="Retour aux actualités" />
+      </div>
 
       <article className={styles.article}>
         <header className={styles.articleHeader}>
-          <p className={styles.eyebrow}>{articleLabel(item.homeSlot)}</p>
+          <p className={styles.eyebrow}>{articleLabel(item)}</p>
 
           <time dateTime={displayDate} className={styles.date}>
             {formatDate(displayDate)}
@@ -104,8 +108,6 @@ export default async function NewsDetailPage({
           <p className={styles.excerpt}>{item.excerpt}</p>
           <div className={styles.rule} />
         </header>
-
-        <SiteAlertTicker />
 
         {item.imageUrl || item.attachment ? (
           <div className={styles.imageWrap}>
@@ -136,7 +138,7 @@ export default async function NewsDetailPage({
 
       {docs.length > 0 ? (
         <section className={styles.relatedSection}>
-          <h2 className={styles.relatedTitle}>Documents liés</h2>
+          <h2 className={styles.relatedTitle}>Documents associés</h2>
           <div className={styles.relatedGrid}>
             {docs.map((doc) => (
               <DocumentCard key={doc.id} doc={doc} />
@@ -144,6 +146,7 @@ export default async function NewsDetailPage({
           </div>
         </section>
       ) : null}
-    </Container>
+      </Container>
+    </>
   );
 }

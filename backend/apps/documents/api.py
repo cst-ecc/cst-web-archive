@@ -2,12 +2,14 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from apps.core.publication import PublicationStatus
 
 from .models import Document
 from .serializers import PublicDocumentSerializer
-from .services import increment_downloads
+from .services import increment_downloads, register_document_open
 
 
 class PublicDocumentQuerysetMixin:
@@ -55,7 +57,7 @@ class PublicDocumentQuerysetMixin:
         elif ordering == "titre":
             qs = qs.order_by("title")
         elif ordering == "populaire":
-            qs = qs.order_by("-downloads", "-date")
+            qs = qs.order_by("-open_count", "-date")
 
         return qs
 
@@ -75,3 +77,21 @@ def public_document_download_view(request, slug):
     )
     increment_downloads(document)
     return redirect(document.file.url)
+
+
+class PublicDocumentOpenView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, slug):
+        document = get_object_or_404(
+            Document.objects.filter(status=PublicationStatus.PUBLISHED),
+            slug=slug,
+        )
+        source = (request.query_params.get("source") or "").strip()
+        open_count = register_document_open(
+            document=document,
+            request=request,
+            source=source,
+        )
+        return Response({"slug": document.slug, "openCount": open_count})
+

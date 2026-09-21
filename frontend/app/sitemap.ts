@@ -85,7 +85,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const lastModified = safeDate(session.startDate);
 
       entries.push({
-        url: `${base}/sessions/${session.id}`,
+        url: `${base}/sessions/${session.slug}`,
         ...(lastModified ? { lastModified } : {}),
         changeFrequency: "monthly",
         priority: 0.7,

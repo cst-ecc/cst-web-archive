@@ -10,7 +10,7 @@
   flex-direction: column;
   min-width: 0;
   height: 100%;
-  padding: clamp(1rem, 0.82rem + 0.3vw, 1.3rem);
+  padding: clamp(1rem, 0.82rem + 0.3vw, 1.35rem);
 }
 
 .top {
@@ -22,50 +22,108 @@
 }
 
 .number {
+  color: v.$color-gold;
   font-family: v.$font-display;
   font-size: v.$font-size-small;
   font-weight: 700;
-  color: v.$color-gold;
 }
 
 .title {
-  font-size: clamp(1.02rem, 0.95rem + 0.22vw, 1.18rem);
-  font-weight: 650;
-  line-height: 1.35;
   color: v.$color-blue-ink;
-  @include m.line-clamp(3);
+  font-size: clamp(1.04rem, 0.96rem + 0.24vw, 1.2rem);
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .titleLink {
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
+  color: inherit;
+
+  &:hover,
+  &:focus-visible {
+    color: v.$color-blue;
   }
 }
 
 .theme {
-  margin-top: 0.3rem;
-  font-size: v.$font-size-small;
-  font-weight: 550;
-  line-height: 1.4;
+  margin-top: 0.35rem;
   color: v.$color-blue;
+  font-size: v.$font-size-small;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .summary {
   @include m.editorial-copy;
-  @include m.line-clamp(3);
 
-  margin-top: 0.55rem;
-  font-size: v.$font-size-small;
-  line-height: 1.52;
+  margin-top: 0.65rem;
   color: rgba(17, 24, 39, 0.7);
+  font-size: v.$font-size-small;
+  line-height: 1.58;
+}
+
+.footer {
+  margin-top: auto;
+  padding-top: 0.9rem;
 }
 
 .dates {
-  margin-top: auto;
   border-top: 1px solid v.$color-surface-line;
   padding-top: 0.8rem;
+  color: rgba(17, 24, 39, 0.62);
   font-size: v.$font-size-meta;
-  color: rgba(17, 24, 39, 0.6);
+}
+
+.documentStatus {
+  margin-top: 0.35rem;
+  color: rgba(17, 24, 39, 0.52);
+  font-size: v.$font-size-micro;
+  font-weight: 600;
+}
+
+.actions {
+  margin-top: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.detailAction {
+  display: inline-flex;
+  min-height: 2.35rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: v.$radius-lg;
+  color: v.$color-blue-deep;
+  font-size: v.$font-size-small;
+  font-weight: 650;
+
+  &:hover,
+  &:focus-visible {
+    color: v.$color-blue;
+    text-decoration: underline;
+  }
+}
+
+.readAction {
+  min-height: 2.35rem;
+  padding: 0.45rem 0.75rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .top,
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .top {
+    align-items: flex-start;
+  }
+
+  .detailAction,
+  .readAction {
+    width: 100%;
+  }
 }

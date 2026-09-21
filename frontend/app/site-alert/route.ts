@@ -16,7 +16,7 @@ function selectAlert(items: NewsItem[]): NewsItem | null {
 }
 
 /**
- * Relais public du « Dernier INFO ».
+ * Relais public du « Dernière INFO ».
  *
  * La récupération se fait ici côté serveur afin que le navigateur n'ait
  * jamais à connaître l'adresse réseau interne du backend Django.

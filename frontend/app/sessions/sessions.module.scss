@@ -1,0 +1,30 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.section {
+  width: 100%;
+  max-width: v.$max-width-home;
+  margin-inline: auto;
+  padding-block: clamp(2rem, 1.5rem + 1vw, 3.25rem) clamp(3.5rem, 2.75rem + 1.5vw, 5rem);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17.5rem), 1fr));
+  gap: clamp(1rem, 0.75rem + 0.45vw, 1.45rem);
+  align-items: stretch;
+}
+
+.empty {
+  @include m.card;
+
+  padding: 2rem;
+  text-align: center;
+  color: rgba(17, 24, 39, 0.65);
+}
+
+@media (min-width: 1600px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

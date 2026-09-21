@@ -20,12 +20,14 @@ class DocumentAdmin(admin.ModelAdmin):
         "status",
         "date",
         "featured",
+        "open_count",
         "downloads",
     )
     list_filter = ("status", "kind", "category", "featured", "date")
     search_fields = ("title", "summary", "reference", "slug")
     readonly_fields = (
         "slug",
+        "open_count",
         "downloads",
         "file_size",
         "mime_type",

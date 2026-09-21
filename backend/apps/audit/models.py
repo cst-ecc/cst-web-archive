@@ -20,6 +20,7 @@ class AuditAction(models.TextChoices):
     CONTENT_DELETED = "content_deleted", "Contenu supprimé"
     MEDIA_UPLOADED = "media_uploaded", "Média téléversé"
     MEDIA_DELETED = "media_deleted", "Média supprimé"
+    DOCUMENT_OPENED = "document_opened", "Document ouvert"
 
 
 class AuditLog(models.Model):

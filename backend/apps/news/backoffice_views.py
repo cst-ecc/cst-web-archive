@@ -17,7 +17,7 @@ from apps.backoffice.workflow import (
 from apps.core.publication import PublicationStatus
 
 from .forms import NewsForm
-from .models import News
+from .models import News, NewsCategory
 from .services import (
     can_edit_news,
     can_preview_news,
@@ -36,12 +36,16 @@ def news_list_view(request):
 
     query = (request.GET.get("q") or "").strip()
     status = (request.GET.get("status") or "").strip()
+    category = (request.GET.get("category") or "").strip()
 
     if query:
         qs = qs.filter(Q(title__icontains=query) | Q(excerpt__icontains=query))
 
     if status:
         qs = qs.filter(status=status)
+
+    if category:
+        qs = qs.filter(category__slug=category)
 
     page_obj = Paginator(qs, 20).get_page(request.GET.get("page"))
 
@@ -52,6 +56,8 @@ def news_list_view(request):
             "page_obj": page_obj,
             "query": query,
             "status_filter": status,
+            "category_filter": category,
+            "category_choices": NewsCategory.objects.filter(is_active=True).order_by("order", "name"),
             "status_choices": PublicationStatus.choices,
         },
     )
@@ -72,6 +78,7 @@ def news_create_view(request):
             news.author = request.user
             news.last_editor = request.user
             news.save()
+            form.save_m2m()
 
             audit_log(
                 action=AuditAction.CONTENT_CREATED,
@@ -145,6 +152,7 @@ def news_edit_view(request, pk):
             updated = form.save(commit=False)
             updated.last_editor = request.user
             updated.save()
+            form.save_m2m()
 
             audit_log(
                 action=AuditAction.CONTENT_UPDATED,

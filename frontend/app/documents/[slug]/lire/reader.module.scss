@@ -1,0 +1,80 @@
+@use "../../../../styles/variables" as v;
+@use "../../../../styles/mixins" as m;
+
+.wrapper {
+  width: 100%;
+  max-width: v.$max-width-home;
+  margin-inline: auto;
+  padding-block: clamp(1.5rem, 1rem + 1vw, 2.5rem) clamp(3rem, 2.25rem + 1.5vw, 4.5rem);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: clamp(1.25rem, 1rem + 0.5vw, 2rem);
+}
+
+.kicker,
+.reference {
+  color: v.$color-blue;
+  font-size: v.$font-size-meta;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.header {
+  max-width: 72rem;
+}
+
+.title {
+  margin-top: 0.45rem;
+  color: v.$color-blue-ink;
+  font-size: clamp(1.55rem, 1.15rem + 1.15vw, 2.65rem);
+  font-weight: 700;
+  line-height: 1.16;
+  text-wrap: balance;
+}
+
+.notice {
+  @include m.editorial-copy;
+
+  max-width: 62rem;
+  margin-top: 0.75rem;
+  color: rgba(17, 24, 39, 0.64);
+  font-size: v.$font-size-small;
+  line-height: 1.6;
+}
+
+.viewerWrap {
+  margin-top: clamp(1.25rem, 0.9rem + 0.7vw, 2rem);
+}
+
+.unavailable {
+  @include m.card;
+
+  min-height: 14rem;
+  display: grid;
+  align-content: center;
+  gap: 0.45rem;
+  padding: clamp(1.25rem, 1rem + 0.6vw, 2rem);
+  color: rgba(17, 24, 39, 0.68);
+
+  strong {
+    color: v.$color-blue-ink;
+    font-size: v.$font-size-card-title;
+  }
+}
+
+@media (max-width: 639px) {
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .kicker {
+    padding-top: 0.55rem;
+    text-align: right;
+  }
+}

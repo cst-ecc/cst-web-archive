@@ -2,12 +2,12 @@
 
 import AlertTicker from "@/components/home-v2/AlertTicker";
 import { useAlertTicker } from "./AlertTickerProvider";
+import styles from "./SiteAlertTicker.module.scss";
 
 /**
- * Bande d'information partagée.
- *
- * Son emplacement est volontairement décidé par la page qui l'utilise :
- * juste après le Hero/PageHeader sur les pages qui en possèdent un.
+ * Bande "Dernière INFO" partagée.
+ * Son emplacement est volontairement décidé par la page qui la rend :
+ * juste après le Hero / PageHeader, jamais automatiquement sous la Navbar.
  */
 export default function SiteAlertTicker() {
   const { alert } = useAlertTicker();
@@ -16,5 +16,11 @@ export default function SiteAlertTicker() {
     return null;
   }
 
-  return <AlertTicker item={alert} />;
+  return (
+    <div className={styles.shell}>
+      <div className={styles.inner}>
+        <AlertTicker item={alert} />
+      </div>
+    </div>
+  );
 }

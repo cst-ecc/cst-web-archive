@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.utils import timezone
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.core.publication import PublicationStatus
+from apps.documents.models import Document
 
 from .models import News, NewsHomeSlot
 from .serializers import PublicNewsSerializer
@@ -37,6 +38,16 @@ def public_news_queryset():
             )
         )
         .select_related("category")
+        .prefetch_related(
+            Prefetch(
+                "documents",
+                queryset=(
+                    Document.objects.filter(status=PublicationStatus.PUBLISHED)
+                    .select_related("category")
+                    .order_by("-date", "display_order", "title")
+                ),
+            )
+        )
     )
 
 
@@ -58,6 +69,19 @@ class PublicNewsQuerysetMixin:
                 "-publication_date",
                 "-published_at",
             )
+
+        category = (self.request.query_params.get("category") or "").strip()
+        if category:
+            qs = qs.filter(category__slug=category)
+
+        document_kind = (
+            self.request.query_params.get("document_kind") or ""
+        ).strip()
+        if document_kind:
+            qs = qs.filter(
+                documents__kind=document_kind,
+                documents__status=PublicationStatus.PUBLISHED,
+            ).distinct()
 
         home_slot = (self.request.query_params.get("home_slot") or "").strip()
         if home_slot:

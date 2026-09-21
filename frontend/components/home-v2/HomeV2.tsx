@@ -97,9 +97,10 @@ export default function HomeV2({
     }
     window.dispatchEvent(new Event("homepanelchange"));
 
-    if (window.innerWidth < 1024) {
-      window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
-    }
+    // Chaque panneau est désormais une page verticale complète.
+    // Lors d'un changement de panneau, on revient systématiquement en haut
+    // afin que le Hero soit immédiatement visible, y compris sur desktop.
+    window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
   };
 
   const navigateToPanel = (panelId: HomePanelId) => {

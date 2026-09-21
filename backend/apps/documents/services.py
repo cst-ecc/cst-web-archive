@@ -180,4 +180,25 @@ def transition_document(
 
 @transaction.atomic
 def increment_downloads(document: Document) -> None:
+    # Conservé pour compatibilité avec l’ancien endpoint public.
     Document.objects.filter(pk=document.pk).update(downloads=F("downloads") + 1)
+
+
+@transaction.atomic
+def register_document_open(*, document: Document, request=None, source: str = "") -> int:
+    Document.objects.filter(pk=document.pk).update(open_count=F("open_count") + 1)
+    document.refresh_from_db(fields=["open_count"])
+
+    audit_log(
+        action=AuditAction.DOCUMENT_OPENED,
+        request=request,
+        target=document,
+        description="Ouverture du lecteur intégré d’un document.",
+        metadata={
+            "source": source[:500],
+            "open_count": document.open_count,
+            "slug": document.slug,
+        },
+    )
+
+    return document.open_count

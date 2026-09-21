@@ -115,3 +115,31 @@
   font-size: 1rem;
   line-height: 1.85;
 }
+
+.bo-associated-documents-help {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .55rem 1rem;
+  padding: .65rem .75rem;
+  border-radius: var(--bo-radius-sm);
+  background: var(--bo-surface-soft);
+  color: var(--bo-muted);
+  font-size: .82rem;
+}
+
+.bo-associated-documents-help a {
+  color: var(--bo-primary);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.bo-field[data-news-field="documents"] select[multiple] {
+  min-height: 13rem;
+  line-height: 1.45;
+}
+
+.bo-field--session[hidden] {
+  display: none !important;
+}

@@ -4,6 +4,7 @@
 .card {
   @include m.card;
 
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -11,17 +12,32 @@
   overflow: hidden;
 }
 
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  height: 4px;
+  background: linear-gradient(90deg, v.$color-blue, v.$color-gold, v.$color-yellow);
+}
+
 .photoWrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  min-height: clamp(11rem, 20vw, 15rem);
+  aspect-ratio: 4 / 5;
+  min-height: 18rem;
+  overflow: hidden;
   background: v.$color-surface-muted;
 }
 
 .photo {
   object-fit: cover;
   object-position: center top;
+  transition: transform 0.35s ease;
+}
+
+.card:hover .photo {
+  transform: scale(1.015);
 }
 
 .body {
@@ -29,41 +45,58 @@
   flex: 1;
   flex-direction: column;
   min-width: 0;
-  padding: clamp(0.95rem, 0.78rem + 0.25vw, 1.2rem);
+  padding: clamp(1rem, 0.8rem + 0.35vw, 1.35rem);
 }
 
 .name {
-  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.12rem);
-  font-weight: 650;
-  line-height: 1.3;
   color: v.$color-blue-ink;
+  font-size: clamp(1.05rem, 0.96rem + 0.28vw, 1.22rem);
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .role {
-  margin-top: 0.1rem;
-  font-size: v.$font-size-small;
-  font-weight: 600;
+  margin-top: 0.3rem;
   color: v.$color-blue;
+  font-size: v.$font-size-small;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 .responsibility {
-  margin-top: 0.2rem;
+  margin-top: 0.55rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid v.$color-surface-line;
+  color: rgba(17, 24, 39, 0.62);
   font-size: v.$font-size-meta;
-  line-height: 1.4;
-  color: rgba(17, 24, 39, 0.6);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .bio {
   @include m.editorial-copy;
 
-  margin-top: 0.55rem;
+  margin-top: 0.65rem;
+  color: rgba(17, 24, 39, 0.72);
   font-size: v.$font-size-small;
-  line-height: 1.55;
-  color: rgba(17, 24, 39, 0.7);
+  line-height: 1.6;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .photoWrap {
+    min-height: 20rem;
+  }
 }
 
 @media (min-width: 1280px) {
   .photoWrap {
-    min-height: 13rem;
+    min-height: 21rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .photoWrap {
+    min-height: 17rem;
   }
 }

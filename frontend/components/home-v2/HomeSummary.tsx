@@ -35,13 +35,17 @@ export default function HomeSummary({
     (item) => item.homeSlot === "upcoming_event",
   );
 
-  const latestNews = [...newsItems]
+  const publicNews = [...newsItems]
     .filter(
       (item) =>
         item.status === "publie" &&
         !item.homeSlot,
-    )
-    .sort((a, b) => b.date.localeCompare(a.date))[0] ?? null;
+    );
+
+  const latestNews =
+    publicNews.find((item) => item.featured) ??
+    publicNews.sort((a, b) => b.date.localeCompare(a.date))[0] ??
+    null;
 
   const hasEvent = eventItems.length > 0;
 

@@ -1,8 +1,11 @@
 import Link from "next/link";
+
+import DocumentReadButton from "@/components/documents/DocumentReadButton";
 import Badge from "@/components/ui/Badge";
 import { KIND_LABELS } from "@/lib/constants";
-import { formatDate, formatFileSize } from "@/lib/utils";
 import type { DocumentItem } from "@/lib/types";
+import { formatDate, formatFileSize } from "@/lib/utils";
+
 import styles from "./DocumentCard.module.scss";
 
 const FILE_LABEL: Record<DocumentItem["fileType"], string> = {
@@ -14,6 +17,8 @@ const FILE_LABEL: Record<DocumentItem["fileType"], string> = {
 };
 
 export default function DocumentCard({ doc }: { doc: DocumentItem }) {
+  const readablePdf = doc.fileType === "pdf" && Boolean(doc.fileUrl) && doc.fileUrl !== "#";
+
   return (
     <article className={styles.card}>
       <div className={styles.rule} />
@@ -37,6 +42,20 @@ export default function DocumentCard({ doc }: { doc: DocumentItem }) {
           <span className={styles.metaStrong}>{FILE_LABEL[doc.fileType]}</span>
           <span aria-hidden>•</span>
           <span>{formatFileSize(doc.fileSize)}</span>
+        </div>
+
+        <div className={styles.actions}>
+          <Link href={`/documents/${doc.slug}`} className={styles.detailLink}>
+            Voir la fiche
+          </Link>
+          {readablePdf ? (
+            <DocumentReadButton
+              slug={doc.slug}
+              label="Lire"
+              variant="outline"
+              className={styles.readButton}
+            />
+          ) : null}
         </div>
       </div>
     </article>

@@ -8,7 +8,7 @@ import styles from "../pages.module.scss";
 export const metadata: Metadata = {
   title: "Bibliothèque documentaire",
   description:
-    "Consultez et téléchargez les décisions, rapports, procès-verbaux et communiqués du Conseil Supérieur de Transition.",
+    "Consultez les décisions, rapports, procès-verbaux et communiqués du Conseil Supérieur de Transition directement dans la plateforme.",
 };
 
 export const revalidate = 300;

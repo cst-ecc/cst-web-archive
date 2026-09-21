@@ -4,7 +4,8 @@
 .hero {
   position: relative;
   isolation: isolate;
-  min-height: v.$home-v2-hero-mobile-min-height;
+  height: v.$home-hero-height-mobile;
+  min-height: v.$home-hero-height-mobile;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -16,10 +17,8 @@
   }
 
   @include m.respond(lg) {
-    height: v.$home-v2-hero-height;
-    min-height: 0;
-    flex: 0 0 v.$home-v2-hero-height;
-    padding-block: 1rem;
+    height: v.$home-hero-height;
+    min-height: v.$home-hero-height;
   }
 }
 
@@ -49,6 +48,8 @@
   position: relative;
   z-index: 1;
   width: 100%;
+  max-width: v.$max-width-home;
+  margin-inline: auto;
 }
 
 .bottomRow {
@@ -57,7 +58,7 @@
   justify-content: space-between;
   gap: 2rem;
   width: 100%;
-  margin-top: clamp(0.65rem, 0.5rem + 0.25vw, 0.9rem);
+  margin-top: clamp(0.85rem, 0.65rem + 0.35vw, 1.15rem);
 }
 
 .eyebrow {
@@ -86,8 +87,8 @@
   margin-top: 0.55rem;
   color: v.$color-white;
   font-family: v.$font-display;
-  font-size: clamp(1.9rem, 1.5rem + 1vw, 2.7rem);
-  line-height: 0.98;
+  font-size: clamp(2rem, 1.5rem + 1.65vw, 3.45rem);
+  line-height: 1;
   letter-spacing: -0.045em;
   text-wrap: balance;
 
@@ -108,7 +109,7 @@
   margin: 0;
   color: rgba(255, 255, 255, 0.9);
   font-size: v.$font-size-body-fluid;
-  line-height: 1.42;
+  line-height: 1.5;
 }
 
 .actions {
@@ -123,7 +124,7 @@
 .primary,
 .secondary {
   @include m.button-base;
-  min-height: 2.55rem;
+  min-height: 2.8rem;
   padding-inline: clamp(1.05rem, 0.8rem + 0.4vw, 1.35rem);
   font-size: v.$font-size-small;
 }
@@ -142,10 +143,6 @@
 }
 
 @media (max-width: 1023px) {
-  .hero {
-    min-height: v.$home-v2-hero-mobile-min-height;
-  }
-
   .bottomRow {
     align-items: flex-start;
     flex-direction: column;
@@ -154,5 +151,33 @@
 
   .actions {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero {
+    height: 29rem;
+    min-height: 29rem;
+    padding-inline: 1rem;
+  }
+
+  .title {
+    font-size: clamp(1.85rem, 9vw, 2.55rem);
+  }
+
+  .lead {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .primary,
+  .secondary {
+    min-height: 2.55rem;
+    padding-inline: 0.9rem;
   }
 }

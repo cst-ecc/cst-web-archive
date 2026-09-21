@@ -45,7 +45,7 @@ export interface DocumentItem {
   summary: string;
   /** Chemin/URL du fichier. En phase mock : chemin dans /public. */
   fileUrl: string;
-  /** Lien de téléchargement suivi par le backend, si différent de fileUrl. */
+  /** Ancienne URL de téléchargement conservée pour compatibilité API ; non utilisée dans l’interface publique. */
   downloadUrl?: string;
   fileType: "pdf" | "docx" | "xlsx" | "image" | "autre";
   /** Taille en octets (formatée à l'affichage). */
@@ -57,6 +57,8 @@ export interface DocumentItem {
   status: PublicationStatus;
   featured: boolean;
   downloads: number;
+  /** Nombre d’ouvertures demandées via l’action de lecture intégrée. */
+  openCount?: number;
   /** Sessions liées (slugs). */
   relatedSessionSlugs?: string[];
 }
@@ -72,8 +74,12 @@ export interface Session {
   startDate: string;
   endDate?: string;
   summary: string;
+  /** Contenu éditorial de l’article Session lorsqu’il est disponible. */
+  content?: string;
   status: PublicationStatus;
   documentSlugs: string[];
+  /** Documents associés déjà préchargés depuis l’article, si disponibles. */
+  documents?: DocumentItem[];
   imageUrls: string[];
 }
 
@@ -89,6 +95,11 @@ export interface Member {
   status: PublicationStatus;
 }
 
+export interface NewsCategoryRef {
+  slug: string;
+  name: string;
+}
+
 export interface NewsItem {
   id: number;
   slug: string;
@@ -102,7 +113,19 @@ export interface NewsItem {
   /** Permet de choisir explicitement une actualité mise en avant. */
   featured?: boolean;
   status: PublicationStatus;
+  /** Catégorie éditoriale de l’article (Session, Rapport, Communiqué, etc.). */
+  category?: NewsCategoryRef;
+  /** Documents officiels associés, préchargés par l’API lorsqu’ils sont publiés. */
+  documents?: DocumentItem[];
+  /** Slugs conservés pour compatibilité avec l’ancienne couche de données. */
   relatedDocumentSlugs?: string[];
+
+  /** Métadonnées facultatives d’un article de catégorie Session. */
+  sessionNumber?: number;
+  sessionTheme?: string;
+  sessionLocation?: string;
+  sessionStartDate?: string;
+  sessionEndDate?: string;
 
   /**
  * Emplacement éditorial spécifique sur l'accueil.
@@ -174,6 +197,12 @@ export interface DocumentQuery {
   ordering?: "recent" | "ancien" | "titre" | "populaire";
   page?: number;
   pageSize?: number;
+}
+
+export interface NewsQuery {
+  categorySlug?: string;
+  documentKind?: DocumentKind;
+  featured?: boolean;
 }
 
 export type NewsHomeSlot =

@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.accounts.models import User
+from apps.audit.models import AuditAction, AuditLog
 from apps.core.publication import PublicationStatus
 from apps.documents.models import Document, DocumentCategory, DocumentKind
 
@@ -66,6 +67,7 @@ class PublicDocumentApiTests(TestCase):
         self.assertEqual(payload["kind"], "rapport")
         self.assertTrue(payload["fileUrl"].startswith("/media/"))
         self.assertTrue(payload["downloadUrl"].endswith("/download/"))
+        self.assertEqual(payload["openCount"], 0)
 
     def test_draft_detail_is_not_public(self):
         document = self._document(title="Privé", status=PublicationStatus.DRAFT)
@@ -75,3 +77,45 @@ class PublicDocumentApiTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+
+    def test_view_endpoint_counts_openings_and_audits_source(self):
+        document = self._document(title="Document lu", status=PublicationStatus.PUBLISHED)
+
+        response = self.client.post(
+            reverse("documents_api:view", kwargs={"slug": document.slug}) + "?source=/sessions/6"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["openCount"], 1)
+
+        document.refresh_from_db()
+        self.assertEqual(document.open_count, 1)
+
+        log = AuditLog.objects.filter(
+            action=AuditAction.DOCUMENT_OPENED,
+            target_id=str(document.pk),
+        ).latest("created_at")
+        self.assertEqual(log.metadata["source"], "/sessions/6")
+        self.assertEqual(log.metadata["open_count"], 1)
+
+    def test_view_endpoint_counts_each_open_request(self):
+        document = self._document(title="Document multiple", status=PublicationStatus.PUBLISHED)
+        url = reverse("documents_api:view", kwargs={"slug": document.slug})
+
+        self.client.post(url)
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["openCount"], 2)
+        document.refresh_from_db()
+        self.assertEqual(document.open_count, 2)
+
+    def test_view_endpoint_rejects_unpublished_document(self):
+        document = self._document(title="Document privé", status=PublicationStatus.DRAFT)
+
+        response = self.client.post(
+            reverse("documents_api:view", kwargs={"slug": document.slug})
+        )
+
+        self.assertEqual(response.status_code, 404)
+

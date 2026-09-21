@@ -93,6 +93,7 @@ class Document(TimeStampedModel):
     featured = models.BooleanField("mise en avant", default=False, db_index=True)
     display_order = models.PositiveIntegerField("ordre d’affichage", default=0)
     downloads = models.PositiveIntegerField("téléchargements", default=0)
+    open_count = models.PositiveIntegerField("ouvertures", default=0)
 
     submitted_at = models.DateTimeField("soumis le", null=True, blank=True)
     published_at = models.DateTimeField("publié le", null=True, blank=True)

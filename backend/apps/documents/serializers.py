@@ -8,6 +8,9 @@ class PublicDocumentSerializer(serializers.ModelSerializer):
     fileUrl = serializers.SerializerMethodField()
     downloadUrl = serializers.SerializerMethodField()
     sizeLabel = serializers.SerializerMethodField()
+    fileSize = serializers.IntegerField(source="file_size", read_only=True)
+    fileType = serializers.SerializerMethodField()
+    openCount = serializers.IntegerField(source="open_count", read_only=True)
 
     class Meta:
         model = Document
@@ -22,7 +25,10 @@ class PublicDocumentSerializer(serializers.ModelSerializer):
             "reference",
             "fileUrl",
             "downloadUrl",
+            "fileType",
+            "fileSize",
             "downloads",
+            "openCount",
             "pages",
             "sizeLabel",
             "featured",
@@ -37,6 +43,19 @@ class PublicDocumentSerializer(serializers.ModelSerializer):
 
     def get_downloadUrl(self, obj):
         return f"/api/v1/documents/{obj.slug}/download/"
+
+    def get_fileType(self, obj):
+        name = (obj.file.name if obj.file else "").lower()
+        mime = (obj.mime_type or "").lower()
+        if mime == "application/pdf" or name.endswith(".pdf"):
+            return "pdf"
+        if name.endswith((".doc", ".docx", ".odt")):
+            return "docx"
+        if name.endswith((".xls", ".xlsx", ".ods")):
+            return "xlsx"
+        if name.endswith((".jpg", ".jpeg", ".png", ".webp")):
+            return "image"
+        return "autre"
 
     def get_sizeLabel(self, obj):
         return obj.size_label

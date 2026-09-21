@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import PdfViewer from "@/components/documents/PdfViewer";
 import { shouldBypassNextImageOptimization } from "@/lib/media";
 import type { NewsItem } from "@/lib/types";
 
@@ -38,13 +39,13 @@ export default function NewsAttachmentViewer({
     );
   }
 
+  const title = attachment.label ?? "Document PDF associé";
+
   return (
     <section className={styles.section} aria-labelledby="attachment-title">
       <div className={styles.heading}>
         <p className={styles.eyebrow}>Document associé</p>
-        <h2 id="attachment-title">
-          {attachment.label ?? "Consulter le document PDF"}
-        </h2>
+        <h2 id="attachment-title">{title}</h2>
       </div>
 
       {attachment.previewUrl ? (
@@ -62,33 +63,7 @@ export default function NewsAttachmentViewer({
         </div>
       ) : null}
 
-      <div className={styles.actions}>
-        <a
-          href={attachment.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.primaryAction}
-        >
-          Ouvrir le PDF
-          <span aria-hidden="true">↗</span>
-        </a>
-
-        <a href={attachment.url} download className={styles.secondaryAction}>
-          Télécharger
-        </a>
-      </div>
-
-      <object
-        data={attachment.url}
-        type="application/pdf"
-        className={styles.pdfObject}
-        aria-label={attachment.label ?? "Document PDF associé"}
-      >
-        <p>
-          Votre navigateur ne peut pas afficher ce PDF directement. Utilisez le
-          bouton « Ouvrir le PDF » ci-dessus.
-        </p>
-      </object>
+      <PdfViewer src={attachment.url} title={title} compact />
     </section>
   );
 }

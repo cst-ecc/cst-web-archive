@@ -50,7 +50,7 @@ export default function DocumentLibrary({
     switch (ordering) {
       case "ancien": list.sort((a, b) => a.date.localeCompare(b.date)); break;
       case "titre": list.sort((a, b) => a.title.localeCompare(b.title, "fr")); break;
-      case "populaire": list.sort((a, b) => b.downloads - a.downloads); break;
+      case "populaire": list.sort((a, b) => (b.openCount ?? 0) - (a.openCount ?? 0)); break;
       default: list.sort((a, b) => b.date.localeCompare(a.date));
     }
     return list;
@@ -101,7 +101,7 @@ export default function DocumentLibrary({
               <option value="recent">Plus récents</option>
               <option value="ancien">Plus anciens</option>
               <option value="titre">Titre (A→Z)</option>
-              <option value="populaire">Téléchargements</option>
+              <option value="populaire">Plus consultés</option>
             </select>
           </div>
         </div>

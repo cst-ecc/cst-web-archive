@@ -33,12 +33,12 @@ export default function AlertTicker({ item }: AlertTickerProps) {
   } as CSSProperties;
 
   return (
-    <aside className={styles.shell} aria-label="Dernier INFO">
+    <aside className={styles.shell} aria-label="Dernière INFO">
       <div className={styles.inner}>
         <div className={styles.ticker}>
           <span className={styles.label}>
             <span className={styles.dot} aria-hidden="true" />
-            <span>Dernier INFO</span>
+            <span>Dernière INFO</span>
           </span>
 
           <span className={styles.viewport} aria-label={summary}>

@@ -51,10 +51,11 @@
 }
 
 .titleLink {
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
+  color: inherit;
+
+  &:hover,
+  &:focus-visible {
+    color: v.$color-blue;
   }
 }
 
@@ -83,4 +84,40 @@
 .metaStrong {
   font-weight: 600;
   color: rgba(17, 24, 39, 0.7);
+}
+
+.actions {
+  margin-top: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.detailLink {
+  color: v.$color-blue-deep;
+  font-size: v.$font-size-small;
+  font-weight: 650;
+
+  &:hover,
+  &:focus-visible {
+    color: v.$color-blue;
+    text-decoration: underline;
+  }
+}
+
+.readButton {
+  min-height: 2.35rem;
+  padding: 0.45rem 0.8rem;
+}
+
+@media (max-width: 420px) {
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .readButton {
+    width: 100%;
+  }
 }

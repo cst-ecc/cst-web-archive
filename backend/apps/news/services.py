@@ -28,7 +28,7 @@ def visible_news_queryset(user):
         "last_editor",
         "submitted_by",
         "published_by",
-    )
+    ).prefetch_related("documents")
 
     if user.is_superuser or user.has_perm("news.review_news"):
         return qs
@@ -91,11 +91,27 @@ def _validate_before_publish(news: News) -> None:
     elif not news.featured_image:
         missing.append("image de couverture")
 
+    if getattr(news.category, "slug", "") == "sessions":
+        if not news.session_start_date:
+            missing.append("date de début de session")
+        if not (news.session_location or "").strip():
+            missing.append("lieu de session")
+
     if missing:
         raise NewsWorkflowError(
             "Publication impossible. Champs requis manquants : "
             + ", ".join(missing)
             + "."
+        )
+
+    if (
+        getattr(news.category, "slug", "") == "sessions"
+        and news.session_start_date
+        and news.session_end_date
+        and news.session_end_date < news.session_start_date
+    ):
+        raise NewsWorkflowError(
+            "La date de fin de session ne peut pas être antérieure à sa date de début."
         )
 
     # La date de l'événement est facultative.
@@ -172,7 +188,8 @@ def transition_news(
     elif action == WorkflowAction.ARCHIVE:
         locked.archived_at = now
         locked.archived_by = user
-        update_fields += ["archived_at", "archived_by"]
+        locked.featured = False
+        update_fields += ["archived_at", "archived_by", "featured"]
 
     elif action == WorkflowAction.RESTORE:
         locked.archived_at = None

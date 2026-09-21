@@ -44,7 +44,7 @@
 
     {% for field in form %}
       <div
-        class="bo-field {% if field.name == 'featured' %}bo-field--checkbox{% endif %}"
+        class="bo-field {% if field.name == 'featured' %}bo-field--checkbox{% endif %}{% if field.name == 'session_number' or field.name == 'session_theme' or field.name == 'session_location' or field.name == 'session_start_date' or field.name == 'session_end_date' %} bo-field--session{% endif %}"
         data-news-field="{{ field.name }}"
       >
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -84,6 +84,17 @@
 
         {{ field }}
 
+        {% if field.name == "documents" %}
+          <div class="bo-associated-documents-help">
+            <span>Maintenez Ctrl (Windows) ou ⌘ (Mac) pour sélectionner plusieurs documents.</span>
+            {% if perms.documents.add_document %}
+              <a href="{% url 'backoffice:document_create' %}" target="_blank" rel="noopener">
+                + Créer un nouveau document
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+
         {% if field.name == "featured_image" %}
           <small class="bo-help">
             Formats acceptés : JPG, PNG, WEBP. Taille maximale avant compression : 30 Mo.
@@ -118,13 +129,14 @@
     (() => {
       const slot = document.getElementById("id_home_slot");
       const eventDateField = document.querySelector('[data-news-field="event_date"]');
-
-      if (!slot || !eventDateField) return;
-
-      const eventDateInput = eventDateField.querySelector("input");
+      const category = document.getElementById("id_category");
+      const newCategory = document.getElementById("id_new_category_name");
+      const sessionFields = Array.from(document.querySelectorAll(".bo-field--session"));
 
       const syncEventDateVisibility = () => {
+        if (!slot || !eventDateField) return;
         const isUpcomingEvent = slot.value === "upcoming_event";
+        const eventDateInput = eventDateField.querySelector("input");
 
         eventDateField.hidden = !isUpcomingEvent;
         eventDateField.setAttribute(
@@ -137,8 +149,32 @@
         }
       };
 
-      slot.addEventListener("change", syncEventDateVisibility);
+      const normalize = (value) => (value || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toLowerCase();
+
+      const syncSessionFields = () => {
+        if (!sessionFields.length) return;
+        const selectedText = category?.selectedOptions?.[0]?.textContent || "";
+        const inlineText = newCategory?.value || "";
+        const isSession = [selectedText, inlineText]
+          .map(normalize)
+          .some((value) => value === "session" || value === "sessions");
+
+        sessionFields.forEach((field) => {
+          field.hidden = !isSession;
+          field.setAttribute("aria-hidden", isSession ? "false" : "true");
+        });
+      };
+
+      slot?.addEventListener("change", syncEventDateVisibility);
+      category?.addEventListener("change", syncSessionFields);
+      newCategory?.addEventListener("input", syncSessionFields);
+
       syncEventDateVisibility();
+      syncSessionFields();
     })();
   </script>
 {% endblock %}

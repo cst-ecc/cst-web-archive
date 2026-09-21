@@ -2,9 +2,11 @@ from pathlib import Path
 
 from django import forms
 from django.conf import settings
+from django.db.models import Q
 from django.utils.text import slugify
 
 from apps.core.publication import PublicationStatus
+from apps.documents.models import Document
 
 from .image_processing import compress_news_cover_image
 from .models import News, NewsCategory, NewsHomeSlot
@@ -78,6 +80,30 @@ class NewsForm(forms.ModelForm):
         ),
     )
 
+    documents = forms.ModelMultipleChoiceField(
+        label="Documents associés",
+        required=False,
+        queryset=Document.objects.none(),
+        widget=forms.SelectMultiple(attrs={"size": 8}),
+        help_text=(
+            "Sélectionnez les documents officiels liés à l’article. "
+            "Ils seront proposés à la lecture depuis la page publique de l’article."
+        ),
+    )
+
+    session_start_date = forms.DateField(
+        label="Début de la session",
+        required=False,
+        input_formats=["%Y-%m-%d"],
+        widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+    )
+    session_end_date = forms.DateField(
+        label="Fin de la session",
+        required=False,
+        input_formats=["%Y-%m-%d"],
+        widget=forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+    )
+
     class Meta:
         model = News
         fields = (
@@ -91,6 +117,12 @@ class NewsForm(forms.ModelForm):
             "event_date",
             "attachment",
             "attachment_label",
+            "documents",
+            "session_number",
+            "session_theme",
+            "session_location",
+            "session_start_date",
+            "session_end_date",
             "featured_image",
             "image_alt",
             "publication_date",
@@ -110,7 +142,10 @@ class NewsForm(forms.ModelForm):
                 "Décrivez brièvement l’image pour l’accessibilité. "
                 "À défaut, le titre de l’actualité sera utilisé."
             ),
-            "featured": "Réservé aux responsables autorisés à publier.",
+            "featured": (
+                "Mettre cet article à la une. Lorsqu’un article publié devient "
+                "À la une, l’ancien article publié perd automatiquement ce statut."
+            ),
         }
 
     def __init__(self, *args, user=None, **kwargs):
@@ -122,6 +157,21 @@ class NewsForm(forms.ModelForm):
         ).order_by("order", "name")
         self.fields["category"].empty_label = "— Choisir une catégorie existante —"
         self.fields["category"].required = False
+
+        document_filter = Q(status__in=[
+            PublicationStatus.DRAFT,
+            PublicationStatus.PENDING,
+            PublicationStatus.PUBLISHED,
+        ])
+        if self.instance.pk:
+            document_filter |= Q(news_items=self.instance)
+
+        self.fields["documents"].queryset = (
+            Document.objects.filter(document_filter)
+            .select_related("category")
+            .distinct()
+            .order_by("-date", "title")
+        )
 
         # Le navigateur interdit le préremplissage réel d'un input type=file.
         # L'image existante est conservée si aucun nouveau fichier n'est choisi,
@@ -138,6 +188,9 @@ class NewsForm(forms.ModelForm):
                 ),
             }
         )
+
+        if "featured" in self.fields:
+            self.fields["featured"].label = "Mettre cet article à la une"
 
         if user is not None and not user.has_perm("news.publish_news"):
             self.fields.pop("featured", None)
@@ -182,6 +235,9 @@ class NewsForm(forms.ModelForm):
             return None
 
         existing = NewsCategory.objects.filter(name__iexact=name).first()
+        if not existing and slugify(name) in {"session", "sessions"}:
+            existing = NewsCategory.objects.filter(slug="sessions").first()
+
         if existing:
             if not existing.is_active:
                 existing.is_active = True
@@ -206,6 +262,33 @@ class NewsForm(forms.ModelForm):
                 "Une actualité archivée doit d’abord être restaurée en brouillon."
             )
 
+        category = cleaned.get("category")
+        new_category_name = (cleaned.get("new_category_name") or "").strip()
+        is_session = (
+            getattr(category, "slug", "") == "sessions"
+            or slugify(new_category_name) in {"session", "sessions"}
+        )
+
+        if is_session:
+            if not cleaned.get("session_start_date"):
+                self.add_error(
+                    "session_start_date",
+                    "La date de début est requise pour un article de catégorie Session.",
+                )
+            if not (cleaned.get("session_location") or "").strip():
+                self.add_error(
+                    "session_location",
+                    "Le lieu est requis pour un article de catégorie Session.",
+                )
+
+            start = cleaned.get("session_start_date")
+            end = cleaned.get("session_end_date")
+            if start and end and end < start:
+                self.add_error(
+                    "session_end_date",
+                    "La date de fin ne peut pas être antérieure à la date de début.",
+                )
+
         return cleaned
 
     def save(self, commit=True):
@@ -217,6 +300,16 @@ class NewsForm(forms.ModelForm):
 
         if news.home_slot != NewsHomeSlot.UPCOMING_EVENT:
             news.event_date = None
+
+        # Les métadonnées de session n'ont de sens que pour un article
+        # classé dans la catégorie Session. Si l'article change de catégorie,
+        # on nettoie ces champs pour éviter de conserver des données fantômes.
+        if getattr(news.category, "slug", "") != "sessions":
+            news.session_number = None
+            news.session_theme = ""
+            news.session_location = ""
+            news.session_start_date = None
+            news.session_end_date = None
 
         if not news.attachment:
             news.attachment_label = ""

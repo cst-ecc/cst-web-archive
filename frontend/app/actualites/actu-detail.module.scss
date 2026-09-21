@@ -8,15 +8,8 @@
   padding-block: clamp(1.75rem, 1.2rem + 1vw, 3rem) clamp(3.5rem, 2.8rem + 1.4vw, 5rem);
 }
 
-.breadcrumb {
+.backRow {
   margin-bottom: clamp(1.25rem, 1rem + 0.5vw, 2rem);
-  font-size: v.$font-size-meta;
-  color: rgba(17, 24, 39, 0.58);
-
-  a:hover,
-  a:focus-visible {
-    color: v.$color-blue;
-  }
 }
 
 .article {

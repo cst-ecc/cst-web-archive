@@ -124,6 +124,47 @@ class News(TimeStampedModel):
         help_text="Ex. Communiqué officiel, Flyer de l’événement…",
     )
 
+    documents = models.ManyToManyField(
+        "documents.Document",
+        verbose_name="documents associés",
+        related_name="news_items",
+        blank=True,
+        help_text=(
+            "Documents officiels liés à cet article : rapport, procès-verbal, "
+            "communiqué, décision, etc."
+        ),
+    )
+
+    # Métadonnées facultatives utilisées lorsque la catégorie de l'article
+    # représente une session. Elles évitent de maintenir un second contenu
+    # éditorial distinct uniquement pour alimenter /sessions/.
+    session_number = models.PositiveIntegerField(
+        "numéro de session",
+        null=True,
+        blank=True,
+    )
+    session_theme = models.CharField(
+        "thème de la session",
+        max_length=260,
+        blank=True,
+    )
+    session_location = models.CharField(
+        "lieu de la session",
+        max_length=180,
+        blank=True,
+    )
+    session_start_date = models.DateField(
+        "début de la session",
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    session_end_date = models.DateField(
+        "fin de la session",
+        null=True,
+        blank=True,
+    )
+
     featured_image = models.ImageField(
         "image de couverture",
         upload_to=news_image_upload_to,
@@ -263,4 +304,22 @@ class News(TimeStampedModel):
         if not self.image_alt and self.title:
             self.image_alt = self.title
 
+        # Les emplacements spéciaux de la Home (Alerte / Événement) disposent
+        # de leur propre zone et ne doivent pas remplacer l'article « À la une ».
+        if self.home_slot and self.featured:
+            self.featured = False
+            update_fields = kwargs.get("update_fields")
+            if update_fields is not None:
+                kwargs["update_fields"] = set(update_fields) | {"featured"}
+
         super().save(*args, **kwargs)
+
+        # La Home V2 ne présente qu'une seule actualité « À la une ».
+        # On conserve la possibilité de préparer un brouillon comme featured,
+        # mais dès qu'un article featured est publié il devient l'unique
+        # actualité publiée mise en avant.
+        if self.featured and self.status == PublicationStatus.PUBLISHED:
+            News.objects.filter(
+                featured=True,
+                status=PublicationStatus.PUBLISHED,
+            ).exclude(pk=self.pk).update(featured=False)

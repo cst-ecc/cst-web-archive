@@ -47,7 +47,7 @@ export default function DocumentFilters({
           <option value="recent">Plus récents</option>
           <option value="ancien">Plus anciens</option>
           <option value="titre">Titre (A→Z)</option>
-          <option value="populaire">Téléchargements</option>
+          <option value="populaire">Plus consultés</option>
         </select>
       </div>
     </div>

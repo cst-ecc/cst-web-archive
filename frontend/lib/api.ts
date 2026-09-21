@@ -26,6 +26,7 @@ import type {
   GalleryAlbum,
   Member,
   NewsItem,
+  NewsQuery,
   Paginated,
   Session,
   SiteStats,
@@ -122,12 +123,20 @@ function normalizePublicNews(items: NewsItem[]): NewsItem[] {
   return items
     .filter(isPublic)
     .filter((item) => Boolean(item.slug && item.title && item.date))
-    .map((item) => ({
-      ...item,
-      imageAlt: item.imageAlt ?? item.title,
-      featured: Boolean(item.featured),
-      relatedDocumentSlugs: item.relatedDocumentSlugs ?? [],
-    }))
+    .map((item) => {
+      const documents = normalizePublicDocuments(item.documents ?? []);
+      const relatedDocumentSlugs = item.relatedDocumentSlugs?.length
+        ? item.relatedDocumentSlugs
+        : documents.map((document) => document.slug);
+
+      return {
+        ...item,
+        imageAlt: item.imageAlt ?? item.title,
+        featured: Boolean(item.featured),
+        documents,
+        relatedDocumentSlugs,
+      };
+    })
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
@@ -165,6 +174,7 @@ function normalizePublicDocuments(items: DocumentItem[]): DocumentItem[] {
         fileType: document.fileType ?? inferFileType(fileUrl),
         fileSize: Number(document.fileSize ?? 0),
         downloads: Number(document.downloads ?? 0),
+        openCount: Number(document.openCount ?? 0),
         pages: document.pages ?? undefined,
         sizeLabel: document.sizeLabel ?? "",
         featured: Boolean(document.featured),
@@ -182,7 +192,7 @@ function sortDocuments(
     case "titre":
       return [...items].sort((a, b) => a.title.localeCompare(b.title, "fr"));
     case "populaire":
-      return [...items].sort((a, b) => b.downloads - a.downloads);
+      return [...items].sort((a, b) => (b.openCount ?? 0) - (a.openCount ?? 0));
     case "recent":
     default:
       return [...items].sort((a, b) => b.date.localeCompare(a.date));
@@ -234,7 +244,44 @@ function paginateDocuments(
   };
 }
 
-const mockNews = () => normalizePublicNews(rawNews);
+function mockSessionArticles(): NewsItem[] {
+  return rawSessions
+    .filter(isPublic)
+    .map((session) => ({
+      id: 10_000 + session.id,
+      slug: session.slug,
+      title: session.title,
+      date: session.startDate,
+      excerpt: session.summary,
+      content: session.summary,
+      imageUrl: session.imageUrls[0] ?? "/images/home/hero-cst.jpg",
+      imageAlt: session.title,
+      featured: false,
+      status: session.status,
+      category: { slug: "sessions", name: "Sessions" },
+      relatedDocumentSlugs: session.documentSlugs,
+      sessionNumber: session.number,
+      sessionTheme: session.theme,
+      sessionLocation: session.location,
+      sessionStartDate: session.startDate,
+      sessionEndDate: session.endDate,
+    }));
+}
+
+const mockNews = () => {
+  const source = [...rawNews, ...mockSessionArticles()];
+
+  return normalizePublicNews(
+    source.map((item) => ({
+      ...item,
+      documents:
+        item.documents ??
+        rawDocuments.filter((document) =>
+          (item.relatedDocumentSlugs ?? []).includes(document.slug),
+        ),
+    })),
+  );
+};
 const mockAlbums = () => normalizePublicAlbums(rawAlbums);
 const mockDocuments = (query: DocumentQuery = {}) =>
   paginateDocuments(filterMockDocuments(rawDocuments, query), query);
@@ -289,11 +336,13 @@ export async function getDocumentBySlug(
       }
 
       console.warn("[CST] Détail Documents indisponible, fallback mock :", error);
-      return rawDocuments.find((d) => d.slug === slug && isPublic(d)) ?? null;
+      const fallback = rawDocuments.find((d) => d.slug === slug && isPublic(d));
+      return fallback ? normalizePublicDocuments([fallback])[0] ?? null : null;
     }
   }
 
-  return rawDocuments.find((d) => d.slug === slug && isPublic(d)) ?? null;
+  const item = rawDocuments.find((d) => d.slug === slug && isPublic(d));
+  return item ? normalizePublicDocuments([item])[0] ?? null : null;
 }
 
 export async function getFeaturedDocuments(limit = 4): Promise<DocumentItem[]> {
@@ -337,20 +386,66 @@ export async function getDocumentYears(): Promise<number[]> {
 // ------------------------------------------------------------------
 // SESSIONS
 // ------------------------------------------------------------------
-export async function getSessions(): Promise<Session[]> {
-  if (USE_API) return apiFetch<Session[]>("/sessions/");
-  return rawSessions.filter(isPublic).sort((a, b) => b.number - a.number);
+function newsToSession(item: NewsItem): Session {
+  return {
+    id: item.id,
+    slug: item.slug,
+    number: item.sessionNumber ?? 0,
+    title: item.title,
+    theme: item.sessionTheme ?? item.excerpt,
+    location: item.sessionLocation ?? "",
+    startDate: item.sessionStartDate ?? item.date,
+    endDate: item.sessionEndDate,
+    summary: item.excerpt,
+    content: item.content,
+    status: item.status,
+    documentSlugs: item.relatedDocumentSlugs ?? [],
+    documents: item.documents ?? [],
+    imageUrls: item.imageUrl ? [item.imageUrl] : [],
+  };
 }
 
-export async function getSessionBySlug(slug: string): Promise<Session | null> {
-  if (USE_API) {
-    try {
-      return await apiFetch<Session>(`/sessions/${slug}/`);
-    } catch {
-      return null;
-    }
+export async function getSessionArticles(): Promise<NewsItem[]> {
+  const items = await getNews({ categorySlug: "sessions" });
+  if (items.length > 0) return items;
+
+  // Compatibilité de migration : tant que les anciennes Sessions n'ont pas
+  // encore été recréées/complétées comme articles dans le back-office, les
+  // données historiques restent disponibles sans casser /sessions/.
+  return normalizePublicNews(
+    mockSessionArticles().map((item) => ({
+      ...item,
+      documents: rawDocuments.filter((document) =>
+        (item.relatedDocumentSlugs ?? []).includes(document.slug),
+      ),
+    })),
+  );
+}
+
+export async function getSessions(): Promise<Session[]> {
+  return (await getSessionArticles())
+    .map(newsToSession)
+    .sort((a, b) => b.startDate.localeCompare(a.startDate));
+}
+
+export async function getSessionBySlug(identifier: string): Promise<Session | null> {
+  const sessions = await getSessions();
+
+  // Les slugs sont désormais les URLs canoniques des sessions éditoriales.
+  const bySlug = sessions.find((session) => session.slug === identifier);
+  if (bySlug) return bySlug;
+
+  // Compatibilité prioritaire avec les anciennes URLs numériques
+  // (/sessions/1, /sessions/6, etc.). Un identifiant de base de données d'un
+  // nouvel article ne doit jamais détourner une ancienne URL indexée.
+  const legacy = rawSessions.find(
+    (session) => String(session.id) === identifier && isPublic(session),
+  );
+  if (legacy) {
+    return sessions.find((session) => session.slug === legacy.slug) ?? legacy;
   }
-  return rawSessions.find((s) => s.slug === slug && isPublic(s)) ?? null;
+
+  return null;
 }
 
 export async function getRecentSessions(limit = 3): Promise<Session[]> {
@@ -368,27 +463,53 @@ export async function getMembers(): Promise<Member[]> {
 // ------------------------------------------------------------------
 // ACTUALITÉS
 // ------------------------------------------------------------------
-export async function getNews(): Promise<NewsItem[]> {
-  if (USE_NEWS_API) {
-    const items = await safeApiFetch<NewsItem[]>("/news/", "Actualités");
-    if (items) return normalizePublicNews(items);
+function filterMockNews(items: NewsItem[], query: NewsQuery): NewsItem[] {
+  let filtered = items;
+
+  if (query.categorySlug) {
+    filtered = filtered.filter(
+      (item) => item.category?.slug === query.categorySlug,
+    );
   }
 
-  return mockNews();
+  if (query.documentKind) {
+    filtered = filtered.filter((item) =>
+      (item.documents ?? []).some(
+        (document) => document.kind === query.documentKind,
+      ),
+    );
+  }
+
+  if (query.featured) {
+    filtered = filtered.filter((item) => item.featured);
+  }
+
+  return filtered;
+}
+
+export async function getNews(query: NewsQuery = {}): Promise<NewsItem[]> {
+  if (USE_NEWS_API) {
+    const params = new URLSearchParams();
+    if (query.categorySlug) params.set("category", query.categorySlug);
+    if (query.documentKind) params.set("document_kind", query.documentKind);
+    if (query.featured) params.set("featured", "1");
+
+    const suffix = params.toString() ? `?${params.toString()}` : "";
+    const items = await safeApiFetch<NewsItem[]>(
+      `/news/${suffix}`,
+      "Actualités",
+    );
+    if (items !== null) return normalizePublicNews(items);
+  }
+
+  return filterMockNews(mockNews(), query);
 }
 
 export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
   if (USE_NEWS_API) {
     try {
       const item = await apiFetch<NewsItem>(`/news/${slug}/`);
-      return isPublic(item)
-        ? {
-          ...item,
-          imageAlt: item.imageAlt ?? item.title,
-          featured: Boolean(item.featured),
-          relatedDocumentSlugs: item.relatedDocumentSlugs ?? [],
-        }
-        : null;
+      return isPublic(item) ? normalizePublicNews([item])[0] ?? null : null;
     } catch (error) {
       if (error instanceof ApiFetchError && error.status === 404) {
         return null;
@@ -398,31 +519,51 @@ export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
         "[CST] Détail Actualités indisponible, fallback mock :",
         error,
       );
-      return rawNews.find((n) => n.slug === slug && isPublic(n)) ?? null;
+      return mockNews().find((item) => item.slug === slug) ?? null;
     }
   }
 
-  return rawNews.find((n) => n.slug === slug && isPublic(n)) ?? null;
+  return mockNews().find((item) => item.slug === slug) ?? null;
 }
 
 /** Actualités explicitement marquées comme mises en avant. */
 export async function getFeaturedNews(limit = 1): Promise<NewsItem[]> {
-  if (USE_NEWS_API) {
-    const items = await safeApiFetch<NewsItem[]>("/news/?featured=1", "Actualités");
-    if (items) return normalizePublicNews(items).slice(0, limit);
-  }
-
-  return mockNews()
-    .filter((item) => item.featured)
-    .slice(0, limit);
+  return (await getNews({ featured: true })).slice(0, limit);
 }
 
-export async function getRecentNews(
-  limit = 3,
-): Promise<NewsItem[]> {
-  return (await getNews())
-    .filter((item) => !item.homeSlot)
-    .slice(0, limit);
+/**
+ * Actualités utilisées sur la Home. L'article explicitement marqué « À la une »
+ * est placé en tête même s'il est plus ancien ; sinon la dernière publication
+ * devient naturellement le fallback.
+ */
+export async function getRecentNews(limit = 3): Promise<NewsItem[]> {
+  const news = (await getNews()).filter((item) => !item.homeSlot);
+  const featured = news.find((item) => item.featured);
+
+  if (!featured) return news.slice(0, limit);
+
+  return [
+    featured,
+    ...news.filter((item) => item.id !== featured.id),
+  ].slice(0, limit);
+}
+
+/** Articles utilisés par la page Rapports. */
+export async function getReportNews(): Promise<NewsItem[]> {
+  const [withReportDocument, reportCategory] = await Promise.all([
+    getNews({ documentKind: "rapport" }),
+    getNews({ categorySlug: "rapports" }),
+  ]);
+
+  const seen = new Set<string>();
+  return [...withReportDocument, ...reportCategory]
+    .filter((item) => {
+      const key = item.slug || String(item.id);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .sort((a, b) => b.date.localeCompare(a.date));
 }
 
 type NewsIdentity = Pick<NewsItem, "id" | "slug">;

@@ -1,10 +1,14 @@
 from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
+from datetime import date
 
 from apps.accounts.models import User
 from apps.accounts.roles import GROUP_EDITOR, GROUP_MANAGER
 from apps.backoffice.session import VERIFIED_USER_ID
+from apps.core.publication import PublicationStatus
+from apps.documents.models import Document, DocumentKind
+from apps.documents.tests.helpers import test_pdf
 from apps.news.models import News, NewsCategory
 from apps.news.permissions import assign_news_permissions
 
@@ -99,3 +103,37 @@ class NewsBackofficeTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Brouillon éditeur")
+
+    def test_editor_can_associate_existing_documents_when_creating_article(self):
+        document = Document.objects.create(
+            title="Rapport disponible",
+            summary="Rapport à associer",
+            kind=DocumentKind.REPORT,
+            date=date(2026, 4, 17),
+            file=test_pdf("rapport-disponible.pdf"),
+            status=PublicationStatus.PUBLISHED,
+            author=self.editor,
+            last_editor=self.editor,
+        )
+        self._verified_login(self.editor)
+
+        response = self.client.post(
+            reverse("backoffice:news_create"),
+            {
+                "title": "Article avec rapport",
+                "organ": "cst_csmo",
+                "excerpt": "Un résumé suffisamment clair.",
+                "content": "Contexte éditorial du rapport.",
+                "documents": [str(document.pk)],
+                "featured_image": test_image("article-rapport.jpg"),
+                "image_alt": "Illustration",
+                "publication_date": "",
+                "seo_title": "",
+                "seo_description": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        news = News.objects.get(title="Article avec rapport")
+        self.assertEqual(list(news.documents.all()), [document])
+
