@@ -10,6 +10,7 @@ APP_DIR="${APP_DIR:-/home/eccops/apps/cst-website}"
 DOCKER_DIR="${DOCKER_DIR:-${APP_DIR}/docker}"
 STATE_DIR="${STATE_DIR:-/home/eccops/deploy-state/cst}"
 STATE_FILE="${STATE_FILE:-${STATE_DIR}/last-successful-sha}"
+ENV_STATE_FILE="${ENV_STATE_FILE:-${STATE_DIR}/last-successful-env-sha256}"
 PUBLIC_URL="${PUBLIC_URL:-https://cst.ecc.bj}"
 
 mkdir -p "${STATE_DIR}"
@@ -230,6 +231,37 @@ public_check() {
   echo "✅ ${name}"
 }
 
+
+gateway_route_check() {
+  local name="$1"
+  local path="$2"
+  local attempts="${3:-12}"
+  local delay="${4:-2}"
+
+  for i in $(seq 1 "${attempts}"); do
+    if docker exec cst-gateway \
+      wget \
+      --timeout=8 \
+      --tries=1 \
+      --header='Host: cst.ecc.bj' \
+      -q \
+      -O /dev/null \
+      "http://127.0.0.1:8080${path}" \
+      >/dev/null 2>&1; then
+
+      echo "✅ ${name}"
+      return 0
+    fi
+
+    echo "⏳ ${name} non prêt (${i}/${attempts})"
+    sleep "${delay}"
+  done
+
+  echo "❌ ${name}"
+  docker logs --tail=100 cst-gateway 2>/dev/null || true
+  return 1
+}
+
 on_error() {
   local rc=$?
   local line="${BASH_LINENO[0]:-inconnue}"
@@ -278,6 +310,10 @@ on_error() {
   echo "===== DERNIER SUCCES ====="
   cat "${STATE_FILE}" 2>/dev/null || echo "aucun"
 
+  echo
+  echo "===== DERNIERE EMPREINTE ENV ====="
+  cat "${ENV_STATE_FILE}" 2>/dev/null || echo "aucune"
+
   exit "${rc}"
 }
 
@@ -313,6 +349,21 @@ fi
 
 test -s "${DOCKER_DIR}/.env.prod"
 
+CURRENT_ENV_HASH="$(sha256sum "${DOCKER_DIR}/.env.prod" | awk '{print $1}')"
+LAST_SUCCESS_ENV_HASH="$(cat "${ENV_STATE_FILE}" 2>/dev/null || true)"
+ENV_CHANGED=false
+
+if [ -z "${LAST_SUCCESS_ENV_HASH}" ] || [ "${CURRENT_ENV_HASH}" != "${LAST_SUCCESS_ENV_HASH}" ]; then
+  ENV_CHANGED=true
+fi
+
+RELEASE_ID="${RELEASE_SHA}-${CURRENT_ENV_HASH:0:12}"
+
+echo "Empreinte env précédente : ${LAST_SUCCESS_ENV_HASH:-aucune}"
+echo "Empreinte env actuelle   : ${CURRENT_ENV_HASH}"
+echo "Environnement modifié    : ${ENV_CHANGED}"
+echo "Release ID               : ${RELEASE_ID}"
+
 BACKEND=false
 FRONTEND=false
 GATEWAY=false
@@ -333,6 +384,13 @@ elif ! git merge-base --is-ancestor "${LAST_SUCCESS_SHA}" "${RELEASE_SHA}" 2>/de
   BACKEND=true
   FRONTEND=true
   GATEWAY=true
+elif [ "${ENV_CHANGED}" = "true" ]; then
+  # .env.prod est hors Git. Un changement peut affecter le runtime
+  # backend et les variables NEXT_PUBLIC_* intégrées au build frontend.
+  # Le gateway n'utilise pas .env.prod comme environnement applicatif :
+  # il conserve donc son image actuelle.
+  BACKEND=true
+  FRONTEND=true
 elif [ "${LAST_SUCCESS_SHA}" != "${RELEASE_SHA}" ]; then
   CHANGED_FILES="$(git diff --name-only "${LAST_SUCCESS_SHA}" "${RELEASE_SHA}")"
 
@@ -353,11 +411,18 @@ elif [ "${LAST_SUCCESS_SHA}" != "${RELEASE_SHA}" ]; then
         GATEWAY=true
         ;;
       docker/docker-compose.prod.yml|.dockerignore)
+        # Le Compose et les règles Docker peuvent modifier plusieurs services.
         BACKEND=true
         FRONTEND=true
         GATEWAY=true
         ;;
+      docker/scripts/*)
+        # Les scripts sont le moteur du déploiement lui-même.
+        # Ils sont déjà issus du commit RELEASE_SHA et ne nécessitent
+        # pas, à eux seuls, de reconstruire une image applicative.
+        ;;
       docker/*)
+        # Fichier d'infrastructure Docker non classé : politique prudente.
         BACKEND=true
         FRONTEND=true
         GATEWAY=true
@@ -375,21 +440,23 @@ section "DEPLOYMENT PLAN"
 echo "Backend  : ${BACKEND}"
 echo "Frontend : ${FRONTEND}"
 echo "Gateway  : ${GATEWAY}"
+echo "Env      : ${ENV_CHANGED}"
+echo "Release  : ${RELEASE_ID}"
 
 if [ "${BACKEND}" = "true" ]; then
-  CST_BACKEND_IMAGE="cst-backend:${RELEASE_SHA}"
+  CST_BACKEND_IMAGE="cst-backend:${RELEASE_ID}"
 else
   CST_BACKEND_IMAGE="$(container_image_name cst-backend cst-backend:latest)"
 fi
 
 if [ "${FRONTEND}" = "true" ]; then
-  CST_FRONTEND_IMAGE="cst-frontend:${RELEASE_SHA}"
+  CST_FRONTEND_IMAGE="cst-frontend:${RELEASE_ID}"
 else
   CST_FRONTEND_IMAGE="$(container_image_name cst-frontend cst-frontend:latest)"
 fi
 
 if [ "${GATEWAY}" = "true" ]; then
-  CST_GATEWAY_IMAGE="cst-gateway:${RELEASE_SHA}"
+  CST_GATEWAY_IMAGE="cst-gateway:${RELEASE_ID}"
 else
   CST_GATEWAY_IMAGE="$(container_image_name cst-gateway cst-gateway:latest)"
 fi
@@ -454,15 +521,27 @@ if [ "${GATEWAY}" = "true" ]; then
   docker image inspect "${CST_GATEWAY_IMAGE}" --format='Gateway image: {{.Id}}'
 fi
 
-if [ "${BACKEND}" = "true" ] || [ "${FRONTEND}" = "true" ] || [ "${GATEWAY}" = "true" ]; then
+if [ "${GATEWAY}" = "true" ]; then
   section "ACTIVATE GATEWAY"
   compose up -d --force-recreate --no-deps cst_gateway
   wait_health cst-gateway 120
   verify_container_image cst-gateway "${CST_GATEWAY_IMAGE}"
 
+  # ecc-shield ne doit être rechargé que lorsque cst-gateway lui-même
+  # est recréé et peut donc changer d'adresse sur ecc_proxy_network.
   docker exec ecc-shield nginx -t
   docker exec ecc-shield nginx -s reload
   echo "✅ ecc-shield rechargé"
+elif [ "${BACKEND}" = "true" ] || [ "${FRONTEND}" = "true" ]; then
+  section "GATEWAY DYNAMIC DNS"
+  echo "cst-gateway n'est pas recréé : Nginx résoudra dynamiquement"
+  echo "les nouvelles IP Docker de cst-backend / cst-frontend."
+fi
+
+if [ "${BACKEND}" = "true" ] || [ "${FRONTEND}" = "true" ]; then
+  section "WAIT FOR GATEWAY UPSTREAM RECONCILIATION"
+  gateway_route_check "Gateway → Frontend" "/" 15 2
+  gateway_route_check "Gateway → API health" "/api/v1/health/" 15 2
 fi
 
 section "FINAL SERVICE STATE"
@@ -493,15 +572,8 @@ docker exec cst-gateway \
   http://127.0.0.1:8080/gateway-health
 echo "✅ Gateway health OK"
 
-docker exec cst-gateway \
-  wget --timeout=10 --tries=2 --header='Host: cst.ecc.bj' -q -O /dev/null \
-  http://127.0.0.1:8080/
-echo "✅ Gateway → Frontend OK"
-
-docker exec cst-gateway \
-  wget --timeout=10 --tries=2 --header='Host: cst.ecc.bj' -q -O /dev/null \
-  http://127.0.0.1:8080/api/v1/health/
-echo "✅ Gateway → API health OK"
+gateway_route_check "Gateway → Frontend OK" "/" 10 2
+gateway_route_check "Gateway → API health OK" "/api/v1/health/" 10 2
 
 section "INTERNAL BUSINESS API"
 docker exec cst-gateway \
@@ -543,7 +615,13 @@ printf '%s\n' "${RELEASE_SHA}" > "${TMP_STATE}"
 chmod 600 "${TMP_STATE}"
 mv "${TMP_STATE}" "${STATE_FILE}"
 
+TMP_ENV_STATE="$(mktemp "${STATE_DIR}/last-successful-env-sha256.XXXXXX")"
+printf '%s\n' "${CURRENT_ENV_HASH}" > "${TMP_ENV_STATE}"
+chmod 600 "${TMP_ENV_STATE}"
+mv "${TMP_ENV_STATE}" "${ENV_STATE_FILE}"
+
 echo "✅ Dernier déploiement réussi : ${RELEASE_SHA}"
+echo "✅ Empreinte environnement   : ${CURRENT_ENV_HASH}"
 
 section "FINAL COMPOSE STATE"
 compose ps
