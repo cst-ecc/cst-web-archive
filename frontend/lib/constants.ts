@@ -90,14 +90,9 @@ export const NAV_LINKS: NavItem[] = [
         description: "Mission, vision et rôle de la phase de transition",
       },
       {
-        label: "Membres du CST",
+        label: "Membres",
         href: "/membres",
-        description: "Composition et responsabilités au sein du Conseil",
-      },
-      {
-        label: "Commissions",
-        href: "/membres/commissions",
-        description: "Composition des trois commissions du CST",
+        description: "Composition du Conseil Supérieur de Transition",
       },
       {
         label: "Sessions",
@@ -129,6 +124,11 @@ export const NAV_LINKS: NavItem[] = [
         label: "Présentation & continuité",
         href: "/#csmo",
         description: "Du CST à la phase de mise en œuvre",
+      },
+      {
+        label: "Mot du Coordonnateur Général",
+        href: "/mot-du-coordonnateur",
+        description: "Message de bienvenue du Coordonnateur Général du CSMo",
       },
       {
         label: "Digitalisation",

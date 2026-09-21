@@ -54,11 +54,28 @@ export const HOME_HASH_ALIASES: Record<string, HomePanelId> = {
 export const HOME_LEADERSHIP_MESSAGE = {
   image: "/images/home/coordonnateur.jpeg",
   imageAlt: "Général Bertin BADA",
-  title: "Général Bertin BADA",
-  role: "Coordonnateur Général du CSMo",
-  excerpt: "Chers frères et sœurs, membres du CSMo, recevez mes salutations fraternelles en Jésus-Christ notre Seigneur. À mesure que le processus avance, notre responsabilité collective grandit : notre communication doit éclairer, rassurer, rapprocher et préserver les conditions du dialogue et de l’unité.",
-  href: "/presentation#mot-du-coordonnateur",
-  text: "Chers frères et sœurs, membres du CSMo, Recevez mes salutations fraternelles en Jésus-Christ notre Seigneur. Je voudrais d’abord remercier chacun de vous pour son implication, sa disponibilité et tout ce qui est déjà accompli, souvent avec beaucoup de discrétion et de sacrifice, au service de cette œuvre d’unification de notre Église. À mesure que le processus avance, gagne en visibilité et entre dans des étapes de plus en plus importantes, notre responsabilité collective grandit également, notamment dans la manière dont nous communiquons autour de cette œuvre. La Parole nous exhorte à nous appliquer *« à conserver l’unité de l’Esprit par le lien de la paix » (Éphésiens 4:3)*, et nous rappelle que *« la réponse douce calme la fureur » (Proverbes 15:1) Notre communication doit donc rester, elle aussi, au service de cette unité : *éclairer, rassurer, rapprocher, préserver la confiance et maintenir les portes du dialogue ouvertes.* Dans nos publications, commentaires, interviews ou interventions publiques, gardons autant que possible un *langage rassembleur, respectueux de toutes les sensibilités et cohérent avec l’esprit de la mission qui nous est confiée.* Veillons également à présenter le processus dans sa dimension collective et ecclésiale, avec ses organes, ses responsabilités et les différentes contributions qui le font avancer. Il ne s’agit pas d’uniformiser les expressions de chacun, mais simplement de garder à l’esprit que notre appartenance au CSMO nous confère une responsabilité particulière dans la manière dont cette démarche est comprise et perçue. Plus le processus avancera, plus notre capacité à parler avec mesure, cohérence et fraternité contribuera elle-même à créer les conditions de l’unité que nous recherchons. Puissions-nous donc continuer à être, par nos actes comme par nos paroles, *des artisans de paix, de dialogue et d’unité.* Que le Dieu d'Oschoffa vous bénisse tous au nom de Jésus Christ!!! Amen Fait à Cotonou, le 15 septembre 2026 *Le Coordonnateur Général du CSMo* *Bertin BADA*",
+  title: "Coordonnateur Général",
+  role: "Conseil Supérieur de Mise en œuvre (CSMo)",
+  excerpt:
+    "Chers frères et sœurs, membres du CSMo, recevez mes salutations fraternelles en Jésus-Christ notre Seigneur. À mesure que le processus avance, notre responsabilité collective grandit : notre communication doit éclairer, rassurer, rapprocher et préserver les conditions du dialogue et de l’unité.",
+  href: "/mot-du-coordonnateur",
+  paragraphs: [
+    "Chers frères et sœurs, membres du CSMo,",
+    "Recevez mes salutations fraternelles en Jésus-Christ notre Seigneur.",
+    "Je voudrais d’abord remercier chacun de vous pour son implication, sa disponibilité et tout ce qui est déjà accompli, souvent avec beaucoup de discrétion et de sacrifice, au service de cette œuvre d’unification de notre Église.",
+    "À mesure que le processus avance, gagne en visibilité et entre dans des étapes de plus en plus importantes, notre responsabilité collective grandit également, notamment dans la manière dont nous communiquons autour de cette œuvre.",
+    "La Parole nous exhorte à nous appliquer « à conserver l’unité de l’Esprit par le lien de la paix » (Éphésiens 4:3), et nous rappelle que « la réponse douce calme la fureur » (Proverbes 15:1).",
+    "Notre communication doit donc rester, elle aussi, au service de cette unité : éclairer, rassurer, rapprocher, préserver la confiance et maintenir les portes du dialogue ouvertes.",
+    "Dans nos publications, commentaires, interviews ou interventions publiques, gardons autant que possible un langage rassembleur, respectueux de toutes les sensibilités et cohérent avec l’esprit de la mission qui nous est confiée.",
+    "Veillons également à présenter le processus dans sa dimension collective et ecclésiale, avec ses organes, ses responsabilités et les différentes contributions qui le font avancer.",
+    "Il ne s’agit pas d’uniformiser les expressions de chacun, mais simplement de garder à l’esprit que notre appartenance au CSMO nous confère une responsabilité particulière dans la manière dont cette démarche est comprise et perçue.",
+    "Plus le processus avancera, plus notre capacité à parler avec mesure, cohérence et fraternité contribuera elle-même à créer les conditions de l’unité que nous recherchons.",
+    "Puissions-nous donc continuer à être, par nos actes comme par nos paroles, des artisans de paix, de dialogue et d’unité.",
+    "Que le Dieu d'Oschoffa vous bénisse tous au nom de Jésus Christ!!! Amen",
+  ],
+  dateLine: "Fait à Cotonou, le 15 septembre 2026",
+  signatureRole: "Le Coordonnateur Général du CSMo",
+  signatureName: "Bertin BADA",
 };
 
 /**

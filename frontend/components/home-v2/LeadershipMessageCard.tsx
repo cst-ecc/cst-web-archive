@@ -9,7 +9,7 @@ export type LeadershipMessage = {
   imageAlt: string;
   title: string;
   role?: string;
-  text: string;
+  text?: string;
   excerpt?: string;
   href?: string;
 };
@@ -37,10 +37,6 @@ export default function LeadershipMessageCard({
         {message.role ? (
           <p className={styles.role}>{message.role}</p>
         ) : null}
-
-        {/* <blockquote className={styles.quote}>
-          {message.excerpt ?? message.text}
-        </blockquote> */}
 
         {message.href ? (
           <Button
