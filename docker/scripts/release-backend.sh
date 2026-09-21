@@ -23,6 +23,7 @@ django() {
   compose run \
     --rm \
     --no-deps \
+    --interactive=false \
     -T \
     cst_backend \
     python manage.py "$@"

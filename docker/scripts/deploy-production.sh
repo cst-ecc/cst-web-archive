@@ -490,7 +490,7 @@ RELEASE_SHA="${RELEASE_SHA}" \
 CST_BACKEND_IMAGE="${CST_BACKEND_IMAGE}" \
 APP_DIR="${APP_DIR}" \
 DOCKER_DIR="${DOCKER_DIR}" \
-  bash "${DOCKER_DIR}/scripts/release-backend.sh"
+  bash "${DOCKER_DIR}/scripts/release-backend.sh" </dev/null
 
 if [ "${BACKEND}" = "true" ]; then
   section "ACTIVATE BACKEND"

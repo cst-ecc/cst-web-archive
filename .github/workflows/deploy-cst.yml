@@ -132,9 +132,25 @@ jobs:
           echo "Branche     : ${DEPLOY_BRANCH}"
           echo "Force full  : ${FORCE_FULL}"
 
+          REMOTE_SCRIPT="/tmp/cst-deploy-${GITHUB_SHA}.sh"
+
+          # Important : ne pas envoyer le script à `bash -s` via STDIN.
+          # `docker compose run` est interactif par défaut et pourrait
+          # consommer le reste du flux SSH, faisant terminer le déploiement
+          # prématurément avec un faux succès.
+          scp \
+            docker/scripts/deploy-production.sh \
+            "cst-vps:${REMOTE_SCRIPT}"
+
           ssh cst-vps \
-            "RELEASE_SHA='${GITHUB_SHA}' RELEASE_BRANCH='${DEPLOY_BRANCH}' FORCE_FULL='${FORCE_FULL}' bash -se" \
-            < docker/scripts/deploy-production.sh
+            "chmod 700 '${REMOTE_SCRIPT}' && \
+             RELEASE_SHA='${GITHUB_SHA}' \
+             RELEASE_BRANCH='${DEPLOY_BRANCH}' \
+             FORCE_FULL='${FORCE_FULL}' \
+             bash '${REMOTE_SCRIPT}'; \
+             rc=\$?; \
+             rm -f '${REMOTE_SCRIPT}'; \
+             exit \$rc"
 
       # ============================================================
       # 5. RESUME
