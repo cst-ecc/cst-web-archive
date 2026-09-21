@@ -1,0 +1,101 @@
+@use "../../../styles/variables" as v;
+@use "../../../styles/mixins" as m;
+
+.section {
+  width: 100%;
+  max-width: v.$max-width-home;
+  margin-inline: auto;
+  padding-block: clamp(2rem, 1.5rem + 1vw, 3.25rem)
+    clamp(3.5rem, 2.75rem + 1.5vw, 5rem);
+}
+
+.commissions {
+  display: grid;
+  gap: clamp(2.5rem, 1.8rem + 1.5vw, 4rem);
+  width: 100%;
+  max-width: 86rem;
+  margin-inline: auto;
+}
+
+.commission {
+  display: grid;
+  gap: clamp(1.25rem, 1rem + 0.7vw, 1.8rem);
+  padding: clamp(1.1rem, 0.9rem + 0.75vw, 1.75rem);
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  background:
+    radial-gradient(circle at top right, rgba(241, 233, 6, 0.08), transparent 28%),
+    v.$color-white;
+  box-shadow: v.$shadow-card;
+}
+
+.heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid v.$color-surface-line;
+
+  h2 {
+    margin: 0.15rem 0 0;
+    color: v.$color-blue-ink;
+    font-family: v.$font-display;
+    font-size: clamp(1.35rem, 1.15rem + 0.7vw, 1.85rem);
+    line-height: 1.2;
+  }
+}
+
+.eyebrow {
+  color: v.$color-blue;
+  font-size: v.$font-size-meta;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.count {
+  flex: 0 0 auto;
+  padding: 0.42rem 0.7rem;
+  border-radius: 999px;
+  color: v.$color-blue-ink;
+  background: rgba(31, 133, 206, 0.08);
+  font-size: v.$font-size-meta;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1rem, 0.75rem + 0.5vw, 1.5rem);
+}
+
+.empty {
+  margin: 0;
+  padding: 1.2rem;
+  color: rgba(17, 24, 39, 0.65);
+  text-align: center;
+}
+
+@include m.respond(sm) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@include m.respond(lg) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .section {
+    padding-top: 1.5rem;
+  }
+
+  .heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

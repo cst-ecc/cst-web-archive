@@ -1,0 +1,82 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.nav {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto clamp(2rem, 1.55rem + 1vw, 3rem);
+  padding: 0.35rem;
+  gap: 0.35rem;
+  overflow-x: auto;
+  border: 1px solid v.$color-surface-line;
+  border-radius: 999px;
+  background: rgba(245, 248, 251, 0.92);
+  box-shadow: 0 8px 28px rgba(12, 59, 92, 0.06);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.link {
+  @include m.focus-ring;
+
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  color: v.$color-blue-ink;
+  font-size: v.$font-size-small;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  &:hover {
+    background: rgba(31, 133, 206, 0.08);
+  }
+}
+
+.active {
+  color: v.$color-white;
+  background: linear-gradient(135deg, v.$color-blue-deep, v.$color-blue);
+  box-shadow: 0 6px 18px rgba(18, 84, 127, 0.18);
+
+  &:hover {
+    background: linear-gradient(135deg, v.$color-blue-deep, v.$color-blue);
+  }
+}
+
+@media (max-width: 639px) {
+  .nav {
+    width: 100%;
+    justify-content: flex-start;
+    margin-bottom: 1.65rem;
+    border-radius: v.$radius-xl;
+  }
+
+  .link {
+    min-height: 2.6rem;
+    padding-inline: 0.85rem;
+  }
+}

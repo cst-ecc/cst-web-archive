@@ -30,101 +30,10 @@ jobs:
           fetch-depth: 0
 
       # ============================================================
-      # 2. DETECTION DES COMPOSANTS MODIFIES
-      # ============================================================
-      - name: Detect changed components
-        id: changes
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-
-          BACKEND=false
-          FRONTEND=false
-          GATEWAY=false
-
-          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
-            echo "Déploiement manuel : tous les composants seront déployés."
-
-            BACKEND=true
-            FRONTEND=true
-            GATEWAY=true
-          else
-            BEFORE="${{ github.event.before }}"
-            AFTER="${GITHUB_SHA}"
-
-            if [ -z "${BEFORE}" ] || \
-               echo "${BEFORE}" | grep -Eq '^0+$' || \
-               ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
-
-              BEFORE="$(git rev-parse "${AFTER}^" 2>/dev/null || true)"
-            fi
-
-            echo "Commit précédent : ${BEFORE:-inconnu}"
-            echo "Nouveau commit   : ${AFTER}"
-
-            if [ -n "${BEFORE}" ]; then
-              CHANGED_FILES="$(git diff --name-only "${BEFORE}" "${AFTER}")"
-            else
-              CHANGED_FILES="$(git show --pretty='' --name-only "${AFTER}")"
-            fi
-
-            echo
-            echo "===== FICHIERS MODIFIÉS ====="
-            echo "${CHANGED_FILES}"
-            echo "============================="
-
-            if grep -Eq '^backend/' <<< "${CHANGED_FILES}"; then
-              BACKEND=true
-            fi
-
-            if grep -Eq '^frontend/' <<< "${CHANGED_FILES}"; then
-              FRONTEND=true
-            fi
-
-            if grep -Eq '^(gateway/|nginx/)' <<< "${CHANGED_FILES}"; then
-              GATEWAY=true
-            fi
-
-            # Une modification Docker peut toucher les Dockerfiles,
-            # Compose, réseaux ou configurations partagées.
-            if grep -Eq '^docker/' <<< "${CHANGED_FILES}"; then
-              BACKEND=true
-              FRONTEND=true
-              GATEWAY=true
-            fi
-
-            if grep -Eq '^\.dockerignore$' <<< "${CHANGED_FILES}"; then
-              BACKEND=true
-              FRONTEND=true
-              GATEWAY=true
-            fi
-          fi
-
-          echo "backend=${BACKEND}" >> "${GITHUB_OUTPUT}"
-          echo "frontend=${FRONTEND}" >> "${GITHUB_OUTPUT}"
-          echo "gateway=${GATEWAY}" >> "${GITHUB_OUTPUT}"
-
-          echo
-          echo "===== PLAN DE DÉPLOIEMENT ====="
-          echo "Backend  : ${BACKEND}"
-          echo "Frontend : ${FRONTEND}"
-          echo "Gateway  : ${GATEWAY}"
-          echo "================================"
-
-          {
-            echo "## Plan de déploiement CST"
-            echo
-            echo "| Composant | Déploiement |"
-            echo "|---|---|"
-            echo "| Backend | ${BACKEND} |"
-            echo "| Frontend | ${FRONTEND} |"
-            echo "| Gateway | ${GATEWAY} |"
-            echo
-            echo "Commit : \`${GITHUB_SHA}\`"
-          } >> "${GITHUB_STEP_SUMMARY}"
-
-      # ============================================================
-      # 3. SSH
+      # 2. PREPARATION SSH
+      #
+      # Doit être exécuté avant la détection des composants car nous
+      # récupérons sur le VPS le SHA du dernier déploiement réussi.
       # ============================================================
       - name: Prepare SSH
         shell: bash
@@ -150,6 +59,7 @@ jobs:
           sed -i 's/\r$//' ~/.ssh/cst_vps_key
           chmod 600 ~/.ssh/cst_vps_key
 
+          # Validation de la clé privée.
           ssh-keygen -y \
             -f ~/.ssh/cst_vps_key \
             > /dev/null
@@ -176,7 +86,204 @@ jobs:
 
           chmod 600 ~/.ssh/config
 
-          ssh cst-vps 'echo "SSH CST OK"'
+          ssh cst-vps 'echo "✅ SSH CST OK"'
+
+      # ============================================================
+      # 3. DETECTION DES COMPOSANTS A DEPLOYER
+      #
+      # IMPORTANT :
+      # on ne compare PAS seulement avec github.event.before.
+      #
+      # On compare avec le dernier commit dont le déploiement
+      # production a été entièrement validé.
+      #
+      # Cela permet de reprendre correctement un déploiement qui
+      # aurait échoué après la synchronisation Git mais avant les
+      # migrations ou avant les healthchecks.
+      # ============================================================
+      - name: Detect changed components
+        id: changes
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          BACKEND=false
+          FRONTEND=false
+          GATEWAY=false
+
+          STATE_FILE="/home/eccops/deploy-state/cst/last-successful-sha"
+
+          LAST_SUCCESS_SHA="$(
+            ssh cst-vps \
+              "cat '${STATE_FILE}' 2>/dev/null || true"
+          )"
+
+          echo "Dernier déploiement réussi : ${LAST_SUCCESS_SHA:-aucun}"
+          echo "Commit demandé             : ${GITHUB_SHA}"
+
+          # --------------------------------------------------------
+          # Déploiement manuel :
+          # reconstruction complète de sécurité.
+          # --------------------------------------------------------
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+
+            echo
+            echo "Déploiement manuel : déploiement complet."
+
+            BACKEND=true
+            FRONTEND=true
+            GATEWAY=true
+
+          # --------------------------------------------------------
+          # Aucun état précédent :
+          # premier lancement avec cette nouvelle stratégie.
+          # --------------------------------------------------------
+          elif [ -z "${LAST_SUCCESS_SHA}" ]; then
+
+            echo
+            echo "Aucun dernier déploiement réussi enregistré."
+            echo "Déploiement complet de sécurité."
+
+            BACKEND=true
+            FRONTEND=true
+            GATEWAY=true
+
+          # --------------------------------------------------------
+          # Le SHA enregistré n'existe plus dans Git.
+          # Peut arriver après un rebase / force push.
+          # --------------------------------------------------------
+          elif ! git cat-file \
+            -e "${LAST_SUCCESS_SHA}^{commit}" \
+            2>/dev/null; then
+
+            echo
+            echo "Le commit enregistré n'existe plus dans l'historique."
+            echo "Déploiement complet de sécurité."
+
+            BACKEND=true
+            FRONTEND=true
+            GATEWAY=true
+
+          # --------------------------------------------------------
+          # Historique divergent :
+          # on ne prend aucun risque.
+          # --------------------------------------------------------
+          elif ! git merge-base \
+            --is-ancestor \
+            "${LAST_SUCCESS_SHA}" \
+            "${GITHUB_SHA}" \
+            2>/dev/null; then
+
+            echo
+            echo "L'historique Git a divergé."
+            echo "Déploiement complet de sécurité."
+
+            BACKEND=true
+            FRONTEND=true
+            GATEWAY=true
+
+          # --------------------------------------------------------
+          # Commit déjà complètement déployé.
+          # --------------------------------------------------------
+          elif [ "${LAST_SUCCESS_SHA}" = "${GITHUB_SHA}" ]; then
+
+            echo
+            echo "Le commit demandé correspond déjà au dernier"
+            echo "déploiement production réussi."
+
+          # --------------------------------------------------------
+          # Comparaison depuis la vraie production.
+          # --------------------------------------------------------
+          else
+
+            CHANGED_FILES="$(
+              git diff \
+                --name-only \
+                "${LAST_SUCCESS_SHA}" \
+                "${GITHUB_SHA}"
+            )"
+
+            echo
+            echo "===== FICHIERS MODIFIÉS DEPUIS LA PROD ====="
+            echo "${CHANGED_FILES}"
+            echo "============================================="
+
+            while IFS= read -r FILE; do
+
+              [ -z "${FILE}" ] && continue
+
+              case "${FILE}" in
+
+                backend/*)
+                  BACKEND=true
+                  ;;
+
+                frontend/*)
+                  FRONTEND=true
+                  ;;
+
+                docker/nginx/*)
+                  GATEWAY=true
+                  ;;
+
+                gateway/*)
+                  GATEWAY=true
+                  ;;
+
+                nginx/*)
+                  GATEWAY=true
+                  ;;
+
+                docker/docker-compose.prod.yml)
+                  BACKEND=true
+                  FRONTEND=true
+                  GATEWAY=true
+                  ;;
+
+                docker/*)
+                  # Toute autre modification de l'infrastructure
+                  # Docker est considérée comme transversale.
+                  BACKEND=true
+                  FRONTEND=true
+                  GATEWAY=true
+                  ;;
+
+                .dockerignore)
+                  BACKEND=true
+                  FRONTEND=true
+                  GATEWAY=true
+                  ;;
+
+              esac
+
+            done <<< "${CHANGED_FILES}"
+          fi
+
+          echo "backend=${BACKEND}" >> "${GITHUB_OUTPUT}"
+          echo "frontend=${FRONTEND}" >> "${GITHUB_OUTPUT}"
+          echo "gateway=${GATEWAY}" >> "${GITHUB_OUTPUT}"
+          echo "last_success_sha=${LAST_SUCCESS_SHA}" >> "${GITHUB_OUTPUT}"
+
+          echo
+          echo "===== PLAN DE DÉPLOIEMENT ====="
+          echo "Backend  : ${BACKEND}"
+          echo "Frontend : ${FRONTEND}"
+          echo "Gateway  : ${GATEWAY}"
+          echo "================================"
+
+          {
+            echo "## Plan de déploiement CST"
+            echo
+            echo "| Composant | Déploiement |"
+            echo "|---|---|"
+            echo "| Backend | ${BACKEND} |"
+            echo "| Frontend | ${FRONTEND} |"
+            echo "| Gateway | ${GATEWAY} |"
+            echo
+            echo "Dernier succès : \`${LAST_SUCCESS_SHA:-aucun}\`"
+            echo
+            echo "Commit demandé : \`${GITHUB_SHA}\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
 
       # ============================================================
       # 4. SYNCHRONISATION GIT
@@ -205,6 +312,8 @@ jobs:
             origin \
             feature-v2
 
+          # Nettoyage des fichiers non suivis,
+          # en conservant impérativement le .env production.
           git clean \
             -fd \
             -e docker/.env.prod
@@ -213,12 +322,14 @@ jobs:
             --hard \
             origin/feature-v2
 
-          DEPLOY_SHA="$(git rev-parse HEAD)"
+          DEPLOY_SHA="$(
+            git rev-parse HEAD
+          )"
 
           echo "Version récupérée : ${DEPLOY_SHA}"
 
           if [ "${DEPLOY_SHA}" != "${EXPECTED_SHA}" ]; then
-            echo "ERREUR : le VPS n'est pas sur le commit attendu."
+            echo "❌ Le VPS n'est pas sur le commit attendu."
             echo "Attendu : ${EXPECTED_SHA}"
             echo "VPS     : ${DEPLOY_SHA}"
             exit 1
@@ -239,6 +350,8 @@ jobs:
 
       # ============================================================
       # 5. INFRASTRUCTURE
+      # PostgreSQL et Redis doivent être disponibles avant toute
+      # opération Django.
       # ============================================================
       - name: Ensure PostgreSQL and Redis
         shell: bash
@@ -263,6 +376,7 @@ jobs:
             elapsed=0
 
             while [ "${elapsed}" -lt "${timeout}" ]; do
+
               health="$(
                 docker inspect \
                   --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
@@ -272,6 +386,7 @@ jobs:
 
               if [ "${health}" = "healthy" ] || \
                  [ "${health}" = "running" ]; then
+
                 echo "✅ ${container}: ${health}"
                 return 0
               fi
@@ -281,7 +396,12 @@ jobs:
             done
 
             echo "❌ ${container} indisponible"
-            docker logs --tail=100 "${container}" || true
+
+            docker logs \
+              --tail=100 \
+              "${container}" \
+              || true
+
             exit 1
           }
 
@@ -292,8 +412,11 @@ jobs:
           REMOTE
 
       # ============================================================
-      # 6. BACKUP DB
-      # Seulement lorsqu'il y a une modification backend.
+      # 6. BACKUP POSTGRESQL
+      #
+      # Le backup est requis lorsqu'un changement backend est détecté.
+      # Grâce au SHA du dernier déploiement réussi, un backend dont le
+      # précédent déploiement a échoué sera de nouveau détecté ici.
       # ============================================================
       - name: Backup PostgreSQL
         if: steps.changes.outputs.backend == 'true'
@@ -308,7 +431,8 @@ jobs:
           BACKUP_DIR="/home/eccops/backups/cst"
 
           DEPLOY_SHA="$(
-            git -C "${APP_DIR}" rev-parse --short HEAD
+            git -C "${APP_DIR}" \
+              rev-parse --short HEAD
           )"
 
           mkdir -p "${BACKUP_DIR}"
@@ -335,13 +459,17 @@ jobs:
             -type f \
             -name 'cst_*.sql.gz' \
             -mtime +14 \
-            -delete || true
+            -delete \
+            || true
 
-          echo "✅ Backup terminé"
+          echo "✅ Backup PostgreSQL terminé"
           REMOTE
 
       # ============================================================
       # 7. BUILD BACKEND
+      #
+      # Si le backend a changé, la nouvelle image doit être construite
+      # AVANT l'exécution des migrations.
       # ============================================================
       - name: Build backend
         if: steps.changes.outputs.backend == 'true'
@@ -354,6 +482,8 @@ jobs:
 
           cd /home/eccops/apps/cst-website/docker
 
+          echo "===== BUILD BACKEND ====="
+
           docker compose \
             --env-file .env.prod \
             -f docker-compose.prod.yml \
@@ -365,9 +495,17 @@ jobs:
 
       # ============================================================
       # 8. DJANGO / MIGRATIONS
+      #
+      # IMPORTANT :
+      # cette étape est TOUJOURS exécutée.
+      #
+      # Même si le dernier commit ne concerne que le frontend,
+      # Django vérifie systématiquement l'état de la base.
+      #
+      # migrate est idempotent :
+      # s'il n'y a aucune migration, Django ne modifie rien.
       # ============================================================
       - name: Django checks and migrations
-        if: steps.changes.outputs.backend == 'true'
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -389,36 +527,46 @@ jobs:
           }
 
           echo "===== DJANGO CHECK ====="
+
           django check
 
           echo
-          echo "===== MIGRATIONS MANQUANTES ? ====="
+          echo "===== MIGRATIONS MANQUANTES DANS LE CODE ? ====="
+
+          # Échoue si les modèles Django ont été modifiés
+          # sans fichier de migration correspondant.
           django makemigrations \
             --check \
             --dry-run
 
           echo
-          echo "===== PLAN MIGRATIONS ====="
+          echo "===== PLAN DES MIGRATIONS ====="
+
           django migrate --plan
 
           echo
-          echo "===== APPLICATION MIGRATIONS ====="
+          echo "===== APPLICATION DES MIGRATIONS ====="
+
           django migrate --noinput
 
           echo
-          echo "===== VALIDATION MIGRATIONS ====="
+          echo "===== VALIDATION DES MIGRATIONS ====="
+
           django migrate --check
 
           echo
           echo "===== COLLECTSTATIC ====="
+
           django collectstatic --noinput
 
           echo
-          echo "===== DATABASE TEST ====="
+          echo "===== TEST DATABASE ====="
+
           django shell -c \
             "from django.db import connection; connection.ensure_connection(); print('DATABASE OK')"
 
-          echo "✅ Django prêt"
+          echo
+          echo "✅ Django et base de données synchronisés"
           REMOTE
 
       # ============================================================
@@ -449,7 +597,10 @@ jobs:
               2>/dev/null || true
           )"
 
-          compose up -d \
+          echo "Ancien backend : ${OLD_ID:-aucun}"
+
+          compose up \
+            -d \
             --force-recreate \
             --no-deps \
             cst_backend
@@ -460,30 +611,46 @@ jobs:
               cst-backend
           )"
 
+          echo "Nouveau backend : ${NEW_ID}"
+
           if [ -n "${OLD_ID}" ] && \
              [ "${OLD_ID}" = "${NEW_ID}" ]; then
+
             echo "❌ Backend non recréé"
             exit 1
           fi
 
-          echo "Nouveau container backend : ${NEW_ID:0:12}"
+          echo
+          echo "===== ATTENTE BACKEND ====="
+
+          READY=false
 
           for i in $(seq 1 40); do
+
             if docker exec cst-backend \
               python -c \
               "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=5).read()" \
               >/dev/null 2>&1; then
 
+              READY=true
               echo "✅ Backend opérationnel"
-              exit 0
+              break
             fi
 
+            echo "Backend non prêt (${i}/40)"
             sleep 3
           done
 
-          echo "❌ Backend non disponible"
-          docker logs --tail=150 cst-backend || true
-          exit 1
+          if [ "${READY}" != "true" ]; then
+            echo "❌ Backend non disponible"
+
+            docker logs \
+              --tail=150 \
+              cst-backend \
+              || true
+
+            exit 1
+          fi
           REMOTE
 
       # ============================================================
@@ -503,7 +670,8 @@ jobs:
           docker compose \
             --env-file .env.prod \
             -f docker-compose.prod.yml \
-            up -d \
+            up \
+            -d \
             --force-recreate \
             --no-deps \
             cst_celery_worker
@@ -518,8 +686,14 @@ jobs:
           )"
 
           if [ "${STATUS}" != "running" ]; then
+
             echo "❌ Celery : ${STATUS}"
-            docker logs --tail=120 cst-celery-worker || true
+
+            docker logs \
+              --tail=120 \
+              cst-celery-worker \
+              || true
+
             exit 1
           fi
 
@@ -572,12 +746,13 @@ jobs:
               2>/dev/null || true
           )"
 
-          echo "Ancien container : ${OLD_ID:-aucun}"
+          echo "Ancien frontend : ${OLD_ID:-aucun}"
 
           docker compose \
             --env-file .env.prod \
             -f docker-compose.prod.yml \
-            up -d \
+            up \
+            -d \
             --force-recreate \
             --no-deps \
             cst_frontend
@@ -588,15 +763,19 @@ jobs:
               cst-frontend
           )"
 
-          echo "Nouveau container : ${NEW_ID}"
+          echo "Nouveau frontend : ${NEW_ID}"
 
           if [ -n "${OLD_ID}" ] && \
              [ "${OLD_ID}" = "${NEW_ID}" ]; then
+
             echo "❌ Le frontend n'a pas été recréé."
             exit 1
           fi
 
+          READY=false
+
           for i in $(seq 1 60); do
+
             HEALTH="$(
               docker inspect \
                 --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
@@ -604,29 +783,38 @@ jobs:
                 2>/dev/null || true
             )"
 
+            echo "Frontend ${i}/60 : ${HEALTH:-inconnu}"
+
             if [ "${HEALTH}" = "healthy" ]; then
-              echo "✅ Frontend healthy"
+              READY=true
               break
             fi
 
             if [ "${HEALTH}" = "unhealthy" ] || \
                [ "${HEALTH}" = "exited" ]; then
+
               echo "❌ Frontend : ${HEALTH}"
-              docker logs --tail=150 cst-frontend || true
+
+              docker logs \
+                --tail=150 \
+                cst-frontend \
+                || true
+
               exit 1
             fi
 
             sleep 3
           done
 
-          FINAL_HEALTH="$(
-            docker inspect \
-              --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
-              cst-frontend
-          )"
+          if [ "${READY}" != "true" ]; then
 
-          if [ "${FINAL_HEALTH}" != "healthy" ]; then
-            echo "❌ Frontend non healthy : ${FINAL_HEALTH}"
+            echo "❌ Frontend non healthy"
+
+            docker logs \
+              --tail=150 \
+              cst-frontend \
+              || true
+
             exit 1
           fi
 
@@ -642,12 +830,12 @@ jobs:
             stat /app/.next/BUILD_ID 2>/dev/null || true
           '
 
+          echo
           echo "✅ Nouveau frontend effectivement déployé"
           REMOTE
 
       # ============================================================
       # 13. BUILD GATEWAY
-      # Seulement si sa configuration / Docker a changé.
       # ============================================================
       - name: Build gateway
         if: steps.changes.outputs.gateway == 'true'
@@ -660,6 +848,8 @@ jobs:
 
           cd /home/eccops/apps/cst-website/docker
 
+          echo "===== BUILD GATEWAY ====="
+
           docker compose \
             --env-file .env.prod \
             -f docker-compose.prod.yml \
@@ -670,12 +860,13 @@ jobs:
           REMOTE
 
       # ============================================================
-      # 14. RECREATE GATEWAY
+      # 14. RECREATE / RELOAD APPLICATION GATEWAY
       #
-      # Important :
-      # lorsqu'un frontend/backend est recréé, son IP Docker peut
-      # changer. On recrée donc Nginx afin qu'il résolve de nouveau
-      # les noms cst-frontend / cst-backend.
+      # Après recréation d'un frontend/backend, son IP Docker peut
+      # changer.
+      #
+      # Le gateway est donc recréé afin de résoudre à nouveau les
+      # noms Docker.
       # ============================================================
       - name: Reload application gateway
         if: |
@@ -694,12 +885,16 @@ jobs:
           docker compose \
             --env-file .env.prod \
             -f docker-compose.prod.yml \
-            up -d \
+            up \
+            -d \
             --force-recreate \
             --no-deps \
             cst_gateway
 
+          READY=false
+
           for i in $(seq 1 40); do
+
             HEALTH="$(
               docker inspect \
                 --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
@@ -707,35 +902,53 @@ jobs:
                 2>/dev/null || true
             )"
 
+            echo "Gateway ${i}/40 : ${HEALTH:-inconnu}"
+
             if [ "${HEALTH}" = "healthy" ]; then
-              echo "✅ Gateway healthy"
+              READY=true
+              break
+            fi
+
+            if [ "${HEALTH}" = "unhealthy" ] || \
+               [ "${HEALTH}" = "exited" ]; then
               break
             fi
 
             sleep 3
           done
 
-          HEALTH="$(
-            docker inspect \
-              --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
-              cst-gateway
-          )"
+          if [ "${READY}" != "true" ]; then
 
-          if [ "${HEALTH}" != "healthy" ]; then
             echo "❌ Gateway non healthy"
-            docker logs --tail=150 cst-gateway || true
+
+            docker logs \
+              --tail=150 \
+              cst-gateway \
+              || true
+
             exit 1
           fi
 
-          # L'ecc-shield doit également résoudre le nouveau gateway.
+          echo
+          echo "===== RELOAD ECC-SHIELD ====="
+
           docker exec ecc-shield nginx -t
           docker exec ecc-shield nginx -s reload
 
-          echo "✅ Gateway rechargé"
+          echo "✅ Gateway et ecc-shield rechargés"
           REMOTE
 
       # ============================================================
       # 15. VALIDATION FINALE
+      #
+      # Cette étape teste :
+      # - conteneurs
+      # - migrations
+      # - backend direct
+      # - frontend via gateway
+      # - API via gateway
+      # - endpoints métiers
+      # - HTTPS public
       # ============================================================
       - name: Production health checks
         shell: bash
@@ -747,7 +960,11 @@ jobs:
 
           PUBLIC_URL="https://cst.ecc.bj"
 
+          # --------------------------------------------------------
+          # Validation des conteneurs
+          # --------------------------------------------------------
           assert_running() {
+
             container="$1"
 
             STATUS="$(
@@ -758,8 +975,15 @@ jobs:
             )"
 
             if [ "${STATUS}" != "running" ]; then
+
               echo "❌ ${container}: ${STATUS:-absent}"
-              docker logs --tail=100 "${container}" 2>/dev/null || true
+
+              docker logs \
+                --tail=100 \
+                "${container}" \
+                2>/dev/null \
+                || true
+
               exit 1
             fi
 
@@ -771,6 +995,7 @@ jobs:
             )"
 
             if [ "${HAS_HEALTH}" = "yes" ]; then
+
               HEALTH="$(
                 docker inspect \
                   --format='{{.State.Health.Status}}' \
@@ -783,9 +1008,99 @@ jobs:
               fi
 
               echo "✅ ${container}: healthy"
+
             else
+
               echo "✅ ${container}: running"
+
             fi
+          }
+
+          # --------------------------------------------------------
+          # Contrôle HTTP public avec diagnostic lisible.
+          # Plusieurs essais sont autorisés afin de laisser le proxy
+          # terminer sa stabilisation après une recréation.
+          # --------------------------------------------------------
+          public_check() {
+
+            NAME="$1"
+            URL="$2"
+            ATTEMPTS="${3:-6}"
+
+            BODY_FILE="$(mktemp)"
+            HEADER_FILE="$(mktemp)"
+            ERROR_FILE="$(mktemp)"
+
+            SUCCESS=false
+            STATUS="000"
+
+            for i in $(seq 1 "${ATTEMPTS}"); do
+
+              : > "${BODY_FILE}"
+              : > "${HEADER_FILE}"
+              : > "${ERROR_FILE}"
+
+              STATUS="$(
+                curl \
+                  --silent \
+                  --show-error \
+                  --location \
+                  --connect-timeout 10 \
+                  --max-time 30 \
+                  --dump-header "${HEADER_FILE}" \
+                  --output "${BODY_FILE}" \
+                  --write-out '%{http_code}' \
+                  "${URL}" \
+                  2>"${ERROR_FILE}" \
+                  || true
+              )"
+
+              echo "${NAME} (${i}/${ATTEMPTS}) : HTTP ${STATUS:-000}"
+
+              case "${STATUS}" in
+                2??)
+                  SUCCESS=true
+                  break
+                  ;;
+              esac
+
+              sleep 3
+            done
+
+            if [ "${SUCCESS}" != "true" ]; then
+
+              echo
+              echo "❌ ${NAME}"
+              echo "URL : ${URL}"
+              echo "HTTP : ${STATUS:-000}"
+
+              echo
+              echo "===== CURL ERROR ====="
+              cat "${ERROR_FILE}" || true
+
+              echo
+              echo "===== RESPONSE HEADERS ====="
+              cat "${HEADER_FILE}" || true
+
+              echo
+              echo "===== RESPONSE BODY ====="
+              head -c 3000 "${BODY_FILE}" || true
+              echo
+
+              rm -f \
+                "${BODY_FILE}" \
+                "${HEADER_FILE}" \
+                "${ERROR_FILE}"
+
+              return 1
+            fi
+
+            rm -f \
+              "${BODY_FILE}" \
+              "${HEADER_FILE}" \
+              "${ERROR_FILE}"
+
+            echo "✅ ${NAME}"
           }
 
           echo "===== SERVICES ====="
@@ -797,8 +1112,22 @@ jobs:
           assert_running cst-celery-worker
           assert_running cst-gateway
 
+          # --------------------------------------------------------
+          # GARDE FINALE MIGRATIONS
+          # --------------------------------------------------------
           echo
-          echo "===== INTERNAL API ====="
+          echo "===== DATABASE MIGRATION STATE ====="
+
+          docker exec cst-backend \
+            python manage.py migrate --check
+
+          echo "✅ Aucune migration Django en attente"
+
+          # --------------------------------------------------------
+          # BACKEND DIRECT
+          # --------------------------------------------------------
+          echo
+          echo "===== BACKEND DIRECT ====="
 
           docker exec cst-gateway \
             wget \
@@ -808,6 +1137,31 @@ jobs:
             -O /dev/null \
             http://cst-backend:8000/api/v1/health/
 
+          echo "✅ Backend direct OK"
+
+          # --------------------------------------------------------
+          # FRONTEND DIRECT
+          # --------------------------------------------------------
+          echo
+          echo "===== FRONTEND DIRECT ====="
+
+          docker exec cst-gateway \
+            wget \
+            --timeout=10 \
+            --tries=2 \
+            --header="Host: cst.ecc.bj" \
+            -q \
+            -O /dev/null \
+            http://cst-frontend:3000/
+
+          echo "✅ Frontend direct OK"
+
+          # --------------------------------------------------------
+          # CST GATEWAY
+          # --------------------------------------------------------
+          echo
+          echo "===== CST GATEWAY ====="
+
           docker exec cst-gateway \
             wget \
             --timeout=10 \
@@ -816,56 +1170,89 @@ jobs:
             -O /dev/null \
             http://127.0.0.1:8080/gateway-health
 
-          echo "✅ Communication interne OK"
+          echo "✅ Gateway health OK"
 
+          docker exec cst-gateway \
+            wget \
+            --timeout=10 \
+            --tries=2 \
+            --header="Host: cst.ecc.bj" \
+            -q \
+            -O /dev/null \
+            http://127.0.0.1:8080/
+
+          echo "✅ Gateway → Frontend OK"
+
+          docker exec cst-gateway \
+            wget \
+            --timeout=10 \
+            --tries=2 \
+            --header="Host: cst.ecc.bj" \
+            -q \
+            -O /dev/null \
+            http://127.0.0.1:8080/api/v1/health/
+
+          echo "✅ Gateway → API health OK"
+
+          # --------------------------------------------------------
+          # ENDPOINTS METIERS CRITIQUES
+          #
+          # Ces contrôles empêchent notamment qu'un problème de
+          # migration News passe inaperçu.
+          # --------------------------------------------------------
+          echo
+          echo "===== INTERNAL BUSINESS API ====="
+
+          docker exec cst-gateway \
+            wget \
+            --timeout=15 \
+            --tries=2 \
+            --header="Host: cst.ecc.bj" \
+            -q \
+            -O /dev/null \
+            http://127.0.0.1:8080/api/v1/news/
+
+          echo "✅ API News interne OK"
+
+          docker exec cst-gateway \
+            wget \
+            --timeout=15 \
+            --tries=2 \
+            --header="Host: cst.ecc.bj" \
+            -q \
+            -O /dev/null \
+            http://127.0.0.1:8080/api/v1/news/home-special/
+
+          echo "✅ API Home Special interne OK"
+
+          # --------------------------------------------------------
+          # HTTPS PUBLIC
+          # --------------------------------------------------------
           echo
           echo "===== PUBLIC HTTPS ====="
 
-          curl \
-            --fail \
-            --silent \
-            --show-error \
-            --location \
-            --retry 3 \
-            --retry-delay 2 \
-            --connect-timeout 10 \
-            --max-time 30 \
-            -o /dev/null \
+          public_check \
+            "Homepage" \
             "${PUBLIC_URL}/"
 
-          curl \
-            --fail \
-            --silent \
-            --show-error \
-            --location \
-            --retry 3 \
-            --connect-timeout 10 \
-            --max-time 30 \
-            "${PUBLIC_URL}/api/v1/health/" \
-            >/dev/null
+          public_check \
+            "API health" \
+            "${PUBLIC_URL}/api/v1/health/"
 
-          curl \
-            --fail \
-            --silent \
-            --show-error \
-            --location \
-            --connect-timeout 10 \
-            --max-time 30 \
-            "${PUBLIC_URL}/api/v1/news/" \
-            >/dev/null
+          public_check \
+            "API News" \
+            "${PUBLIC_URL}/api/v1/news/"
 
-          curl \
-            --fail \
-            --silent \
-            --show-error \
-            --location \
-            --connect-timeout 10 \
-            --max-time 30 \
-            "${PUBLIC_URL}/api/v1/news/home-special/" \
-            >/dev/null
+          public_check \
+            "API Home Special" \
+            "${PUBLIC_URL}/api/v1/news/home-special/"
 
+          echo
           echo "✅ HTTPS public OK"
 
+          # --------------------------------------------------------
+          # ETAT FINAL
+          # --------------------------------------------------------
           echo
           echo "===== ETAT FINAL ====="
 
@@ -878,7 +1265,9 @@ jobs:
 
           echo
           echo "Commit déployé :"
-          git -C /home/eccops/apps/cst-website \
+
+          git \
+            -C /home/eccops/apps/cst-website \
             rev-parse HEAD
 
           echo
@@ -886,7 +1275,90 @@ jobs:
           REMOTE
 
       # ============================================================
-      # 16. DIAGNOSTIC EN CAS D'ERREUR
+      # 16. ENREGISTREMENT DU DERNIER DEPLOIEMENT REUSSI
+      #
+      # IMPORTANT :
+      # cette étape arrive uniquement APRES :
+      # - migrations
+      # - déploiement
+      # - tests internes
+      # - tests HTTPS publics
+      #
+      # Si quoi que ce soit échoue avant, le SHA précédent reste
+      # enregistré.
+      # ============================================================
+      - name: Mark deployment successful
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          ssh cst-vps "EXPECTED_SHA='${GITHUB_SHA}' bash -se" <<'REMOTE'
+          set -Eeuo pipefail
+
+          APP_DIR="/home/eccops/apps/cst-website"
+          STATE_DIR="/home/eccops/deploy-state/cst"
+          STATE_FILE="${STATE_DIR}/last-successful-sha"
+
+          CURRENT_SHA="$(
+            git \
+              -C "${APP_DIR}" \
+              rev-parse HEAD
+          )"
+
+          if [ "${CURRENT_SHA}" != "${EXPECTED_SHA}" ]; then
+
+            echo "❌ Impossible d'enregistrer le déploiement."
+            echo "Attendu : ${EXPECTED_SHA}"
+            echo "Présent : ${CURRENT_SHA}"
+
+            exit 1
+          fi
+
+          mkdir -p "${STATE_DIR}"
+          chmod 700 "${STATE_DIR}"
+
+          TMP_FILE="$(
+            mktemp \
+              "${STATE_DIR}/last-successful-sha.XXXXXX"
+          )"
+
+          printf '%s\n' \
+            "${EXPECTED_SHA}" \
+            > "${TMP_FILE}"
+
+          chmod 600 "${TMP_FILE}"
+
+          mv \
+            "${TMP_FILE}" \
+            "${STATE_FILE}"
+
+          echo
+          echo "✅ Dernier déploiement réussi enregistré :"
+          echo "${EXPECTED_SHA}"
+          REMOTE
+
+      # ============================================================
+      # 17. RESUME DU DEPLOIEMENT
+      # ============================================================
+      - name: Deployment summary
+        if: success()
+        shell: bash
+        run: |
+          {
+            echo
+            echo "## ✅ Déploiement production réussi"
+            echo
+            echo "Commit : \`${GITHUB_SHA}\`"
+            echo
+            echo "Backend : \`${{ steps.changes.outputs.backend }}\`"
+            echo "Frontend : \`${{ steps.changes.outputs.frontend }}\`"
+            echo "Gateway : \`${{ steps.changes.outputs.gateway }}\`"
+            echo
+            echo "Les migrations Django et les endpoints publics ont été validés."
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      # ============================================================
+      # 18. DIAGNOSTIC EN CAS D'ERREUR
       # ============================================================
       - name: Failure diagnostics
         if: failure()
@@ -894,30 +1366,91 @@ jobs:
         run: |
           ssh cst-vps 'bash -se' <<'REMOTE' || true
 
+          APP_DIR="/home/eccops/apps/cst-website"
+          DOCKER_DIR="${APP_DIR}/docker"
+          STATE_FILE="/home/eccops/deploy-state/cst/last-successful-sha"
+
+          echo "===== DEPLOYMENT STATE ====="
+
+          echo "Dernier succès :"
+          cat "${STATE_FILE}" 2>/dev/null || echo "aucun"
+
+          echo
+          echo "Commit actuellement présent sur le VPS :"
+
+          git \
+            -C "${APP_DIR}" \
+            rev-parse HEAD \
+            2>/dev/null \
+            || true
+
+          echo
           echo "===== DOCKER PS ====="
 
-          cd /home/eccops/apps/cst-website/docker || exit 0
+          cd "${DOCKER_DIR}" || exit 0
 
           docker compose \
             --env-file .env.prod \
             -f docker-compose.prod.yml \
-            ps -a || true
+            ps \
+            -a \
+            || true
+
+          echo
+          echo "===== MIGRATIONS DJANGO ====="
+
+          docker exec cst-backend \
+            python manage.py showmigrations \
+            2>&1 \
+            || true
+
+          echo
+          echo "===== MIGRATION CHECK ====="
+
+          docker exec cst-backend \
+            python manage.py migrate --check \
+            2>&1 \
+            || true
 
           echo
           echo "===== BACKEND ====="
-          docker logs --tail=120 cst-backend || true
+
+          docker logs \
+            --tail=200 \
+            cst-backend \
+            || true
 
           echo
           echo "===== FRONTEND ====="
-          docker logs --tail=120 cst-frontend || true
+
+          docker logs \
+            --tail=150 \
+            cst-frontend \
+            || true
 
           echo
           echo "===== CELERY ====="
-          docker logs --tail=100 cst-celery-worker || true
+
+          docker logs \
+            --tail=120 \
+            cst-celery-worker \
+            || true
 
           echo
           echo "===== GATEWAY ====="
-          docker logs --tail=120 cst-gateway || true
+
+          docker logs \
+            --tail=150 \
+            cst-gateway \
+            || true
+
+          echo
+          echo "===== ECC SHIELD ====="
+
+          docker logs \
+            --tail=150 \
+            ecc-shield \
+            || true
 
           REMOTE
 

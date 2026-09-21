@@ -5,15 +5,120 @@
   width: 100%;
   max-width: v.$max-width-home;
   margin-inline: auto;
-  padding-block: clamp(2rem, 1.5rem + 1vw, 3.25rem) clamp(3.5rem, 2.75rem + 1.5vw, 5rem);
+  padding-block: clamp(2rem, 1.5rem + 1vw, 3.25rem)
+    clamp(3.5rem, 2.75rem + 1.5vw, 5rem);
+}
+
+.content {
+  display: grid;
+  gap: clamp(3rem, 2.2rem + 2vw, 5rem);
+  width: 100%;
+  max-width: 86rem;
+  margin-inline: auto;
+}
+
+.roleGroup {
+  display: grid;
+  gap: clamp(1.1rem, 0.9rem + 0.55vw, 1.6rem);
+}
+
+.roleHeading {
+  display: grid;
+  grid-template-columns: minmax(1rem, 1fr) auto minmax(1rem, 1fr);
+  align-items: center;
+  gap: 0.9rem;
+  width: min(100%, 50rem);
+  margin-inline: auto;
+
+  h2 {
+    margin: 0;
+    color: v.$color-blue-ink;
+    font-family: v.$font-display;
+    font-size: clamp(1.1rem, 1rem + 0.45vw, 1.45rem);
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+  }
+}
+
+.roleLine {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(31, 133, 206, 0.28),
+    rgba(218, 167, 16, 0.38)
+  );
+
+  &:last-child {
+    transform: scaleX(-1);
+  }
+}
+
+.memberRow {
+  display: grid;
+  width: 100%;
+  margin-inline: auto;
+  gap: clamp(1rem, 0.8rem + 0.5vw, 1.5rem);
+}
+
+.memberRowTwo {
+  max-width: 52rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.memberRowThree {
+  max-width: 76rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.executiveBlock,
+.otherMembers {
+  display: grid;
+  gap: clamp(2.25rem, 1.7rem + 1.25vw, 3.5rem);
+  padding: clamp(1.25rem, 1rem + 0.8vw, 2rem);
+  border: 1px solid rgba(227, 234, 241, 0.92);
+  border-radius: clamp(1rem, 0.9rem + 0.35vw, 1.35rem);
+  background:
+    radial-gradient(circle at top right, rgba(31, 133, 206, 0.06), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 248, 251, 0.72));
+}
+
+.sectionIntro {
+  max-width: 46rem;
+  margin-inline: auto;
+  text-align: center;
+
+  h2 {
+    margin: 0.25rem 0 0;
+    color: v.$color-blue-ink;
+    font-family: v.$font-display;
+    font-size: clamp(1.35rem, 1.15rem + 0.75vw, 1.85rem);
+    line-height: 1.2;
+  }
+
+  p {
+    max-width: 40rem;
+    margin: 0.65rem auto 0;
+    color: rgba(17, 24, 39, 0.66);
+    font-size: v.$font-size-small;
+    line-height: 1.65;
+  }
+}
+
+.eyebrow {
+  color: v.$color-blue;
+  font-size: v.$font-size-meta;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: clamp(1rem, 0.75rem + 0.5vw, 1.5rem);
-  max-width: 76rem;
-  margin-inline: auto;
+  width: 100%;
 }
 
 .empty {
@@ -27,8 +132,18 @@
 }
 
 @include m.respond(sm) {
+  .memberRowTwo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@include m.respond(md) {
+  .memberRowThree {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -39,13 +154,22 @@
 }
 
 @media (min-width: 1600px) {
-  .grid {
-    max-width: 82rem;
+  .content {
+    max-width: 90rem;
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 639px) {
   .section {
     padding-top: 1.5rem;
+  }
+
+  .executiveBlock,
+  .otherMembers {
+    padding-inline: 0.85rem;
+  }
+
+  .roleHeading {
+    gap: 0.65rem;
   }
 }

@@ -90,9 +90,14 @@ export const NAV_LINKS: NavItem[] = [
         description: "Mission, vision et rôle de la phase de transition",
       },
       {
-        label: "Membres",
+        label: "Membres du CST",
         href: "/membres",
-        description: "Composition du Conseil Supérieur de Transition",
+        description: "Composition et responsabilités au sein du Conseil",
+      },
+      {
+        label: "Commissions",
+        href: "/membres/commissions",
+        description: "Composition des trois commissions du CST",
       },
       {
         label: "Sessions",
