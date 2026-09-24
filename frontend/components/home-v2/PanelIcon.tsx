@@ -9,6 +9,7 @@ export type PanelIconName =
   | "gear"
   | "document"
   | "chart"
+  | "organization"
   | "globe"
   | "book"
   | "news"
@@ -77,6 +78,16 @@ export default function PanelIcon({ name }: { name: PanelIconName | string }) {
       return (
         <svg {...common}>
           <path d="M4 20V10h4v10M10 20V4h4v16M16 20v-7h4v7" />
+        </svg>
+      );
+    case "organization":
+      return (
+        <svg {...common}>
+          <rect x="9" y="3" width="6" height="4" rx="1" />
+          <rect x="2" y="17" width="6" height="4" rx="1" />
+          <rect x="9" y="17" width="6" height="4" rx="1" />
+          <rect x="16" y="17" width="6" height="4" rx="1" />
+          <path d="M12 7v5M5 17v-3h14v3M12 12v5" />
         </svg>
       );
     case "globe":

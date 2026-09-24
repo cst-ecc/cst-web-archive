@@ -100,6 +100,11 @@ export const NAV_LINKS: NavItem[] = [
         description: "Les sessions de travail du Conseil",
       },
       {
+        label: "Organigramme",
+        href: "/organigramme",
+        description: "Organisation structurelle de l’Église",
+      },
+      {
         label: "Décisions",
         href: "/decisions",
         description: "Décisions et actes officiels du CST",

@@ -84,6 +84,7 @@ export default function InstitutionPanel({ type, newsItems }: InstitutionPanelPr
             <SectionHeading eyebrow="Ressources" title="Approfondir" />
             <div className={styles.linkList}>
               <Link href="/presentation"><PanelIcon name="target" /><span><strong>Présentation</strong><small>Mission, vision et rôle</small></span><i>→</i></Link>
+              <Link href="/organigramme"><PanelIcon name="organization" /><span><strong>Organigramme</strong><small>Organisation structurelle de l’Église</small></span><i>→</i></Link>
               <Link href="/decisions"><PanelIcon name="check" /><span><strong>Décisions</strong><small>Actes officiels publiés</small></span><i>→</i></Link>
               <Link href="/documents"><PanelIcon name="book" /><span><strong>Documents</strong><small>Bibliothèque documentaire</small></span><i>→</i></Link>
             </div>

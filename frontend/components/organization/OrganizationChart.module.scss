@@ -1,0 +1,788 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.chartSection {
+  --chart-connector: rgba(18, 84, 127, 0.38);
+  --chart-branch-border: rgba(31, 133, 206, 0.28);
+  --chart-territorial-border: rgba(218, 167, 16, 0.42);
+  --chart-territorial-bg: rgba(241, 233, 6, 0.12);
+  --chart-cabinet-border: rgba(218, 167, 16, 0.58);
+  --chart-cabinet-connector: rgba(181, 130, 8, 0.72);
+  --chart-cabinet-bg: linear-gradient(135deg, rgba(255, 249, 214, 0.98), rgba(241, 233, 6, 0.12));
+
+  width: 100%;
+  padding: clamp(1.2rem, 0.9rem + 1vw, 2rem);
+  overflow: hidden;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-xl2;
+  background:
+    radial-gradient(circle at top left, rgba(31, 133, 206, 0.06), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 248, 251, 0.72));
+  box-shadow: v.$shadow-card;
+}
+
+.world {
+  --chart-connector: rgba(18, 84, 127, 0.38);
+}
+
+.diocesan {
+  --chart-connector: rgba(174, 126, 5, 0.38);
+  --chart-branch-border: rgba(218, 167, 16, 0.4);
+}
+
+.chartHeader {
+  max-width: 52rem;
+  margin: 0 auto clamp(1.7rem, 1.2rem + 1.2vw, 2.75rem);
+  text-align: center;
+
+  h2 {
+    margin: 0.25rem 0 0;
+    color: v.$color-blue-ink;
+    font-family: v.$font-display;
+    font-size: clamp(1.35rem, 1.1rem + 0.9vw, 2rem);
+    line-height: 1.18;
+  }
+
+  p {
+    max-width: 45rem;
+    margin: 0.65rem auto 0;
+    color: rgba(17, 24, 39, 0.62);
+    font-size: v.$font-size-body-fluid;
+    line-height: 1.65;
+  }
+}
+
+.eyebrow {
+  color: v.$color-blue;
+  font-size: v.$font-size-meta;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.diocesan .eyebrow {
+  color: #9b7208;
+}
+
+.chartViewport {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding-bottom: 0.2rem;
+}
+
+.governanceStage,
+.authorityStage,
+.organsStage,
+.secondaryStage,
+.markerStage,
+.territorialStage {
+  position: relative;
+}
+
+.governanceStage {
+  position: relative;
+  isolation: isolate;
+}
+
+/*
+ * Rattachement direct de l'autorité au Cabinet.
+ * Le tracé est volontairement séparé du pont des organes : il part du bord
+ * droit de l'autorité, longe le bord extérieur du schéma puis revient vers
+ * le centre du Cabinet. Sa teinte dorée le distingue aussi des organes.
+ */
+.cabinetRelation {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cabinetRouteStart,
+.cabinetRouteRail,
+.cabinetRouteEnd {
+  position: absolute;
+  display: block;
+}
+
+.cabinetRouteStart {
+  top: 1.2rem;
+  left: calc(50% + 6.5rem);
+  right: 1.75rem;
+  border-top: 2px solid var(--chart-cabinet-connector);
+}
+
+.cabinetRouteRail {
+  top: 1.2rem;
+  right: 1.75rem;
+  bottom: 5.7rem;
+  border-right: 2px solid var(--chart-cabinet-connector);
+}
+
+.cabinetRouteEnd {
+  right: 1.75rem;
+  bottom: 5.7rem;
+  left: 83.3333%;
+  border-bottom: 2px solid var(--chart-cabinet-connector);
+}
+
+.cabinetRouteEnd::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0.72rem;
+  border-left: 2px solid var(--chart-cabinet-connector);
+  transform: translateX(-1px);
+}
+
+.cabinetRouteEnd::after {
+  content: "";
+  position: absolute;
+  top: 0.46rem;
+  left: -0.26rem;
+  width: 0.52rem;
+  height: 0.52rem;
+  border-right: 2px solid var(--chart-cabinet-connector);
+  border-bottom: 2px solid var(--chart-cabinet-connector);
+  transform: rotate(45deg);
+}
+
+.authorityStage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/*
+ * Pont continu entre l'autorité et les trois organes.
+ * Un seul bloc porte la tige centrale, la barre horizontale et les trois
+ * descentes : il n'y a donc plus de raccord entre pseudo-éléments voisins.
+ */
+.organConnector {
+  position: relative;
+  z-index: 0;
+  height: 2.8rem;
+}
+
+.organConnector::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 1.3rem;
+  border-left: 2px solid var(--chart-connector);
+  transform: translateX(-1px);
+}
+
+.organConnector::after {
+  content: "";
+  position: absolute;
+  top: 1.3rem;
+  left: 16.6667%;
+  right: 16.6667%;
+  border-top: 2px solid var(--chart-connector);
+}
+
+.organDrop {
+  position: absolute;
+  top: 1.3rem;
+  bottom: 0;
+  border-left: 2px solid var(--chart-connector);
+}
+
+.organDrop::after {
+  content: "";
+  position: absolute;
+  bottom: 0.04rem;
+  left: -0.31rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--chart-connector);
+  border-bottom: 2px solid var(--chart-connector);
+  transform: rotate(45deg);
+}
+
+.organDropLeft {
+  left: 16.6667%;
+}
+
+.organDropCenter {
+  left: 50%;
+}
+
+.organDropRight {
+  left: 83.3333%;
+}
+
+.organsStage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.7rem, 1.2vw, 1.5rem);
+}
+
+.organsStage > .node {
+  height: 100%;
+}
+
+/* Liaison continue du centre de la rangée des organes vers le Comité exécutif. */
+.executiveConnector {
+  position: relative;
+  z-index: 0;
+  height: 2.7rem;
+}
+
+.executiveConnector::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  border-left: 2px solid var(--chart-connector);
+  transform: translateX(-1px);
+}
+
+.executiveConnector::after {
+  content: "";
+  position: absolute;
+  bottom: 0.05rem;
+  left: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--chart-connector);
+  border-bottom: 2px solid var(--chart-connector);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.secondaryStage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(0.7rem, 1.2vw, 1.5rem);
+}
+
+.executiveFlow {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.executiveSlot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+/*
+ * La sortie vers les départements commence après la carte du Comité exécutif.
+ * Elle est dans le flux normal : le trait ne peut donc plus traverser la box.
+ */
+.departmentConnector {
+  position: relative;
+  width: 100%;
+  height: 3rem;
+  flex: 0 0 3rem;
+}
+
+.departmentConnector::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  border-left: 2px solid var(--chart-connector);
+  transform: translateX(-1px);
+}
+
+.departmentConnector::after {
+  content: "";
+  position: absolute;
+  bottom: 0.04rem;
+  left: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--chart-connector);
+  border-bottom: 2px solid var(--chart-connector);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.cabinetSlot {
+  grid-column: 3;
+  justify-self: center;
+  width: min(100%, 13rem);
+  margin-top: 1.6rem;
+}
+
+.cabinetKicker {
+  display: block;
+  margin: 0 0 0.38rem 0.15rem;
+  color: #8d6810;
+  font-size: v.$font-size-micro;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.markerStage {
+  position: relative;
+  width: min(100%, 52rem);
+  margin: 0 auto;
+  padding: 0 0 2.6rem;
+}
+
+.markerGrid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.5rem, 1vw, 0.85rem);
+  min-width: 0;
+}
+
+.marker {
+  display: grid;
+  min-width: 3rem;
+  min-height: 2.25rem;
+  place-items: center;
+  border: 1px solid rgba(31, 133, 206, 0.32);
+  border-radius: 0.6rem;
+  background: rgba(31, 133, 206, 0.08);
+  color: v.$color-blue-deep;
+  font-size: clamp(0.68rem, 0.64rem + 0.12vw, 0.76rem);
+  font-weight: 850;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 10px rgba(12, 59, 92, 0.04);
+}
+
+.markerEllipsis {
+  display: inline-grid;
+  min-width: 2.2rem;
+  place-items: center;
+  color: v.$color-blue-ink;
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.12em;
+}
+
+.diocesan .marker {
+  border-color: rgba(218, 167, 16, 0.42);
+  background: rgba(241, 233, 6, 0.11);
+  color: v.$color-blue-ink;
+}
+
+.territorialStage {
+  display: grid;
+  justify-items: center;
+  width: min(100%, 25rem);
+  margin: 0 auto 2.4rem;
+}
+
+.territorialStage::before {
+  content: "";
+  position: absolute;
+  top: -2.6rem;
+  left: 50%;
+  height: 2.6rem;
+  border-left: 2px solid var(--chart-connector);
+  transform: translateX(-1px);
+}
+
+.territorialStage::after {
+  content: "";
+  position: absolute;
+  top: -0.43rem;
+  left: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--chart-connector);
+  border-bottom: 2px solid var(--chart-connector);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.territorialItem {
+  position: relative;
+  width: 100%;
+  padding-top: 1.25rem;
+}
+
+.territorialItem:first-child {
+  padding-top: 0;
+}
+
+.territorialItem:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 1.25rem;
+  border-left: 2px solid var(--chart-connector);
+  transform: translateX(-1px);
+}
+
+.territorialItem:not(:first-child)::after {
+  content: "";
+  position: absolute;
+  top: 0.82rem;
+  left: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--chart-connector);
+  border-bottom: 2px solid var(--chart-connector);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  width: min(100%, 14rem);
+  min-height: 4.35rem;
+  margin-inline: auto;
+  padding: 0.75rem 0.8rem;
+  border: 1px solid var(--chart-branch-border);
+  border-radius: v.$radius-lg;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 20px rgba(12, 59, 92, 0.07);
+  text-align: center;
+}
+
+.nodeLabel {
+  color: v.$color-blue-ink;
+  font-size: clamp(0.78rem, 0.72rem + 0.18vw, 0.9rem);
+  font-weight: 800;
+  line-height: 1.28;
+  overflow-wrap: anywhere;
+}
+
+.nodeAcronym {
+  width: fit-content;
+  margin: 0.35rem auto 0;
+  padding: 0.16rem 0.42rem;
+  border-radius: 999px;
+  background: rgba(31, 133, 206, 0.09);
+  color: v.$color-blue-deep;
+  font-size: v.$font-size-micro;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.node_authority {
+  min-height: 4.75rem;
+  border-color: transparent;
+  background: linear-gradient(135deg, v.$color-blue-deep, v.$color-blue);
+  box-shadow: 0 12px 28px rgba(18, 84, 127, 0.18);
+
+  .nodeLabel {
+    color: v.$color-white;
+    font-family: v.$font-display;
+    font-size: clamp(0.95rem, 0.85rem + 0.36vw, 1.18rem);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .nodeAcronym {
+    background: rgba(255, 255, 255, 0.16);
+    color: v.$color-white;
+  }
+}
+
+.diocesan .node_authority {
+  border: 1px solid rgba(218, 167, 16, 0.62);
+  background: linear-gradient(135deg, #f5df55, v.$color-yellow);
+  box-shadow: 0 12px 28px rgba(218, 167, 16, 0.17);
+
+  .nodeLabel,
+  .nodeAcronym {
+    color: v.$color-blue-ink;
+  }
+
+  .nodeAcronym {
+    background: rgba(255, 255, 255, 0.48);
+  }
+}
+
+.node_institution {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 248, 251, 0.94));
+}
+
+.diocesan .node_institution {
+  border-color: rgba(31, 133, 206, 0.3);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 248, 251, 0.92));
+}
+
+.node_executive {
+  border-color: rgba(31, 133, 206, 0.4);
+  background: linear-gradient(135deg, rgba(31, 133, 206, 0.15), rgba(18, 84, 127, 0.08));
+
+  .nodeLabel {
+    color: v.$color-blue-deep;
+  }
+}
+
+.diocesan .node_executive {
+  border-color: rgba(218, 167, 16, 0.5);
+  background: linear-gradient(135deg, rgba(218, 167, 16, 0.14), rgba(241, 233, 6, 0.1));
+}
+
+.node_cabinet {
+  border-color: var(--chart-cabinet-border);
+  background: var(--chart-cabinet-bg);
+  box-shadow: 0 9px 22px rgba(120, 91, 18, 0.09);
+
+  .nodeLabel {
+    color: #66501a;
+  }
+
+  .nodeAcronym {
+    background: rgba(218, 167, 16, 0.14);
+    color: #73560c;
+  }
+}
+
+.node_territorial {
+  width: min(100%, 18rem);
+  min-height: 3.65rem;
+  border-color: var(--chart-territorial-border);
+  background: var(--chart-territorial-bg);
+
+  .nodeLabel {
+    color: v.$color-blue-ink;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+.rootNode {
+  width: min(100%, 13rem);
+}
+
+.legend {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 0 auto;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgba(18, 84, 127, 0.12);
+  border-radius: v.$radius-lg;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.legendTitle {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: v.$color-blue-ink;
+  font-size: v.$font-size-micro;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.legendItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.9rem;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgba(17, 24, 39, 0.7);
+  font-size: clamp(0.69rem, 0.65rem + 0.1vw, 0.76rem);
+  font-weight: 700;
+}
+
+.legendSwatch {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  flex: 0 0 auto;
+  border-radius: 0.24rem;
+}
+
+.legendInstitution {
+  border: 1px solid rgba(31, 133, 206, 0.36);
+  background: #fff;
+}
+
+.legendCabinet {
+  border: 1px solid var(--chart-cabinet-border);
+  background: rgba(241, 233, 6, 0.2);
+}
+
+.legendMarker {
+  border: 1px solid rgba(31, 133, 206, 0.32);
+  background: rgba(31, 133, 206, 0.1);
+}
+
+@media (max-width: 899px) {
+  .chartSection {
+    padding-inline: clamp(0.85rem, 0.55rem + 2vw, 1.4rem);
+  }
+
+  .chartHeader {
+    margin-bottom: 1.5rem;
+  }
+
+  .cabinetRelation {
+    display: none;
+  }
+
+  .organConnector {
+    height: 1.6rem;
+  }
+
+  .organConnector::before {
+    display: none;
+  }
+
+  .organConnector::after,
+  .organDropLeft,
+  .organDropRight {
+    display: none;
+  }
+
+  .organDropCenter {
+    top: 0;
+    bottom: 0;
+    left: 50%;
+  }
+
+  .organsStage {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 1rem;
+  }
+
+  .organsStage::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    border-left: 2px solid var(--chart-connector);
+    transform: translateX(-1px);
+  }
+
+  .organsStage > .node {
+    z-index: 1;
+  }
+
+  .executiveConnector {
+    height: 2rem;
+  }
+
+  .secondaryStage {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 1.2rem;
+  }
+
+  .executiveFlow,
+  .cabinetSlot {
+    grid-column: 1;
+    justify-self: center;
+    width: min(100%, 31rem);
+    margin-top: 0;
+  }
+
+  .cabinetSlot {
+    position: relative;
+    margin-top: 1.7rem;
+  }
+
+  .cabinetSlot::before {
+    content: "";
+    position: absolute;
+    top: -1.7rem;
+    left: 50%;
+    height: 1.7rem;
+    border-left: 2px solid var(--chart-cabinet-connector);
+    transform: translateX(-1px);
+  }
+
+  .cabinetSlot::after {
+    content: "";
+    position: absolute;
+    top: -0.43rem;
+    left: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid var(--chart-cabinet-connector);
+    border-bottom: 2px solid var(--chart-cabinet-connector);
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .departmentConnector {
+    height: 2.5rem;
+    flex-basis: 2.5rem;
+  }
+
+  .cabinetKicker {
+    text-align: center;
+  }
+
+  .node,
+  .rootNode,
+  .node_territorial {
+    width: min(100%, 31rem);
+    min-height: 3.9rem;
+  }
+
+  .markerGrid {
+    flex-wrap: wrap;
+  }
+
+  .legend {
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 599px) {
+  .markerGrid {
+    gap: 0.45rem;
+  }
+
+  .marker {
+    min-width: 2.75rem;
+  }
+
+  .legendItems {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 479px) {
+  .chartSection {
+    border-radius: v.$radius-xl;
+  }
+
+  .node {
+    padding-inline: 0.7rem;
+  }
+
+  .chartHeader p {
+    font-size: 0.9rem;
+  }
+
+  .markerGrid {
+    gap: 0.38rem;
+  }
+
+  .markerEllipsis {
+    min-width: 1.7rem;
+  }
+
+  .marker {
+    min-height: 2.1rem;
+  }
+}

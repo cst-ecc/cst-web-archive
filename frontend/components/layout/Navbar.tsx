@@ -28,6 +28,7 @@ const INTERNAL_SECTION_PATHS: Record<string, string[]> = {
     "/presentation",
     "/membres",
     "/sessions",
+    "/organigramme",
   ],
   "/#ressources": [
     "/documents",

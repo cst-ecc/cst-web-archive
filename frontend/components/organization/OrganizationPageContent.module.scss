@@ -1,0 +1,27 @@
+@use "../../styles/variables" as v;
+
+.section {
+  width: 100%;
+  max-width: v.$max-width-home;
+  margin-inline: auto;
+  padding-block: clamp(1.5rem, 1.1rem + 1vw, 2.5rem)
+    clamp(3.5rem, 2.75rem + 1.5vw, 5rem);
+}
+
+.topline {
+  width: min(100%, 92rem);
+  margin: 0 auto 1.2rem;
+}
+
+.intro {
+  max-width: 52rem;
+  margin: 0 auto clamp(1.35rem, 1rem + 0.9vw, 2rem);
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: rgba(17, 24, 39, 0.64);
+    font-size: v.$font-size-body-fluid;
+    line-height: 1.65;
+  }
+}
