@@ -68,10 +68,19 @@ function isActiveHref(
 }
 
 function navigateHomePanel(href: string) {
-  if (typeof window === "undefined" || !href.startsWith("/#")) return false;
+  if (typeof window === "undefined") return false;
   if (window.location.pathname !== "/") return false;
 
-  const nextHash = href.slice(1);
+  // Le lien Accueil conserve `href="/"` dans le HTML (URL publique/SEO),
+  // mais lorsqu'on est déjà sur la Home il doit repiloter le panneau interne
+  // vers `#accueil`, comme les autres sections pilotées par fragment.
+  const nextHash = href === "/"
+    ? "#accueil"
+    : href.startsWith("/#")
+      ? href.slice(1)
+      : null;
+
+  if (!nextHash) return false;
 
   if (window.location.hash !== nextHash) {
     window.history.pushState(null, "", nextHash);

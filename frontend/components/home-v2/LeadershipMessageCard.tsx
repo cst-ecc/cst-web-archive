@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import Button from "@/components/ui/Button";
+import { MotionArticle } from "@/components/ui/Motion";
 
 import styles from "./LeadershipMessageCard.module.scss";
 
@@ -20,7 +21,7 @@ export default function LeadershipMessageCard({
   message: LeadershipMessage;
 }) {
   return (
-    <article className={styles.card}>
+    <MotionArticle className={styles.card} delay={0.06}>
       <div className={styles.imageWrap}>
         <Image
           src={message.image}
@@ -48,6 +49,6 @@ export default function LeadershipMessageCard({
           </Button>
         ) : null}
       </div>
-    </article>
+    </MotionArticle>
   );
 }

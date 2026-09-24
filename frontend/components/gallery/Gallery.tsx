@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   useCallback,
   useEffect,
@@ -22,6 +23,7 @@ type ActiveImage = {
 };
 
 export default function Gallery({ albums }: { albums: GalleryAlbum[] }) {
+  const reducedMotion = useReducedMotion();
   const [active, setActive] = useState<ActiveImage | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -158,7 +160,14 @@ export default function Gallery({ albums }: { albums: GalleryAlbum[] }) {
   return (
     <div className={styles.wrapper}>
       {albums.map((album, albumIndex) => (
-        <section key={album.id} className={styles.album}>
+        <motion.section
+          key={album.id}
+          className={styles.album}
+          initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.12 }}
+          transition={{ duration: reducedMotion ? 0 : 0.42, ease: "easeOut" }}
+        >
           <div className={styles.albumHead}>
             <div>
               <h2 className={styles.albumTitle}>{album.title}</h2>
@@ -171,7 +180,7 @@ export default function Gallery({ albums }: { albums: GalleryAlbum[] }) {
 
           <div className={styles.grid}>
             {album.images.map((image, imageIndex) => (
-              <button
+              <motion.button
                 key={image.id}
                 type="button"
                 onClick={(event) =>
@@ -179,6 +188,15 @@ export default function Gallery({ albums }: { albums: GalleryAlbum[] }) {
                 }
                 className={styles.thumb}
                 aria-label={`Agrandir : ${image.title || image.alt || album.title}`}
+                initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.12 }}
+                transition={{
+                  duration: reducedMotion ? 0 : 0.36,
+                  delay: reducedMotion ? 0 : Math.min(imageIndex * 0.025, 0.12),
+                  ease: "easeOut",
+                }}
+                whileHover={reducedMotion ? undefined : { y: -2 }}
               >
                 <Image
                   src={image.imageUrl}
@@ -193,10 +211,10 @@ export default function Gallery({ albums }: { albums: GalleryAlbum[] }) {
                 <span className={styles.thumbTitle}>
                   {image.title || image.alt || album.title}
                 </span>
-              </button>
+              </motion.button>
             ))}
           </div>
-        </section>
+        </motion.section>
       ))}
 
       {activeImage && active && activeAlbum && (

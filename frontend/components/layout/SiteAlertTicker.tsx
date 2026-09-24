@@ -10,16 +10,16 @@ import styles from "./SiteAlertTicker.module.scss";
  * juste après le Hero / PageHeader, jamais automatiquement sous la Navbar.
  */
 export default function SiteAlertTicker() {
-  const { alert } = useAlertTicker();
+  const { alerts } = useAlertTicker();
 
-  if (!alert) {
+  if (alerts.length === 0) {
     return null;
   }
 
   return (
     <div className={styles.shell}>
       <div className={styles.inner}>
-        <AlertTicker item={alert} />
+        <AlertTicker items={alerts} />
       </div>
     </div>
   );

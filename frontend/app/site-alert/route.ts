@@ -5,13 +5,11 @@ import type { NewsItem } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-function selectAlert(items: NewsItem[]): NewsItem | null {
-  return (
-    items.find(
-      (item) =>
-        item.homeSlot === "alert_info" &&
-        item.status === "publie",
-    ) ?? null
+function selectAlerts(items: NewsItem[]): NewsItem[] {
+  return items.filter(
+    (item) =>
+      item.homeSlot === "alert_info" &&
+      item.status === "publie",
   );
 }
 
@@ -23,10 +21,10 @@ function selectAlert(items: NewsItem[]): NewsItem | null {
  */
 export async function GET() {
   const items = await getHomeSpecialNews();
-  const alert = selectAlert(items);
+  const alerts = selectAlerts(items);
 
   return NextResponse.json(
-    { alert },
+    { alerts },
     {
       headers: {
         "Cache-Control": "no-store, max-age=0",

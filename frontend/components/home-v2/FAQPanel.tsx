@@ -6,6 +6,7 @@ import { BIBLE_VERSES } from "@/lib/home-v2";
 import PanelFrame from "./PanelFrame";
 import PanelIcon from "./PanelIcon";
 import SectionHeading from "./SectionHeading";
+import { MotionSection } from "@/components/ui/Motion";
 import styles from "./FAQPanel.module.scss";
 
 export default function FAQPanel() {
@@ -34,7 +35,7 @@ export default function FAQPanel() {
       }}
     >
       <div className={styles.explorer}>
-        <section className={styles.column}>
+        <MotionSection className={styles.column}>
           <SectionHeading eyebrow="Thèmes" title="Explorer la FAQ" />
           <div className={styles.list}>
             {FAQ_GROUPS.map((group, index) => (
@@ -53,9 +54,9 @@ export default function FAQPanel() {
               </button>
             ))}
           </div>
-        </section>
+        </MotionSection>
 
-        <section className={styles.column}>
+        <MotionSection className={styles.column} delay={0.05}>
           <SectionHeading eyebrow={activeGroup?.title ?? "FAQ"} title="Questions" />
           <div className={styles.list}>
             {activeGroup?.items.map((item) => (
@@ -71,9 +72,9 @@ export default function FAQPanel() {
               </button>
             ))}
           </div>
-        </section>
+        </MotionSection>
 
-        <section className={styles.answer} aria-live="polite">
+        <MotionSection className={styles.answer} delay={0.1}>
           {activeQuestion ? (
             <>
               <div className={styles.answerTitle}>
@@ -91,7 +92,7 @@ export default function FAQPanel() {
               </div>
             </>
           ) : null}
-        </section>
+        </MotionSection>
       </div>
     </PanelFrame>
   );

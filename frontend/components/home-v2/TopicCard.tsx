@@ -1,4 +1,5 @@
 import PanelIcon from "./PanelIcon";
+import { MotionArticle } from "@/components/ui/Motion";
 import styles from "./TopicCard.module.scss";
 
 type TopicCardProps = {
@@ -8,6 +9,7 @@ type TopicCardProps = {
   tone?: "blue" | "gold" | "green" | "violet";
   actionLabel?: string;
   onAction?: () => void;
+  motionDelay?: number;
 };
 
 export default function TopicCard({
@@ -17,9 +19,10 @@ export default function TopicCard({
   tone = "blue",
   actionLabel,
   onAction,
+  motionDelay = 0,
 }: TopicCardProps) {
   return (
-    <article className={styles.card} data-tone={tone}>
+    <MotionArticle className={styles.card} dataTone={tone} delay={motionDelay}>
       <span className={styles.icon}>
         <PanelIcon name={icon} />
       </span>
@@ -32,6 +35,6 @@ export default function TopicCard({
           </button>
         ) : null}
       </div>
-    </article>
+    </MotionArticle>
   );
 }

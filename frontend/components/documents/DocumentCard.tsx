@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import DocumentReadButton from "@/components/documents/DocumentReadButton";
 import Badge from "@/components/ui/Badge";
+import { MotionArticle } from "@/components/ui/Motion";
 import { KIND_LABELS } from "@/lib/constants";
 import type { DocumentItem } from "@/lib/types";
 import { formatDate, formatFileSize } from "@/lib/utils";
@@ -16,11 +17,11 @@ const FILE_LABEL: Record<DocumentItem["fileType"], string> = {
   autre: "FICHIER",
 };
 
-export default function DocumentCard({ doc }: { doc: DocumentItem }) {
+export default function DocumentCard({ doc, motionDelay = 0 }: { doc: DocumentItem; motionDelay?: number }) {
   const readablePdf = doc.fileType === "pdf" && Boolean(doc.fileUrl) && doc.fileUrl !== "#";
 
   return (
-    <article className={styles.card}>
+    <MotionArticle className={styles.card} delay={motionDelay}>
       <div className={styles.rule} />
       <div className={styles.body}>
         <div className={styles.top}>
@@ -58,6 +59,6 @@ export default function DocumentCard({ doc }: { doc: DocumentItem }) {
           ) : null}
         </div>
       </div>
-    </article>
+    </MotionArticle>
   );
 }

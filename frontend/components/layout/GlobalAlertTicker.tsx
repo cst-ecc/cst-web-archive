@@ -22,19 +22,17 @@ function isHiddenDetailRoute(pathname: string): boolean {
   return false;
 }
 
-function selectAlert(items: NewsItem[]): NewsItem | null {
-  return (
-    items.find(
-      (item) =>
-        item.homeSlot === "alert_info" &&
-        item.status === "publie",
-    ) ?? null
+function selectAlerts(items: NewsItem[]): NewsItem[] {
+  return items.filter(
+    (item) =>
+      item.homeSlot === "alert_info" &&
+      item.status === "publie",
   );
 }
 
 export default function GlobalAlertTicker() {
   const pathname = usePathname();
-  const [alert, setAlert] = useState<NewsItem | null>(null);
+  const [alerts, setAlerts] = useState<NewsItem[]>([]);
   const [homeHash, setHomeHash] = useState("");
 
   useEffect(() => {
@@ -79,7 +77,7 @@ export default function GlobalAlertTicker() {
           return;
         }
 
-        setAlert(selectAlert(payload as NewsItem[]));
+        setAlerts(selectAlerts(payload as NewsItem[]));
       } catch (error) {
         if (
           error instanceof DOMException &&
@@ -95,7 +93,7 @@ export default function GlobalAlertTicker() {
     return () => controller.abort();
   }, []);
 
-  if (!pathname || !alert || isHiddenDetailRoute(pathname)) {
+  if (!pathname || alerts.length === 0 || isHiddenDetailRoute(pathname)) {
     return null;
   }
 
@@ -109,5 +107,5 @@ export default function GlobalAlertTicker() {
     return null;
   }
 
-  return <AlertTicker item={alert} />;
+  return <AlertTicker items={alerts} />;
 }

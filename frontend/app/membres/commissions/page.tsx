@@ -57,8 +57,12 @@ export default async function CommissionsPage() {
 
               {commissionMembers.length > 0 ? (
                 <div className={styles.grid}>
-                  {commissionMembers.map((member) => (
-                    <MemberCard key={member.id} member={member} />
+                  {commissionMembers.map((member, index) => (
+                    <MemberCard
+                      key={member.id}
+                      member={member}
+                      motionDelay={Math.min(index * 0.045, 0.22)}
+                    />
                   ))}
                 </div>
               ) : (

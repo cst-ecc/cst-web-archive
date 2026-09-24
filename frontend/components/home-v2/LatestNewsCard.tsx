@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import type { NewsItem } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import { MotionArticle } from "@/components/ui/Motion";
 import { imageNeedsUnoptimized } from "./homeV2.utils";
 
 import styles from "./LatestNewsCard.module.scss";
@@ -23,7 +24,7 @@ export default function LatestNewsCard({
   }
 
   return (
-    <article className={styles.card}>
+    <MotionArticle className={styles.card}>
       <Link
         href={`/actualites/${item.slug}`}
         className={styles.link}
@@ -61,6 +62,6 @@ export default function LatestNewsCard({
           </strong>
         </div>
       </Link>
-    </article>
+    </MotionArticle>
   );
 }

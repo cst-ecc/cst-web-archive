@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django.test import TestCase
 from django.urls import reverse
@@ -194,6 +194,38 @@ class PublicNewsApiTests(TestCase):
         payload = response.json()
         self.assertEqual([item["slug"] for item in payload], [event.slug])
         self.assertEqual(payload[0]["homeSlot"], NewsHomeSlot.UPCOMING_EVENT)
+
+    def test_home_special_returns_all_published_alerts_newest_first(self):
+        older = self._news(
+            title="Alerte ancienne",
+            status=PublicationStatus.PUBLISHED,
+            home_slot=NewsHomeSlot.ALERT_INFO,
+        )
+        older.publication_date = timezone.localdate() - timedelta(days=2)
+        older.save(update_fields=["publication_date"])
+
+        newest = self._news(
+            title="Alerte récente",
+            status=PublicationStatus.PUBLISHED,
+            home_slot=NewsHomeSlot.ALERT_INFO,
+        )
+        self._news(
+            title="Alerte brouillon",
+            status=PublicationStatus.DRAFT,
+            home_slot=NewsHomeSlot.ALERT_INFO,
+        )
+
+        response = self.client.get(reverse("news_api:home-special"))
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(
+            [item["slug"] for item in payload],
+            [newest.slug, older.slug],
+        )
+        self.assertTrue(
+            all(item["homeSlot"] == NewsHomeSlot.ALERT_INFO for item in payload)
+        )
 
     def test_home_special_returns_latest_undated_upcoming_event_when_no_dated_event_exists(self):
         event = self._news(

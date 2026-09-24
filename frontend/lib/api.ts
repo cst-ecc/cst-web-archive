@@ -713,13 +713,11 @@ function selectHomeSpecialNews(items: NewsItem[]): NewsItem[] {
     (item) => item.homeSlot === "upcoming_event",
   );
 
-  const alert = news.find(
+  const alerts = news.filter(
     (item) => item.homeSlot === "alert_info",
   );
 
-  return [event, alert].filter(
-    (item): item is NewsItem => Boolean(item),
-  );
+  return event ? [event, ...alerts] : alerts;
 }
 
 export async function getHomeSpecialNews(): Promise<NewsItem[]> {

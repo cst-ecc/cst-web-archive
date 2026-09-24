@@ -2,6 +2,7 @@ import { BIBLE_VERSES } from "@/lib/home-v2";
 import PanelFrame from "./PanelFrame";
 import PanelIcon from "./PanelIcon";
 import ProcessPyramid from "./ProcessPyramid";
+import { MotionAside, MotionSection } from "@/components/ui/Motion";
 import {
   CST_CURRENT_PYRAMID_STEP,
   CST_PYRAMID_STEPS,
@@ -24,7 +25,7 @@ export default function ProgressPanel() {
       }}
     >
       <div className={styles.layout}>
-        <section className={styles.pyramidSection} aria-labelledby="cst-pyramid-title">
+        <MotionSection className={styles.pyramidSection} ariaLabelledby="cst-pyramid-title">
           <div className={styles.heading}>
             <div>
               <span>Feuille de route du processus</span>
@@ -40,9 +41,9 @@ export default function ProgressPanel() {
             steps={CST_PYRAMID_STEPS}
             currentStep={CST_CURRENT_PYRAMID_STEP}
           />
-        </section>
+        </MotionSection>
 
-        <aside className={styles.currentCard} aria-labelledby="current-stage-title">
+        <MotionAside className={styles.currentCard} ariaLabelledby="current-stage-title" delay={0.06} hover>
           <span className={styles.iconCircle} aria-hidden="true">
             <PanelIcon name="chart" />
           </span>
@@ -76,7 +77,7 @@ export default function ProgressPanel() {
             <span><i data-tone="current" /> En cours</span>
             <span><i data-tone="next" /> À venir</span>
           </div>
-        </aside>
+        </MotionAside>
       </div>
     </PanelFrame>
   );

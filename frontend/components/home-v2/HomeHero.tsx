@@ -27,7 +27,7 @@ export default function HomeHero({
   specialNewsItems,
   onNavigate,
 }: HomeHeroProps) {
-  const alert = specialNewsItems.find(
+  const alerts = specialNewsItems.filter(
     (item) =>
       item.homeSlot === "alert_info" &&
       item.status === "publie",
@@ -39,8 +39,8 @@ export default function HomeHero({
         onNavigate={onNavigate}
       />
 
-      {alert ? (
-        <AlertTicker item={alert} />
+      {alerts.length > 0 ? (
+        <AlertTicker items={alerts} />
       ) : null}
 
       <HomeSummary

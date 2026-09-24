@@ -154,6 +154,7 @@
   font-weight: 700;
   letter-spacing: 0.035em;
   text-transform: uppercase;
+  white-space: nowrap;
   color: var(--nav-text);
   background: none;
   border: none;
@@ -1168,17 +1169,43 @@
    ------------------------------------------------------------------ */
 
 @media (min-width: 1600px) {
+  /*
+   * Sur les grands ecrans, la navigation utilise la largeur reelle du
+   * viewport. Le plafond historique de 100rem comprimait les menus au
+   * moment precis ou leurs espacements augmentaient.
+   */
+  .headerHome .bar {
+    max-width: none;
+    width: 100%;
+    margin-inline: 0;
+    padding-inline: clamp(2rem, 2.5vw, 4.5rem);
+  }
+
   .homeBar {
-    --home-logo-gap: 0.9rem;
-    --home-tools-gap: 1.5rem;
-    --home-tools-width: 9rem;
-    --home-menu-gap: 0.16rem;
+    --home-logo-size: clamp(4.7rem, 3vw, 5.25rem);
+    --home-logo-gap: clamp(0.42rem, 0.65vw, 0.9rem);
+    --home-tools-gap: clamp(0.5rem, 0.8vw, 1.25rem);
+    --home-tools-width: clamp(7rem, 7vw, 9rem);
+    --home-menu-gap: clamp(0.02rem, 0.14vw, 0.16rem);
   }
 
   .headerHome .navLink,
   .headerHome .dropdownTrigger {
-    padding-inline: 0.62rem;
-    font-size: v.$font-size-nav;
+    padding-inline: clamp(0.34rem, 0.35vw, 0.62rem);
+    font-size: clamp(0.82rem, 0.72rem + 0.12vw, 0.9rem);
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+
+  .headerHome .dropdownSplitTrigger {
+    flex: 0 0 auto;
+    min-width: max-content;
+  }
+
+  .homeNavLeft,
+  .homeNavRight {
+    width: 100%;
+    flex-wrap: nowrap;
   }
 }
 

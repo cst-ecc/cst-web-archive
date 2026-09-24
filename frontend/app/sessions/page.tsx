@@ -26,7 +26,7 @@ export default async function SessionsPage() {
       <Container className={styles.section}>
         {sessions.length > 0 ? (
           <div className={styles.grid}>
-            {sessions.map((session) => {
+            {sessions.map((session, index) => {
               const documents = session.documents ?? [];
               const readableDocument = documents.find(
                 (doc) =>
@@ -41,6 +41,7 @@ export default async function SessionsPage() {
                   session={session}
                   readableDocumentSlug={readableDocument?.slug}
                   documentCount={documents.length}
+                  motionDelay={Math.min(index * 0.05, 0.22)}
                 />
               );
             })}

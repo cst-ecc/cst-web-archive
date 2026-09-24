@@ -15,7 +15,7 @@ export default function SiteFooter() {
           <strong>
             © {new Date().getFullYear()} {SITE.institution}
           </strong>
-          <span className={styles.process}>{SITE.fullName}</span>
+          {/* <span className={styles.process}>{SITE.fullName}</span> */}
         </div>
 
         <div className={styles.contacts} aria-label="Coordonnées">

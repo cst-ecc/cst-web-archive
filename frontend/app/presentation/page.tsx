@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import PageHeader from "@/components/layout/PageHeader";
 import Container from "@/components/layout/Container";
+import { FadeIn, MotionDiv } from "@/components/ui/Motion";
 import { SITE } from "@/lib/constants";
 import styles from "../pages.module.scss";
 
@@ -50,7 +51,7 @@ export default function PresentationPage() {
         subtitle={`Organe de transition de l'${SITE.institution}`}
       />
       <Container className={styles.section}>
-        <div className={styles.prose}>
+        <FadeIn className={styles.prose}>
           <p>
             Le <strong>Conseil Supérieur de Transition (CST)</strong> est l'organe
             mis en place pour conduire le processus de transition, de réunification
@@ -71,16 +72,21 @@ export default function PresentationPage() {
             moderniser sa gouvernance et préparer la mise en place d'institutions
             communes, légitimes et fonctionnelles.
           </p>
-        </div>
+        </FadeIn>
 
         {/* Missions */}
         <div className={styles.grid2} style={{ marginTop: "3rem" }}>
-          {missions.map((m) => (
-            <div key={m.title} className={styles.missionCard}>
+          {missions.map((m, index) => (
+            <MotionDiv
+              key={m.title}
+              className={styles.missionCard}
+              delay={Math.min(index * 0.055, 0.16)}
+              hover
+            >
               <div className={styles.missionRule} />
               <h2 className={styles.missionTitle}>{m.title}</h2>
               <p className={styles.missionText}>{m.text}</p>
-            </div>
+            </MotionDiv>
           ))}
         </div>
 

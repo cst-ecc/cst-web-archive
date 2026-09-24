@@ -113,9 +113,12 @@ class PublicNewsDetailView(PublicNewsQuerysetMixin, RetrieveAPIView):
 
 class PublicHomeSpecialNewsView(APIView):
     """
-    Retourne au maximum deux éléments, dans l'ordre d'affichage de l'accueil :
-    1. le prochain événement (date aujourd'hui ou future la plus proche) ;
-    2. la dernière Alerte Info publiée.
+    Retourne les contenus spéciaux de l'accueil :
+    1. au maximum un prochain événement ;
+    2. toutes les Alertes Info publiées, de la plus récente à la plus ancienne.
+
+    Le frontend utilise la même collection pour la carte spéciale de la Home
+    et pour le bandeau « Dernière INFO ».
     """
 
     permission_classes = [AllowAny]
@@ -156,17 +159,15 @@ class PublicHomeSpecialNewsView(APIView):
                 .first()
             )
 
-        alert = (
-            base.filter(home_slot=NewsHomeSlot.ALERT_INFO)
-            .order_by(
+        alerts = list(
+            base.filter(home_slot=NewsHomeSlot.ALERT_INFO).order_by(
                 "-publication_date",
                 "-published_at",
                 "display_order",
             )
-            .first()
         )
 
-        items = [item for item in (event, alert) if item is not None]
+        items = ([event] if event is not None else []) + alerts
         serializer = PublicNewsSerializer(
             items,
             many=True,

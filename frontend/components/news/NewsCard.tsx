@@ -4,15 +4,16 @@ import { formatDate } from "@/lib/utils";
 import type { NewsItem } from "@/lib/types";
 
 import NewsMedia from "./NewsMedia";
+import { MotionArticle } from "@/components/ui/Motion";
 
 import styles from "./NewsCard.module.scss";
 
-export default function NewsCard({ item }: { item: NewsItem }) {
+export default function NewsCard({ item, motionDelay = 0 }: { item: NewsItem; motionDelay?: number }) {
   const href = `/actualites/${item.slug}`;
   const displayDate = item.eventDate ?? item.date;
 
   return (
-    <article className={styles.card}>
+    <MotionArticle className={styles.card} delay={motionDelay}>
       <Link
         href={href}
         className={styles.imageLink}
@@ -43,6 +44,6 @@ export default function NewsCard({ item }: { item: NewsItem }) {
           Lire la suite <span aria-hidden>→</span>
         </Link>
       </div>
-    </article>
+    </MotionArticle>
   );
 }

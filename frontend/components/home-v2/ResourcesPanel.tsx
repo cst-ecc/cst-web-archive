@@ -3,6 +3,7 @@ import { BIBLE_VERSES, RESOURCE_GROUPS } from "@/lib/home-v2";
 import type { HomeNavigate } from "./homeV2.types";
 import PanelFrame from "./PanelFrame";
 import PanelIcon from "./PanelIcon";
+import { FadeIn, MotionSection } from "@/components/ui/Motion";
 import styles from "./ResourcesPanel.module.scss";
 
 export default function ResourcesPanel({ onNavigate }: { onNavigate: HomeNavigate }) {
@@ -18,7 +19,13 @@ export default function ResourcesPanel({ onNavigate }: { onNavigate: HomeNavigat
     >
       <div className={styles.grid}>
         {RESOURCE_GROUPS.map((group, groupIndex) => (
-          <section key={group.title} className={styles.card} data-tone={groupIndex === 1 ? "gold" : groupIndex === 2 ? "green" : "blue"}>
+          <MotionSection
+            key={group.title}
+            className={styles.card}
+            dataTone={groupIndex === 1 ? "gold" : groupIndex === 2 ? "green" : "blue"}
+            delay={Math.min(groupIndex * 0.055, 0.12)}
+            hover
+          >
             <div className={styles.header}>
               <span className={styles.iconCircle}>
                 <PanelIcon name={groupIndex === 0 ? "document" : groupIndex === 1 ? "book" : "link"} />
@@ -36,11 +43,11 @@ export default function ResourcesPanel({ onNavigate }: { onNavigate: HomeNavigat
                 </Link>
               ))}
             </div>
-          </section>
+          </MotionSection>
         ))}
       </div>
 
-      <div className={styles.callout}>
+      <FadeIn className={styles.callout} delay={0.1}>
         <div>
           <span className={styles.iconCircle}><PanelIcon name="question" /></span>
           <p><strong>Vous cherchez une information précise ?</strong><small>La FAQ répond aux principales questions et la recherche documentaire permet d’aller plus loin.</small></p>
@@ -49,7 +56,7 @@ export default function ResourcesPanel({ onNavigate }: { onNavigate: HomeNavigat
           <button type="button" onClick={() => onNavigate("faq")}>Consulter la FAQ →</button>
           <Link href="/contact">Nous contacter →</Link>
         </div>
-      </div>
+      </FadeIn>
     </PanelFrame>
   );
 }

@@ -5,6 +5,7 @@ import Container from "@/components/layout/Container";
 import PageHeader from "@/components/layout/PageHeader";
 import NewsCard from "@/components/news/NewsCard";
 import NewsMedia from "@/components/news/NewsMedia";
+import { MotionArticle } from "@/components/ui/Motion";
 import { getNews } from "@/lib/api";
 import type { NewsItem } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
@@ -47,7 +48,7 @@ export default async function ActualitesPage() {
           </p>
         ) : (
           <>
-            <article className={styles.featured}>
+            <MotionArticle className={styles.featured} hover={false}>
               <Link
                 href={`/actualites/${featured.slug}`}
                 className={styles.featuredImageLink}
@@ -87,7 +88,7 @@ export default async function ActualitesPage() {
                   Lire la suite <span aria-hidden>→</span>
                 </Link>
               </div>
-            </article>
+            </MotionArticle>
 
             {others.length > 0 ? (
               <section
@@ -106,8 +107,12 @@ export default async function ActualitesPage() {
                 </div>
 
                 <div className={styles.grid}>
-                  {others.map((item) => (
-                    <NewsCard key={item.id} item={item} />
+                  {others.map((item, index) => (
+                    <NewsCard
+                      key={item.id}
+                      item={item}
+                      motionDelay={Math.min(index * 0.045, 0.22)}
+                    />
                   ))}
                 </div>
               </section>

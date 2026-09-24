@@ -3,6 +3,7 @@
 
 .card {
   @include m.card;
+  @include m.card-hover;
 
   position: relative;
   display: flex;
@@ -98,5 +99,15 @@
 @media (max-width: 420px) {
   .photoWrap {
     min-height: 17rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo {
+    transition: none;
+  }
+
+  .card:hover .photo {
+    transform: none;
   }
 }

@@ -36,6 +36,14 @@
     box-shadow: v.$shadow-card-hover;
     transform: translateY(-2px);
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: box-shadow 0.15s ease;
+
+    &:hover {
+      transform: none;
+    }
+  }
 }
 
 @mixin cst-rule {

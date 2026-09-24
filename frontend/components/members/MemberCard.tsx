@@ -1,10 +1,11 @@
 import Image from "next/image";
 import type { Member } from "@/lib/types";
+import { MotionArticle } from "@/components/ui/Motion";
 import styles from "./MemberCard.module.scss";
 
-export default function MemberCard({ member }: { member: Member }) {
+export default function MemberCard({ member, motionDelay = 0 }: { member: Member; motionDelay?: number }) {
   return (
-    <article className={styles.card}>
+    <MotionArticle className={styles.card} delay={motionDelay}>
       <div className={styles.photoWrap}>
         <Image
           src={member.photoUrl}
@@ -20,6 +21,6 @@ export default function MemberCard({ member }: { member: Member }) {
         {member.responsibility && <p className={styles.responsibility}>{member.responsibility}</p>}
         {member.bio && <p className={styles.bio}>{member.bio}</p>}
       </div>
-    </article>
+    </MotionArticle>
   );
 }

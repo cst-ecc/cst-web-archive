@@ -45,8 +45,12 @@ export default async function RapportsPage() {
       <Container className={styles.section}>
         {articles.length > 0 ? (
           <div className={styles.grid3}>
-            {articles.map((item) => (
-              <NewsCard key={item.id} item={item} />
+            {articles.map((item, index) => (
+              <NewsCard
+                key={item.id}
+                item={item}
+                motionDelay={Math.min(index * 0.045, 0.22)}
+              />
             ))}
           </div>
         ) : legacyData ? (

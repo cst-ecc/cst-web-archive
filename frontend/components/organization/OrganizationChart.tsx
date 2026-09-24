@@ -3,6 +3,7 @@ import type {
   OrganizationNode,
 } from "@/lib/organization";
 import { cn } from "@/lib/utils";
+import { MotionDiv } from "@/components/ui/Motion";
 
 import styles from "./OrganizationChart.module.scss";
 
@@ -14,7 +15,7 @@ function OrganizationCard({
   root?: boolean;
 }) {
   return (
-    <div
+    <MotionDiv
       className={cn(
         styles.node,
         styles[`node_${node.tone}`],
@@ -25,7 +26,7 @@ function OrganizationCard({
       {node.acronym ? (
         <span className={styles.nodeAcronym}>{node.acronym}</span>
       ) : null}
-    </div>
+    </MotionDiv>
   );
 }
 

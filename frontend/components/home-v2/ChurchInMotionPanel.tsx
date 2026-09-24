@@ -9,6 +9,7 @@ import PanelFrame from "./PanelFrame";
 import PanelIcon from "./PanelIcon";
 import SectionHeading from "./SectionHeading";
 import TopicCard from "./TopicCard";
+import { MotionSection } from "@/components/ui/Motion";
 import styles from "./ChurchInMotionPanel.module.scss";
 
 export default function ChurchInMotionPanel({ newsItems }: { newsItems: NewsItem[] }) {
@@ -31,12 +32,13 @@ export default function ChurchInMotionPanel({ newsItems }: { newsItems: NewsItem
             title={item.eyebrow}
             text={`${item.title}. ${item.text}`}
             tone={index === 1 ? "gold" : index === 2 ? "green" : "blue"}
+            motionDelay={Math.min(index * 0.055, 0.16)}
           />
         ))}
       </div>
 
       <div className={styles.contentGrid}>
-        <section className={styles.card}>
+        <MotionSection className={styles.card} hover>
           <SectionHeading
             eyebrow="Histoires et rencontres"
             title="Les derniers temps forts"
@@ -60,18 +62,18 @@ export default function ChurchInMotionPanel({ newsItems }: { newsItems: NewsItem
               </Link>
             ))}
           </div>
-        </section>
+        </MotionSection>
 
-        <section className={styles.card}>
+        <MotionSection className={styles.card} delay={0.05} hover>
           <SectionHeading eyebrow="À découvrir" title="Voir l’Église vivre" />
           <div className={styles.linkList}>
             <Link href="/galerie"><PanelIcon name="people" /><span><strong>Galerie</strong><small>Rencontres et temps forts en images</small></span><i>→</i></Link>
             <Link href="/actualites"><PanelIcon name="news" /><span><strong>Actualités</strong><small>Suivre la dynamique en cours</small></span><i>→</i></Link>
             <Link href="/contact"><PanelIcon name="link" /><span><strong>Nous contacter</strong><small>Partager une initiative ou une information</small></span><i>→</i></Link>
           </div>
-        </section>
+        </MotionSection>
 
-        <section className={styles.card}>
+        <MotionSection className={styles.card} delay={0.1} hover>
           <SectionHeading eyebrow="Modernisation" title="Des outils au service de l’Église" />
           <p className={styles.detailLead}>
             La digitalisation accompagne la connaissance du territoire ecclésial, le recensement et une administration plus structurée.
@@ -81,7 +83,7 @@ export default function ChurchInMotionPanel({ newsItems }: { newsItems: NewsItem
             <span><strong>Accéder à DIGECC</strong><small>Plateforme de digitalisation de l’ECC</small></span>
             <i>↗</i>
           </a>
-        </section>
+        </MotionSection>
       </div>
     </PanelFrame>
   );

@@ -321,3 +321,16 @@
     animation: none;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .thumbImage,
+  .thumbShade,
+  .thumbTitle {
+    transition: none;
+  }
+
+  .thumb:hover .thumbImage,
+  .thumb:focus-visible .thumbImage {
+    transform: none;
+  }
+}

@@ -7,6 +7,7 @@ import type {
 } from "@/lib/types";
 
 import { formatDate } from "@/lib/utils";
+import { MotionArticle } from "@/components/ui/Motion";
 import { imageNeedsUnoptimized } from "./homeV2.utils";
 
 import styles from "./HomeSpecialNews.module.scss";
@@ -184,13 +185,10 @@ function SpecialNewsCard({
         item.title;
 
     return (
-        <article
+        <MotionArticle
             className={styles.card}
-            data-tone={
-                isAlert
-                    ? "alert"
-                    : "event"
-            }
+            dataTone={isAlert ? "alert" : "event"}
+            delay={0.08}
         >
             <div className={styles.media}>
                 {media.url ? (
@@ -244,7 +242,7 @@ function SpecialNewsCard({
                     </span>
                 </Link>
             </div>
-        </article>
+        </MotionArticle>
     );
 }
 

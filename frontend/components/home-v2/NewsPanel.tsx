@@ -7,6 +7,7 @@ import { imageNeedsUnoptimized } from "./homeV2.utils";
 import PanelFrame from "./PanelFrame";
 import PanelIcon from "./PanelIcon";
 import SectionHeading from "./SectionHeading";
+import { MotionSection } from "@/components/ui/Motion";
 import styles from "./NewsPanel.module.scss";
 
 export default function NewsPanel({ newsItems }: { newsItems: NewsItem[] }) {
@@ -45,7 +46,7 @@ export default function NewsPanel({ newsItems }: { newsItems: NewsItem[] }) {
             </div>
           </Link>
 
-          <section className={styles.card}>
+          <MotionSection className={styles.card} delay={0.05} hover>
             <SectionHeading
               eyebrow="Dernières publications"
               title="Autres actualités"
@@ -60,16 +61,16 @@ export default function NewsPanel({ newsItems }: { newsItems: NewsItem[] }) {
                 </Link>
               ))}
             </div>
-          </section>
+          </MotionSection>
 
-          <section className={styles.card}>
+          <MotionSection className={styles.card} delay={0.1} hover>
             <SectionHeading eyebrow="Communication" title="Explorer" />
             <div className={styles.linkList}>
               <Link href="/galerie"><PanelIcon name="people" /><span><strong>Galerie</strong><small>Photos et temps forts</small></span><i>→</i></Link>
               <Link href="/documents?q=communiqu%C3%A9"><PanelIcon name="news" /><span><strong>Communiqués</strong><small>Informations officielles</small></span><i>→</i></Link>
               <Link href="/contact"><PanelIcon name="link" /><span><strong>Contact</strong><small>Joindre l’équipe institutionnelle</small></span><i>→</i></Link>
             </div>
-          </section>
+          </MotionSection>
         </div>
       ) : (
         <div className={styles.empty}>Aucune actualité publiée pour le moment.</div>

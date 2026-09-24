@@ -51,17 +51,16 @@ export default function HomeV2({
 
   useEffect(() => {
     const syncFromLocation = () => {
-      const next = panelIndexFromHash(window.location.hash);
+      const currentHash = window.location.hash;
+      const next = panelIndexFromHash(currentHash);
       const panelId = HOME_PANELS[next]?.id ?? "accueil";
-      const canonicalHash = panelId === "accueil" ? "" : `#${panelId}`;
+      const canonicalHash = `#${panelId}`;
 
-      if (panelId === "accueil" && window.location.hash) {
-        window.history.replaceState(
-          null,
-          "",
-          `${window.location.pathname}${window.location.search}`,
-        );
-      } else if (window.location.hash && window.location.hash !== canonicalHash) {
+      // Une arrivée directe sur `/` reste sans fragment pour conserver l'URL
+      // d'accueil propre. En revanche, un fragment explicite (notamment
+      // `#accueil`) est conservé afin que la navigation entre panneaux reste
+      // pilotée par le hash sans rechargement de page.
+      if (currentHash && currentHash !== canonicalHash) {
         window.history.replaceState(null, "", canonicalHash);
       }
 
@@ -94,16 +93,8 @@ export default function HomeV2({
       setActiveIndex(index);
     }
 
-    const nextHash = nextPanel.id === "accueil" ? "" : `#${nextPanel.id}`;
-    if (nextPanel.id === "accueil") {
-      if (window.location.hash) {
-        window.history.pushState(
-          null,
-          "",
-          `${window.location.pathname}${window.location.search}`,
-        );
-      }
-    } else if (window.location.hash !== nextHash) {
+    const nextHash = `#${nextPanel.id}`;
+    if (window.location.hash !== nextHash) {
       window.history.pushState(null, "", nextHash);
     }
     window.dispatchEvent(new Event("homepanelchange"));

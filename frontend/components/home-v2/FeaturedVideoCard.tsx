@@ -1,3 +1,4 @@
+import { MotionSection } from "@/components/ui/Motion";
 import styles from "./FeaturedVideoCard.module.scss";
 
 export type FeaturedVideo = {
@@ -12,9 +13,11 @@ export default function FeaturedVideoCard({
   video: FeaturedVideo;
 }) {
   return (
-    <section
+    <MotionSection
       className={styles.card}
-      aria-labelledby="home-featured-video"
+      ariaLabelledby="home-featured-video"
+      delay={0.05}
+      hover
     >
       <div className={styles.player}>
         <iframe
@@ -40,6 +43,6 @@ export default function FeaturedVideoCard({
           <p>{video.description}</p>
         ) : null}
       </div>
-    </section>
+    </MotionSection>
   );
 }

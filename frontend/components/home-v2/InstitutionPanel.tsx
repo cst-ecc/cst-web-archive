@@ -13,6 +13,7 @@ import { formatDate } from "@/lib/utils";
 import PanelFrame from "./PanelFrame";
 import PanelIcon from "./PanelIcon";
 import SectionHeading from "./SectionHeading";
+import { MotionSection } from "@/components/ui/Motion";
 import TopicCard from "./TopicCard";
 import styles from "./InstitutionPanel.module.scss";
 
@@ -53,13 +54,14 @@ export default function InstitutionPanel({ type, newsItems }: InstitutionPanelPr
             title={item.title}
             text={item.text}
             tone={index === 1 ? "gold" : index === 2 ? "green" : index === 3 ? "violet" : "blue"}
+            motionDelay={Math.min(index * 0.055, 0.18)}
           />
         ))}
       </div>
 
       {isCst ? (
         <div className={styles.details}>
-          <section className={styles.card}>
+          <MotionSection className={styles.card} hover>
             <SectionHeading eyebrow="Repères" title="Les grandes étapes" />
             <ol className={styles.milestones}>
               {CST_MILESTONES.map((item, index) => (
@@ -69,18 +71,18 @@ export default function InstitutionPanel({ type, newsItems }: InstitutionPanelPr
                 </li>
               ))}
             </ol>
-          </section>
+          </MotionSection>
 
-          <section className={styles.card}>
+          <MotionSection className={styles.card} delay={0.05} hover>
             <SectionHeading eyebrow="Le Conseil" title="Connaître le CST" />
             <div className={styles.linkList}>
               <Link href="/membres"><PanelIcon name="people" /><span><strong>Les membres</strong><small>Composition du Conseil</small></span><i>→</i></Link>
               <Link href="/sessions"><PanelIcon name="chart" /><span><strong>Les sessions</strong><small>Dates, thèmes et travaux</small></span><i>→</i></Link>
               <Link href="/rapports"><PanelIcon name="document" /><span><strong>Le rapport final</strong><small>Synthèse et conclusions</small></span><i>→</i></Link>
             </div>
-          </section>
+          </MotionSection>
 
-          <section className={styles.card}>
+          <MotionSection className={styles.card} delay={0.1} hover>
             <SectionHeading eyebrow="Ressources" title="Approfondir" />
             <div className={styles.linkList}>
               <Link href="/presentation"><PanelIcon name="target" /><span><strong>Présentation</strong><small>Mission, vision et rôle</small></span><i>→</i></Link>
@@ -88,20 +90,20 @@ export default function InstitutionPanel({ type, newsItems }: InstitutionPanelPr
               <Link href="/decisions"><PanelIcon name="check" /><span><strong>Décisions</strong><small>Actes officiels publiés</small></span><i>→</i></Link>
               <Link href="/documents"><PanelIcon name="book" /><span><strong>Documents</strong><small>Bibliothèque documentaire</small></span><i>→</i></Link>
             </div>
-          </section>
+          </MotionSection>
         </div>
       ) : (
         <div className={styles.details}>
-          <section className={styles.card}>
+          <MotionSection className={styles.card} hover>
             <SectionHeading eyebrow="Priorités" title="Les chantiers" />
             <ol className={styles.workstreams}>
               {CSMO_WORKSTREAMS.map((item, index) => (
                 <li key={item}><span>{index + 1}</span><strong>{item}</strong></li>
               ))}
             </ol>
-          </section>
+          </MotionSection>
 
-          <section className={styles.card}>
+          <MotionSection className={styles.card} delay={0.05} hover>
             <SectionHeading eyebrow="Méthode" title="Notre approche" />
             <div className={styles.approach}>
               {CSMO_APPROACH.map((item, index) => (
@@ -111,9 +113,9 @@ export default function InstitutionPanel({ type, newsItems }: InstitutionPanelPr
                 </div>
               ))}
             </div>
-          </section>
+          </MotionSection>
 
-          <section className={styles.card}>
+          <MotionSection className={styles.card} delay={0.1} hover>
             <SectionHeading
               eyebrow="Suivre"
               title="Actualités du processus"
@@ -133,7 +135,7 @@ export default function InstitutionPanel({ type, newsItems }: InstitutionPanelPr
               <span><strong>DIGECC</strong><small>Digitalisation, recensement et cartographie</small></span>
               <i>↗</i>
             </a>
-          </section>
+          </MotionSection>
         </div>
       )}
     </PanelFrame>

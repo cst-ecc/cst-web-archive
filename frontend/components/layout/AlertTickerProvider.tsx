@@ -12,15 +12,15 @@ import {
 import type { NewsItem } from "@/lib/types";
 
 type AlertTickerContextValue = {
-  alert: NewsItem | null;
+  alerts: NewsItem[];
 };
 
 type AlertTickerResponse = {
-  alert: NewsItem | null;
+  alerts: NewsItem[];
 };
 
 const AlertTickerContext = createContext<AlertTickerContextValue>({
-  alert: null,
+  alerts: [],
 });
 
 /*
@@ -38,7 +38,7 @@ export default function AlertTickerProvider({
 }: {
   children: ReactNode;
 }) {
-  const [alert, setAlert] = useState<NewsItem | null>(null);
+  const [alerts, setAlerts] = useState<NewsItem[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -59,11 +59,11 @@ export default function AlertTickerProvider({
 
         const payload = (await response.json()) as AlertTickerResponse;
 
-        if (!payload || !("alert" in payload)) {
+        if (!payload || !Array.isArray(payload.alerts)) {
           return;
         }
 
-        setAlert(payload.alert ?? null);
+        setAlerts(payload.alerts);
       } catch (error) {
         if (
           error instanceof DOMException &&
@@ -82,8 +82,8 @@ export default function AlertTickerProvider({
   }, []);
 
   const value = useMemo(
-    () => ({ alert }),
-    [alert],
+    () => ({ alerts }),
+    [alerts],
   );
 
   return (

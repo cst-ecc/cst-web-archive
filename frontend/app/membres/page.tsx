@@ -45,8 +45,12 @@ function MemberRow({ title, members, columns }: MemberRowProps) {
           columns === 3 ? styles.memberRowThree : styles.memberRowTwo
         }`}
       >
-        {members.map((member) => (
-          <MemberCard key={member.id} member={member} />
+        {members.map((member, index) => (
+          <MemberCard
+            key={member.id}
+            member={member}
+            motionDelay={Math.min(index * 0.05, 0.2)}
+          />
         ))}
       </div>
     </section>
@@ -116,8 +120,12 @@ export default async function MembresPage() {
                 </div>
 
                 <div className={styles.grid}>
-                  {groups.councilMembers.map((member) => (
-                    <MemberCard key={member.id} member={member} />
+                  {groups.councilMembers.map((member, index) => (
+                    <MemberCard
+                      key={member.id}
+                      member={member}
+                      motionDelay={Math.min(index * 0.045, 0.22)}
+                    />
                   ))}
                 </div>
               </section>

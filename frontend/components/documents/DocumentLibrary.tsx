@@ -118,8 +118,12 @@ export default function DocumentLibrary({
         </div>
       ) : (
         <div className={styles.grid}>
-          {pageItems.map((doc) => (
-            <DocumentCard key={doc.id} doc={doc} />
+          {pageItems.map((doc, index) => (
+            <DocumentCard
+              key={doc.id}
+              doc={doc}
+              motionDelay={Math.min(index * 0.045, 0.22)}
+            />
           ))}
         </div>
       )}

@@ -2,6 +2,7 @@ import { BIBLE_VERSES, UNDERSTAND_STEPS, UNDERSTAND_TOPICS } from "@/lib/home-v2
 import type { HomeNavigate } from "./homeV2.types";
 import PanelFrame from "./PanelFrame";
 import SectionHeading from "./SectionHeading";
+import { MotionSection } from "@/components/ui/Motion";
 import TopicCard from "./TopicCard";
 import styles from "./UnderstandPanel.module.scss";
 
@@ -26,11 +27,12 @@ export default function UnderstandPanel({ onNavigate }: { onNavigate: HomeNaviga
             tone={index === 1 ? "green" : index === 3 ? "gold" : "blue"}
             actionLabel={index === 3 ? "Voir les questions" : undefined}
             onAction={index === 3 ? () => onNavigate("faq") : undefined}
+            motionDelay={Math.min(index * 0.055, 0.18)}
           />
         ))}
       </div>
 
-      <section className={styles.flow}>
+      <MotionSection className={styles.flow} delay={0.08}>
         <SectionHeading
           eyebrow="Le fil conducteur"
           title="Du dialogue à la mise en œuvre"
@@ -51,7 +53,7 @@ export default function UnderstandPanel({ onNavigate }: { onNavigate: HomeNaviga
             </article>
           ))}
         </div>
-      </section>
+      </MotionSection>
     </PanelFrame>
   );
 }

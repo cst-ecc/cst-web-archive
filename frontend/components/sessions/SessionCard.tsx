@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import DocumentReadButton from "@/components/documents/DocumentReadButton";
 import Badge from "@/components/ui/Badge";
+import { MotionArticle } from "@/components/ui/Motion";
 import type { Session } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -11,13 +12,15 @@ export default function SessionCard({
   session,
   readableDocumentSlug,
   documentCount = session.documentSlugs.length,
+  motionDelay = 0,
 }: {
   session: Session;
   readableDocumentSlug?: string;
   documentCount?: number;
+  motionDelay?: number;
 }) {
   return (
-    <article className={styles.card}>
+    <MotionArticle className={styles.card} delay={motionDelay}>
       <div className={styles.top}>
         <span className={styles.number}>{session.number > 0 ? `Session n°${session.number}` : "Session"}</span>
         {session.location ? <Badge tone="muted">{session.location}</Badge> : null}
@@ -59,6 +62,6 @@ export default function SessionCard({
           ) : null}
         </div>
       </div>
-    </article>
+    </MotionArticle>
   );
 }
