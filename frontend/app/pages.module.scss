@@ -365,6 +365,6 @@
 
 @include m.respond(xl) {
   .prose {
-    max-width: 68rem;
+    max-width: 100%;
   }
 }
