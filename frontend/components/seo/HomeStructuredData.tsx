@@ -8,11 +8,12 @@ export default function HomeStructuredData() {
     "@type": "WebSite",
     "@id": `${baseUrl}/#website`,
     url: baseUrl,
-    name: "CST – CSMO ECC",
+    name: SITE.name,
     alternateName: [
       "CST ECC",
       "CSM ECC",
-      "CSMO ECC",
+      "CSMo ECC",
+      "CST & CSMo ECC",
       "Conseil Supérieur de Transition",
       "Conseil Supérieur de Mise en Œuvre",
     ],
@@ -23,18 +24,22 @@ export default function HomeStructuredData() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": `${baseUrl}/#organization`,
-    name:
-      "Conseil Supérieur de Mise en Œuvre de l'Église du Christianisme Céleste",
+    name: SITE.fullName,
+    parentOrganization: {
+      "@type": "Organization",
+      name: SITE.institution,
+    },
     alternateName: [
-      "CSMO",
-      "CSMO ECC",
+      "CSMo",
       "CSM",
+      "CSMo ECC",
       "CSM ECC",
       "Conseil Supérieur de Transition",
       "CST",
       "CST ECC",
     ],
     url: baseUrl,
+    logo: `${baseUrl}/logo/logo-original.png`,
   };
 
   return (

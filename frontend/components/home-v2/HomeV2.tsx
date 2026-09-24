@@ -52,9 +52,16 @@ export default function HomeV2({
   useEffect(() => {
     const syncFromLocation = () => {
       const next = panelIndexFromHash(window.location.hash);
-      const canonicalHash = `#${HOME_PANELS[next]?.id ?? "accueil"}`;
+      const panelId = HOME_PANELS[next]?.id ?? "accueil";
+      const canonicalHash = panelId === "accueil" ? "" : `#${panelId}`;
 
-      if (window.location.hash && window.location.hash !== canonicalHash) {
+      if (panelId === "accueil" && window.location.hash) {
+        window.history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}${window.location.search}`,
+        );
+      } else if (window.location.hash && window.location.hash !== canonicalHash) {
         window.history.replaceState(null, "", canonicalHash);
       }
 
@@ -63,10 +70,6 @@ export default function HomeV2({
         return next;
       });
     };
-
-    if (!window.location.hash) {
-      window.history.replaceState(null, "", "#accueil");
-    }
 
     syncFromLocation();
     window.addEventListener("hashchange", syncFromLocation);
@@ -91,8 +94,16 @@ export default function HomeV2({
       setActiveIndex(index);
     }
 
-    const nextHash = `#${nextPanel.id}`;
-    if (window.location.hash !== nextHash) {
+    const nextHash = nextPanel.id === "accueil" ? "" : `#${nextPanel.id}`;
+    if (nextPanel.id === "accueil") {
+      if (window.location.hash) {
+        window.history.pushState(
+          null,
+          "",
+          `${window.location.pathname}${window.location.search}`,
+        );
+      }
+    } else if (window.location.hash !== nextHash) {
       window.history.pushState(null, "", nextHash);
     }
     window.dispatchEvent(new Event("homepanelchange"));

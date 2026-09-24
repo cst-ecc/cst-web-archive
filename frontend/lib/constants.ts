@@ -1,13 +1,13 @@
 /** Constantes globales de la plateforme institutionnelle CST / CSMO. */
 
 export const SITE = {
-  name: "Église du Christianisme Céleste",
-  fullName: "CST & CSMo",
+  name: "CST & CSMo ECC",
+  fullName: "Conseil Supérieur de Transition et Conseil Supérieur de Mise en Œuvre",
   processName: "La Grande Marche vers l’Unité",
   institution: "Église du Christianisme Céleste",
-  title: "CST & CSMo — La Grande Marche vers l’Unité",
+  title: "CST & CSMo ECC — La Grande Marche vers l’Unité",
   description:
-    "Plateforme institutionnelle consacrée aux travaux du Conseil Supérieur de Transition (CST), à leur mise en œuvre par le Conseil Supérieur de Mise en Œuvre (CSMo) et aux chantiers de modernisation et de digitalisation de l'Église du Christianisme Céleste.",
+    "Site officiel du Conseil Supérieur de Transition (CST) et du Conseil Supérieur de Mise en Œuvre (CSMo/CSM) de l'Église du Christianisme Céleste (ECC) : actualités, documents, travaux et informations sur la marche vers l'unité.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   email: "contact@ecc.bj",
   phone: "+229 0148 899 999 | +229 01 498 999 999",
@@ -38,16 +38,16 @@ export type NavItem = NavLink & {
  * route tant qu'une page dédiée n'existe pas.
  */
 export const HOME_NAV_LINKS: NavItem[] = [
-  { label: "Accueil", href: "/#accueil" },
+  { label: "Accueil", href: "/" },
   { label: "Comprendre", href: "/#comprendre" },
   { label: "Où en sommes-nous ?", href: "/#avancement" },
-  { label: "Le CST", href: "/#cst" },
-  { label: "Le CSMo", href: "/#csmo" },
+  { label: "Le CST", href: "/presentation" },
+  { label: "Le CSMo", href: "/csmo" },
   { label: "L’Église en marche", href: "/#eglise-en-marche" },
-  { label: "Ressources", href: "/#ressources" },
+  { label: "Ressources", href: "/documents" },
   {
     label: "Actualités",
-    href: "/#actualites",
+    href: "/actualites",
     children: [
       {
         label: "Galerie",
@@ -123,11 +123,11 @@ export const NAV_LINKS: NavItem[] = [
   },
   {
     label: "CSMo",
-    href: "/#csmo",
+    href: "/csmo",
     children: [
       {
         label: "Présentation & continuité",
-        href: "/#csmo",
+        href: "/csmo",
         description: "Du CST à la phase de mise en œuvre",
       },
       {
@@ -198,7 +198,7 @@ export const FOOTER_GROUPS: FooterGroup[] = [
     title: "Le processus",
     links: [
       { label: "Le CST", href: "/presentation" },
-      { label: "Le CSMo", href: "/#csmo" },
+      { label: "Le CSMo", href: "/csmo" },
       { label: "Questions fréquentes", href: "/#faq" },
       {
         label: "Digitalisation de l'ECC",

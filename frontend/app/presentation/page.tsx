@@ -5,8 +5,12 @@ import { SITE } from "@/lib/constants";
 import styles from "../pages.module.scss";
 
 export const metadata: Metadata = {
-  title: "Présentation",
-  description: "Présentation, mission, vision et objectifs du Conseil Supérieur de Transition de l'Église du Christianisme Céleste.",
+  title: "CST — Conseil Supérieur de Transition",
+  description:
+    "Présentation officielle du Conseil Supérieur de Transition (CST) de l’Église du Christianisme Céleste : mission, vision, rôle et objectifs.",
+  alternates: {
+    canonical: "/presentation",
+  },
 };
 
 const missions = [

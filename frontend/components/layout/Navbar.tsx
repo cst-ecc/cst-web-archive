@@ -63,7 +63,7 @@ function isActiveHref(
 
   const pathOnly = href.split(/[?#]/)[0] || "/";
   return pathOnly === "/"
-    ? pathname === "/"
+    ? pathname === "/" && (!activeHash || activeHash === "#accueil")
     : pathname === pathOnly || pathname.startsWith(`${pathOnly}/`);
 }
 
@@ -539,12 +539,9 @@ export default function Navbar() {
         />
 
         <Link
-          href="/#accueil"
+          href="/"
           className={cn(styles.logoLink, styles.homeLogoLink)}
           aria-label={`${SITE.name} — ${SITE.fullName}`}
-          onClick={(event) => {
-            if (navigateHomePanel("/#accueil")) event.preventDefault();
-          }}
         >
           <Image
             src="/logo/logo-original.png"
