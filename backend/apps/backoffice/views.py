@@ -194,7 +194,19 @@ def logout_view(request):
 @never_cache
 @backoffice_2fa_required
 def dashboard_view(request):
-    return render(request, "backoffice/dashboard.html", {"role_label": backoffice_role_label(request.user)})
+    from apps.communication.models import (
+        ContactRequest, ContactStatus, Conversation, ConversationStatus,
+        ChatMessage, ChatSender, NewsletterSubscriber, SubscriberStatus,
+    )
+    return render(request, "backoffice/dashboard.html", {
+        "role_label": backoffice_role_label(request.user),
+        "communication_stats": {
+            "new_contacts": ContactRequest.objects.filter(status=ContactStatus.NEW).count(),
+            "waiting_conversations": Conversation.objects.filter(status=ConversationStatus.WAITING).count(),
+            "unread_messages": ChatMessage.objects.filter(sender_type=ChatSender.VISITOR, is_read=False).count(),
+            "newsletter_subscribers": NewsletterSubscriber.objects.filter(status=SubscriberStatus.ACTIVE).count(),
+        },
+    })
 
 
 def _masked_email(email: str) -> str:

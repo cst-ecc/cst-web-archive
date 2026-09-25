@@ -18,6 +18,7 @@ DEBUG = env.bool("DJANGO_DEBUG")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -27,6 +28,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "django_filters",
+    "channels",
     "apps.core.apps.CoreConfig",
     "apps.accounts.apps.AccountsConfig",
     "apps.audit.apps.AuditConfig",
@@ -34,6 +36,7 @@ INSTALLED_APPS = [
     "apps.news.apps.NewsConfig",
     "apps.gallery.apps.GalleryConfig",
     "apps.documents.apps.DocumentsConfig",
+    "apps.communication.apps.CommunicationConfig",
 ]
 
 MIDDLEWARE = [
@@ -173,3 +176,19 @@ GALLERY_UPLOAD_SESSION_TTL_HOURS = env.int(
 
 # Document upload limits
 MAX_DOCUMENT_UPLOAD_MB = env.int("MAX_DOCUMENT_UPLOAD_MB")
+
+# Communication / temps réel
+PUBLIC_SITE_URL = env("PUBLIC_SITE_URL", default=env("NEXT_PUBLIC_SITE_URL"))
+REDIS_CACHE_URL = env("REDIS_CACHE_URL")
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_CACHE_URL,
+    }
+}
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [env("CHANNEL_REDIS_URL")]},
+    }
+}

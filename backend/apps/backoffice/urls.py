@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 
 from apps.documents import backoffice_views as document_views
 from apps.gallery import backoffice_views as gallery_views
@@ -15,6 +15,8 @@ urlpatterns = [
     path("login/otp/", views.otp_view, name="otp"),
     path("login/otp/resend/", views.resend_otp_view, name="otp_resend"),
     path("logout/", views.logout_view, name="logout"),
+
+    path("communication/", include("apps.communication.backoffice_urls")),
 
     path(
         "setup/<uidb64>/<token>/",

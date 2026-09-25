@@ -45,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .map((item) => internalPath(item.href, item.external))
     .filter((path): path is string => Boolean(path));
 
-  const staticPages = [...new Set(["/", ...navPaths])];
+  const staticPages = [...new Set(["/", "/politique-cookies", ...navPaths])];
 
   /**
    * Pour les pages statiques, on évite volontairement `new Date()`

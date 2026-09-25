@@ -31,6 +31,9 @@ services:
       WATCHPACK_POLLING: "true"
       HOSTNAME: "0.0.0.0"
       PORT: "3000"
+      # Les rewrites Next.js ne proxifient pas de manière fiable les upgrades
+      # WebSocket. En développement, le chat passe donc par le gateway Nginx.
+      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:8080}
 
     volumes:
       - ../frontend:/app

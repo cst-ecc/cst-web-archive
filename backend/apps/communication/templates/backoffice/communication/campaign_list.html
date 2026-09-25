@@ -1,0 +1,15 @@
+{% extends "backoffice/base.html" %}
+{% block title %}Campagnes Newsletter — Back-office{% endblock %}
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head">
+    <div><a class="bo-back-link" href="{% url 'backoffice:communication_subscribers' %}">← Abonnés</a><span class="bo-eyebrow">Newsletter</span><h1>Campagnes</h1><p>Préparer, tester et envoyer les communications aux abonnés actifs.</p></div>
+    {% if perms.communication.add_newslettercampaign %}<a class="bo-btn" href="{% url 'backoffice:communication_campaign_create' %}">Nouvelle campagne</a>{% endif %}
+  </header>
+
+  <div class="bo-table-wrap"><table class="bo-table"><thead><tr><th>Campagne</th><th>Statut</th><th>Destinataires</th><th>Réussis</th><th>Échecs</th><th>Actions</th></tr></thead><tbody>
+    {% for c in campaigns %}<tr><td><strong>{{ c.title }}</strong><span>{{ c.subject }}</span></td><td><span class="bo-status bo-status--{{ c.status }}">{{ c.get_status_display }}</span></td><td>{{ c.recipient_count }}</td><td>{{ c.success_count }}</td><td>{{ c.failure_count }}</td><td class="bo-table__actions"><div class="bo-workflow-actions">{% if c.status == 'brouillon' and perms.communication.change_newslettercampaign %}<a class="bo-btn bo-btn--soft" href="{% url 'backoffice:communication_campaign_edit' c.pk %}">Modifier</a>{% endif %}{% if perms.communication.send_newslettercampaign %}<form method="post" action="{% url 'backoffice:communication_campaign_test' c.pk %}">{% csrf_token %}<input type="hidden" name="email" value="{{ request.user.email }}"><button class="bo-btn bo-btn--soft">Test</button></form>{% if c.status == 'brouillon' %}<form method="post" action="{% url 'backoffice:communication_campaign_send' c.pk %}">{% csrf_token %}<button class="bo-btn">Envoyer</button></form>{% endif %}{% endif %}</div></td></tr>
+    {% empty %}<tr><td colspan="6" class="bo-empty">Aucune campagne.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

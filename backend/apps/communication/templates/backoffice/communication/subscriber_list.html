@@ -1,0 +1,21 @@
+{% extends "backoffice/base.html" %}
+{% block title %}Abonnés Newsletter — Back-office{% endblock %}
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head">
+    <div><span class="bo-eyebrow">Newsletter</span><h1>Abonnés</h1><p>Rechercher les inscriptions et administrer leur statut.</p></div>
+    <a class="bo-btn" href="{% url 'backoffice:communication_campaigns' %}">Voir les campagnes</a>
+  </header>
+
+  <form class="bo-news-filters" method="get">
+    <input type="search" name="q" value="{{ query }}" placeholder="Rechercher un e-mail ou un nom">
+    <select name="status"><option value="">Tous les statuts</option>{% for v,l in status_choices %}<option value="{{ v }}" {% if status_filter == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+    <button class="bo-btn bo-btn--soft">Filtrer</button>
+  </form>
+
+  <div class="bo-table-wrap"><table class="bo-table"><thead><tr><th>E-mail</th><th>Nom</th><th>Statut</th><th>Inscription</th><th></th></tr></thead><tbody>
+    {% for s in page_obj %}<tr><td><strong>{{ s.email }}</strong><span>{{ s.source }}</span></td><td>{{ s.name|default:"—" }}</td><td><span class="bo-status bo-status--{{ s.status }}">{{ s.get_status_display }}</span></td><td>{{ s.subscribed_at|date:"d/m/Y H:i" }}</td><td class="bo-table__actions">{% if perms.communication.manage_newslettersubscriber %}<form method="post" action="{% url 'backoffice:communication_subscriber_toggle' s.pk %}">{% csrf_token %}<button class="bo-btn bo-btn--soft">{% if s.status == 'bloque' %}Débloquer{% else %}Bloquer{% endif %}</button></form>{% endif %}</td></tr>
+    {% empty %}<tr><td colspan="5" class="bo-empty">Aucun abonné.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

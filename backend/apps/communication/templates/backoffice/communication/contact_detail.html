@@ -1,0 +1,49 @@
+{% extends "backoffice/base.html" %}
+{% block title %}Contact #{{ contact.pk }} — Back-office{% endblock %}
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head">
+    <div>
+      <a class="bo-back-link" href="{% url 'backoffice:communication_contacts' %}">← Retour aux demandes</a>
+      <span class="bo-eyebrow">Communication</span>
+      <h1>{{ contact.subject }}</h1>
+      <p>{{ contact.first_name }} {{ contact.last_name }} · {{ contact.email }}{% if contact.phone %} · {{ contact.phone }}{% endif %}</p>
+    </div>
+    <span class="bo-status bo-status--{{ contact.status }}">{{ contact.get_status_display }}</span>
+  </header>
+
+  <div class="bo-contact-detail-grid">
+    <article class="bo-card">
+      <span class="bo-eyebrow">Message reçu</span>
+      <div class="bo-message-copy">{{ contact.message }}</div>
+      <div class="bo-info-stack">
+        <div><span>Catégorie</span><strong>{{ contact.category|default:"—" }}</strong></div>
+        <div><span>Reçu le</span><strong>{{ contact.created_at|date:"d/m/Y à H:i" }}</strong></div>
+        <div><span>Téléphone</span><strong>{{ contact.phone|default:"Non renseigné" }}</strong></div>
+      </div>
+    </article>
+
+    <article class="bo-card">
+      <span class="bo-eyebrow">Suivi interne</span>
+      <form method="post" class="bo-form" style="margin-top:1rem">
+        {% csrf_token %}
+        <div class="bo-field"><label for="{{ form.status.id_for_label }}">Statut</label>{{ form.status }}{% for e in form.status.errors %}<p class="bo-error">{{ e }}</p>{% endfor %}</div>
+        <div class="bo-field"><label for="{{ form.assigned_to.id_for_label }}">Assignée à</label>{{ form.assigned_to }}{% for e in form.assigned_to.errors %}<p class="bo-error">{{ e }}</p>{% endfor %}</div>
+        <div class="bo-field"><label for="{{ form.internal_note.id_for_label }}">Note interne</label>{{ form.internal_note }}{% for e in form.internal_note.errors %}<p class="bo-error">{{ e }}</p>{% endfor %}</div>
+        {% if perms.communication.manage_contactrequest %}<button class="bo-btn" type="submit">Enregistrer le suivi</button>{% endif %}
+      </form>
+    </article>
+  </div>
+
+  {% if perms.communication.reply_contactrequest %}
+    <article class="bo-card">
+      <span class="bo-eyebrow">Réponse par e-mail</span>
+      <form method="post" action="{% url 'backoffice:communication_contact_reply' contact.pk %}" class="bo-form" style="margin-top:1rem">
+        {% csrf_token %}
+        <div class="bo-field"><label for="contact-reply">Votre réponse</label><textarea id="contact-reply" name="reply" rows="7" required placeholder="Rédigez votre réponse…"></textarea></div>
+        <div><button class="bo-btn" type="submit">Envoyer la réponse</button></div>
+      </form>
+    </article>
+  {% endif %}
+</section>
+{% endblock %}

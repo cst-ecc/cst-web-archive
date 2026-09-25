@@ -1,0 +1,14 @@
+{% extends "backoffice/base.html" %}
+{% block title %}{% if campaign %}Modifier la campagne{% else %}Nouvelle campagne{% endif %} — Back-office{% endblock %}
+{% block content %}
+<section class="bo-page bo-form-page bo-form-page--wide">
+  <header class="bo-page-head"><div><a class="bo-back-link" href="{% url 'backoffice:communication_campaigns' %}">← Campagnes</a><span class="bo-eyebrow">Newsletter</span><h1>{% if campaign %}Modifier la campagne{% else %}Nouvelle campagne{% endif %}</h1><p>Préparez le contenu avant tout envoi aux abonnés actifs.</p></div></header>
+  <form method="post" class="bo-form--card">
+    {% csrf_token %}
+    <div class="bo-field"><label for="{{ form.title.id_for_label }}">Titre interne</label>{{ form.title }}{% for e in form.title.errors %}<p class="bo-error">{{ e }}</p>{% endfor %}</div>
+    <div class="bo-field"><label for="{{ form.subject.id_for_label }}">Objet de l’e-mail</label>{{ form.subject }}{% for e in form.subject.errors %}<p class="bo-error">{{ e }}</p>{% endfor %}</div>
+    <div class="bo-field"><label for="{{ form.content.id_for_label }}">Contenu</label>{{ form.content }}{% for e in form.content.errors %}<p class="bo-error">{{ e }}</p>{% endfor %}</div>
+    <div><button class="bo-btn" type="submit">Enregistrer le brouillon</button></div>
+  </form>
+</section>
+{% endblock %}

@@ -8,6 +8,7 @@ import styles from "./SocialFloatingLinks.module.scss";
 
 type SocialInlineLinksProps = {
     links?: SocialLink[];
+    variant?: "dark" | "light";
 };
 
 function SocialIcon({ name }: { name: SocialIconName }) {
@@ -65,6 +66,7 @@ function SocialIcon({ name }: { name: SocialIconName }) {
 
 export default function SocialInlineLinks({
     links = SOCIAL_LINKS,
+    variant = "dark",
 }: SocialInlineLinksProps) {
     const visibleLinks = links.filter(
         (link) =>
@@ -78,7 +80,7 @@ export default function SocialInlineLinks({
 
     return (
         <nav
-            className={styles.socials}
+            className={`${styles.socials} ${variant === "light" ? styles.light : ""}`}
             aria-label="Réseaux sociaux officiels"
         >
             {visibleLinks.map((link) => (

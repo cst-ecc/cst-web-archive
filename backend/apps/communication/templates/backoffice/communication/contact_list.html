@@ -1,0 +1,50 @@
+{% extends "backoffice/base.html" %}
+{% block title %}Contacts — Back-office CST/CSMo{% endblock %}
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head">
+    <div>
+      <span class="bo-eyebrow">Communication</span>
+      <h1>Demandes de contact</h1>
+      <p>Consulter, rechercher et traiter les messages reçus depuis le formulaire public.</p>
+    </div>
+  </header>
+
+  <form method="get" class="bo-news-filters">
+    <input type="search" name="q" value="{{ query }}" placeholder="Nom, e-mail, objet…" aria-label="Rechercher une demande">
+    <select name="status" aria-label="Filtrer par statut">
+      <option value="">Tous les statuts</option>
+      {% for value,label in status_choices %}<option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <button class="bo-btn bo-btn--soft">Filtrer</button>
+  </form>
+
+  <div class="bo-table-wrap">
+    <table class="bo-table">
+      <thead><tr><th>Demandeur</th><th>Objet</th><th>Catégorie</th><th>Statut</th><th>Date</th><th></th></tr></thead>
+      <tbody>
+        {% for item in page_obj %}
+          <tr>
+            <td><strong>{{ item.first_name }} {{ item.last_name }}</strong><span>{{ item.email }}</span></td>
+            <td>{{ item.subject }}</td>
+            <td>{{ item.category|default:"—" }}</td>
+            <td><span class="bo-status bo-status--{{ item.status }}">{{ item.get_status_display }}</span></td>
+            <td>{{ item.created_at|date:"d/m/Y H:i" }}</td>
+            <td class="bo-table__actions"><a href="{% url 'backoffice:communication_contact_detail' item.pk %}">Ouvrir →</a></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="bo-empty">Aucune demande pour ces critères.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="bo-pagination" aria-label="Pagination">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&q={{ query|urlencode }}&status={{ status_filter }}">← Précédent</a>{% endif %}
+      <span>Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&q={{ query|urlencode }}&status={{ status_filter }}">Suivant →</a>{% endif %}
+    </nav>
+  {% endif %}
+</section>
+{% endblock %}

@@ -23,6 +23,7 @@ services:
         NEXT_PUBLIC_NEWS_SOURCE: ${NEXT_PUBLIC_NEWS_SOURCE:-api}
         NEXT_PUBLIC_GALLERY_SOURCE: ${NEXT_PUBLIC_GALLERY_SOURCE:-api}
         NEXT_PUBLIC_DOCUMENTS_SOURCE: ${NEXT_PUBLIC_DOCUMENTS_SOURCE:-api}
+        NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-}
 
     image: ${CST_FRONTEND_IMAGE:-cst-frontend:latest}
     container_name: cst-frontend
@@ -41,6 +42,7 @@ services:
       NEXT_PUBLIC_NEWS_SOURCE: ${NEXT_PUBLIC_NEWS_SOURCE:-api}
       NEXT_PUBLIC_GALLERY_SOURCE: ${NEXT_PUBLIC_GALLERY_SOURCE:-api}
       NEXT_PUBLIC_DOCUMENTS_SOURCE: ${NEXT_PUBLIC_DOCUMENTS_SOURCE:-api}
+      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-}
 
     expose:
       - "3000"
@@ -170,12 +172,7 @@ services:
     # Les opérations de release (migrations / collectstatic) sont exécutées
     # par docker/scripts/release-backend.sh avant l'activation du conteneur.
     command: >
-      gunicorn config.wsgi:application
-      --bind 0.0.0.0:8000
-      --workers 3
-      --timeout 120
-      --access-logfile -
-      --error-logfile -
+      daphne -b 0.0.0.0 -p 8000 config.asgi:application
 
     restart: unless-stopped
 

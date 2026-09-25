@@ -1,0 +1,218 @@
+@use "../../styles/variables" as v;
+
+.wrap {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 1.15rem;
+  color: v.$color-white;
+}
+
+.intro {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.kicker {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: v.$color-yellow;
+}
+
+.kicker::before {
+  content: "";
+  width: 1.5rem;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.intro strong {
+  max-width: 37rem;
+  font-family: v.$font-display;
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+}
+
+.intro p {
+  max-width: 39rem;
+  margin: 0;
+  font-size: 0.79rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.form {
+  width: min(100%, 39rem);
+}
+
+.fieldShell {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 3.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.28rem 0.3rem 0.28rem 0.85rem;
+  backdrop-filter: blur(12px);
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.fieldShell:focus-within {
+  border-color: rgba(241, 233, 6, 0.66);
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 0 0 4px rgba(241, 233, 6, 0.08);
+}
+
+.mailIcon {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.mailIcon svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fieldShell input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  padding: 0.72rem 0.55rem;
+  font: inherit;
+  font-size: 0.79rem;
+  color: v.$color-white;
+}
+
+.fieldShell input::placeholder {
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.fieldShell button {
+  min-height: 2.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 0;
+  border-radius: 999px;
+  background: v.$color-white;
+  padding: 0.65rem 1rem;
+  color: v.$color-blue-ink;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 0.55rem 1.4rem rgba(5, 31, 49, 0.16);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.fieldShell button span {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: v.$color-yellow;
+}
+
+.fieldShell button:hover:not(:disabled),
+.fieldShell button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 0.8rem 1.7rem rgba(5, 31, 49, 0.22);
+  outline: none;
+}
+
+.fieldShell button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.meta {
+  min-height: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.9rem;
+  align-items: center;
+  font-size: 0.65rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.meta p {
+  margin: 0;
+  font-weight: 650;
+}
+
+.success {
+  color: #d9f8e4;
+}
+
+.error {
+  color: #ffd0d6;
+}
+
+.honeypot {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+@media (max-width: 640px) {
+  .wrap {
+    gap: 1rem;
+  }
+
+  .intro strong {
+    font-size: 1.35rem;
+  }
+
+  .fieldShell {
+    grid-template-columns: auto minmax(0, 1fr);
+    border-radius: 1rem;
+    padding: 0.42rem 0.5rem 0.5rem 0.8rem;
+  }
+
+  .fieldShell button {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fieldShell,
+  .fieldShell button {
+    transition: none;
+  }
+
+  .fieldShell button:hover:not(:disabled),
+  .fieldShell button:focus-visible {
+    transform: none;
+  }
+}

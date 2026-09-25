@@ -20,6 +20,7 @@ type BibleVerseCarouselProps = {
   intervalMs?: number;
   variant?: "strip" | "card";
   className?: string;
+  showSocials?: boolean;
 };
 
 export default function BibleVerseCarousel({
@@ -27,6 +28,7 @@ export default function BibleVerseCarousel({
   intervalMs = 180_000,
   variant = "card",
   className,
+  showSocials = variant === "strip",
 }: BibleVerseCarouselProps) {
   const availableVerses = useMemo(
     () =>
@@ -179,7 +181,7 @@ export default function BibleVerseCarousel({
           </div>
         ) : null}
 
-        {variant === "strip" ? (
+        {variant === "strip" && showSocials ? (
           <>
             <span
               className={styles.divider}

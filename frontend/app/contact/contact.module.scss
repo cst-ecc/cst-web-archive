@@ -1,73 +1,353 @@
 @use "../../styles/variables" as v;
 @use "../../styles/mixins" as m;
 
-.wrapper {
-  padding-block: 3rem;
+.page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(1.4rem, 3vw, 3.4rem) 0 clamp(2.5rem, 5vw, 5.5rem);
+  background:
+    radial-gradient(circle at 8% 7%, rgba(31, 133, 206, 0.12), transparent 26rem),
+    radial-gradient(circle at 93% 88%, rgba(241, 233, 6, 0.09), transparent 22rem),
+    v.$color-surface-muted;
 }
 
-.layout {
+.pageGlow {
+  position: absolute;
+  z-index: -1;
+  top: 8rem;
+  right: -12rem;
+  width: 30rem;
+  height: 30rem;
+  border-radius: 50%;
+  background: rgba(31, 133, 206, 0.08);
+  filter: blur(70px);
+  pointer-events: none;
+}
+
+.shell {
+  width: min(calc(100% - 2rem), 94rem);
+  margin-inline: auto;
   display: grid;
-  gap: 2.5rem;
-
-  @include m.respond(lg) {
-    grid-template-columns: 1fr 20rem;
-  }
+  grid-template-columns: minmax(22rem, 0.9fr) minmax(0, 1.1fr);
+  min-height: clamp(42rem, 74vh, 50rem);
+  overflow: hidden;
+  border: 1px solid rgba(18, 84, 127, 0.11);
+  border-radius: clamp(1.35rem, 2vw, 2rem);
+  background: v.$color-white;
+  box-shadow:
+    0 1.7rem 5rem rgba(12, 59, 92, 0.1),
+    0 0.25rem 0.8rem rgba(17, 24, 39, 0.04);
 }
 
-.sidebar {
-  @include m.card;
-  padding: 1.5rem;
-  align-self: start;
+.visualPanel {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: clamp(2rem, 3.4vw, 3.5rem);
+  background:
+    radial-gradient(circle at 82% 12%, rgba(36, 124, 211, 0.55), transparent 32%),
+    linear-gradient(145deg, v.$color-blue-ink 0%, v.$color-blue-deep 58%, #0a466f 100%);
+  color: v.$color-white;
 }
 
-.sidebarTitle {
-  font-size: 0.875rem;
-  font-weight: 700;
+.visualPanel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 3.75rem 3.75rem;
+  mask-image: linear-gradient(to bottom, transparent 9%, #000 36%, #000 83%, transparent);
+  pointer-events: none;
+}
+
+.visualPanel::after {
+  content: "";
+  position: absolute;
+  top: 2.4rem;
+  right: 2.4rem;
+  width: 0.78rem;
+  height: 0.78rem;
+  border-radius: 50%;
+  background: v.$color-yellow;
+  box-shadow:
+    1.25rem 0 0 rgba(241, 233, 6, 0.44),
+    0 1.25rem 0 rgba(255, 255, 255, 0.35);
+}
+
+.visualTop,
+.contactList {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow,
+.formIntro > span {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+}
+
+.eyebrow {
+  color: rgba(255, 255, 255, 0.64);
+}
+
+.eyebrow::before,
+.formIntro > span::before {
+  content: "";
+  width: 1.75rem;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.visualTop h1 {
+  max-width: 38rem;
+  margin: 0;
+  font-family: v.$font-display;
+  font-size: clamp(2.05rem, 3.5vw, 4rem);
+  font-weight: 600;
+  line-height: 1.03;
+  letter-spacing: -0.045em;
+  color: v.$color-white !important;
+}
+
+.visualTop h1 em {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  color: v.$color-yellow;
+}
+
+.lead {
+  max-width: 37rem;
+  margin: 1.2rem 0 0;
+  font-size: clamp(0.86rem, 0.8rem + 0.18vw, 0.98rem);
+  line-height: 1.72;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.contactList {
+  display: grid;
+  margin-top: auto;
+  padding-top: clamp(2.25rem, 7vw, 6rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.contactList a {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 2.2rem minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: center;
+  min-height: 3.9rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 0.95rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: v.$color-white;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.contactList a:hover,
+.contactList a:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(241, 233, 6, 0.48);
+  background: rgba(255, 255, 255, 0.12);
+  outline: none;
+}
+
+.contactIcon {
+  width: 2.15rem;
+  height: 2.15rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.72rem;
+  background: v.$color-yellow;
   color: v.$color-blue-ink;
 }
 
-.coordList {
-  margin-top: 1rem;
+.contactIcon svg {
+  width: 0.98rem;
+  height: 0.98rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.contactList a > span:last-child {
+  min-width: 0;
   display: grid;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: rgba(17, 24, 39, 0.8);
+  gap: 0.05rem;
 }
 
-.coordLabel {
-  color: rgba(17, 24, 39, 0.6);
+.contactList small {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.emailLink {
+.contactList strong {
+  overflow: hidden;
+  font-size: 0.7rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.formPanel {
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(2rem, 4.2vw, 4.8rem);
+  background:
+    radial-gradient(circle at 100% 0, rgba(31, 133, 206, 0.055), transparent 18rem),
+    v.$color-white;
+}
+
+.formIntro {
+  margin-bottom: clamp(1.4rem, 2.4vw, 2.1rem);
+}
+
+.formIntro > span {
   color: v.$color-blue;
-
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
-.linksTitle {
-  margin-top: 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.formIntro h2 {
+  margin: 0;
+  font-family: v.$font-display;
+  font-size: clamp(1.8rem, 2.6vw, 2.65rem);
+  font-weight: 650;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
   color: v.$color-blue-ink;
 }
 
-.linksList {
-  margin-top: 0.75rem;
-  display: grid;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+.formIntro p {
+  max-width: 43rem;
+  margin: 0.65rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.65;
+  color: rgba(17, 24, 39, 0.62);
+}
 
-  a {
-    color: v.$color-blue;
+.successBanner {
+  margin-bottom: 1.2rem;
+  border: 1px solid rgba(31, 133, 206, 0.18);
+  border-radius: 0.9rem;
+  background: rgba(31, 133, 206, 0.07);
+  padding: 0.85rem 1rem;
+  color: v.$color-blue-deep;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
 
-    &:hover {
-      text-decoration: underline;
-    }
+.formNote {
+  margin: 1.3rem 0 0;
+  padding-top: 1.15rem;
+  border-top: 1px solid v.$color-surface-line;
+  color: rgba(17, 24, 39, 0.45);
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 1180px) {
+  .shell {
+    grid-template-columns: minmax(20rem, 0.88fr) minmax(0, 1.12fr);
+  }
+
+  .contactList {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding-top: 1rem;
+  }
+
+  .shell {
+    grid-template-columns: 1fr;
+    width: min(calc(100% - 1.4rem), 52rem);
+  }
+
+  .visualPanel {
+    min-height: auto;
+  }
+
+  .contactList {
+    margin-top: 0;
+    padding-top: 2.25rem;
+  }
+
+  .visualTop h1 {
+    max-width: 42rem;
+    font-size: clamp(2rem, 7vw, 3.3rem);
+  }
+
+
+  .contactList {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .shell {
+    width: min(calc(100% - 1rem), 42rem);
+    border-radius: 1.2rem;
+  }
+
+  .visualPanel,
+  .formPanel {
+    padding: 1.35rem;
+  }
+
+  .visualPanel::after {
+    top: 1.4rem;
+    right: 1.4rem;
+  }
+
+
+  .contactList {
+    grid-template-columns: 1fr;
+  }
+
+  .contactList a {
+    min-height: 3.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contactList a {
+    transition: none;
+  }
+
+  .contactList a:hover,
+  .contactList a:focus-visible {
+    transform: none;
   }
 }

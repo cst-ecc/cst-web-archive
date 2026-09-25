@@ -1,106 +1,559 @@
 @use "../../styles/variables" as v;
-@use "../../styles/mixins" as m;
 
 .footer {
   flex: 0 0 auto;
   width: 100%;
-  border-top: 1px solid v.$color-surface-line;
-  background: v.$color-white;
+  overflow: hidden;
+  background: v.$color-surface-muted;
 }
 
-.inner {
-  @include m.container;
-  max-width: v.$max-width-home;
-  margin-inline: auto;
+.scriptureBand {
+  position: relative;
+  z-index: 1;
+}
 
-  min-height: clamp(3.2rem, 2.9rem + 0.4vw, 3.65rem);
+.surface {
+  position: relative;
+  background:
+    radial-gradient(circle at 11% 34%, rgba(31, 133, 206, 0.06), transparent 24rem),
+    linear-gradient(180deg, #f4f8fb 0%, #ffffff 58%, #ffffff 100%);
+  border-top: 1px solid rgba(18, 84, 127, 0.08);
+}
+
+.newsletterWrap {
+  position: relative;
+  z-index: 3;
+  width: min(calc(100% - 2rem), 90rem);
+  margin: -1.2rem auto 0;
+  padding-top: clamp(2rem, 3vw, 3rem);
+}
+
+.newsletterCard {
+  min-height: 17rem;
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.72fr) minmax(0, 1.28fr);
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: clamp(1.25rem, 2vw, 1.8rem);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(36, 124, 211, 0.95), transparent 38%),
+    linear-gradient(135deg, v.$color-blue-deep 0%, v.$color-blue 100%);
+  box-shadow:
+    0 2.2rem 5rem rgba(12, 59, 92, 0.2),
+    0 0.4rem 1.2rem rgba(12, 59, 92, 0.08);
+}
+
+.newsletterCard > :last-child {
+  padding: clamp(2rem, 4vw, 3.5rem) clamp(1.6rem, 4vw, 4rem) clamp(2rem, 4vw, 3.5rem) 0;
+}
+
+.newsletterArt {
+  position: relative;
+  min-height: 17rem;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.newsletterArt::before {
+  content: "";
+  position: absolute;
+  width: 16rem;
+  height: 16rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 0 0 2.5rem rgba(255, 255, 255, 0.035),
+    0 0 0 5rem rgba(255, 255, 255, 0.02);
+}
+
+.newsletterArt::after {
+  content: "";
+  position: absolute;
+  left: 13%;
+  bottom: 10%;
+  width: 75%;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: rgba(5, 31, 49, 0.25);
+  filter: blur(16px);
+}
+
+.envelope {
+  position: relative;
+  z-index: 2;
+  width: clamp(10rem, 16vw, 14rem);
+  transform: rotate(-7deg);
+  filter: drop-shadow(0 1.2rem 1.25rem rgba(5, 31, 49, 0.26));
+}
+
+.envelope svg {
+  width: 100%;
+  fill: rgba(255, 255, 255, 0.92);
+  stroke: v.$color-blue-ink;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.envelope span {
+  position: absolute;
+  top: -0.8rem;
+  right: -0.35rem;
+  width: 2.65rem;
+  height: 2.65rem;
+  display: grid;
+  place-items: center;
+  border: 0.3rem solid v.$color-blue;
+  border-radius: 50%;
+  background: v.$color-yellow;
+  color: v.$color-blue-ink;
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+.artOrbitOne,
+.artOrbitTwo {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 50%;
+  transform: rotate(-18deg);
+}
+
+.artOrbitOne {
+  width: 19rem;
+  height: 7rem;
+}
+
+.artOrbitTwo {
+  width: 15rem;
+  height: 5rem;
+  transform: rotate(28deg);
+}
+
+.artDotOne,
+.artDotTwo {
+  position: absolute;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: v.$color-yellow;
+  box-shadow: 0 0 0 0.4rem rgba(241, 233, 6, 0.1);
+}
+
+.artDotOne {
+  top: 26%;
+  left: 22%;
+}
+
+.artDotTwo {
+  right: 20%;
+  bottom: 21%;
+}
+
+.mainFooter {
+  width: min(calc(100% - 2rem), 90rem);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(16rem, 1.4fr) repeat(2, minmax(9rem, 0.65fr)) minmax(15rem, 1fr);
+  gap: clamp(2rem, 4vw, 4.5rem);
+  padding: clamp(3.2rem, 6vw, 5.7rem) 0 clamp(2.6rem, 4vw, 4rem);
+}
+
+.brandColumn,
+.linkColumn,
+.contactColumn {
+  min-width: 0;
+}
+
+.brand {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  color: v.$color-blue-ink;
+  text-decoration: none;
+}
+
+.brandLogo {
+  width: 4.25rem;
+  height: 4.25rem;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 1.15rem;
+  background: linear-gradient(145deg, v.$color-blue-ink, v.$color-blue-deep);
+  box-shadow: 0 0.7rem 1.6rem rgba(12, 59, 92, 0.13);
+}
+
+.brandLogo img {
+  width: 3.55rem;
+  height: 3.55rem;
+  object-fit: contain;
+}
+
+.brandText {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.brandText strong {
+  font-family: v.$font-display;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.brandText small {
+  max-width: 14rem;
+  color: rgba(17, 24, 39, 0.54);
+  font-size: 0.67rem;
+  line-height: 1.35;
+}
+
+.brandDescription {
+  max-width: 27rem;
+  margin: 1.1rem 0 1.15rem;
+  color: rgba(17, 24, 39, 0.6);
+  font-size: 0.77rem;
+  line-height: 1.65;
+}
+
+.linkColumn h3,
+.contactColumn h3 {
+  margin: 0 0 1rem;
+  font-family: v.$font-display;
+  font-size: 0.85rem;
+  color: v.$color-blue-ink;
+}
+
+.linkColumn > div {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.linkColumn a {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: rgba(17, 24, 39, 0.62);
+  font-size: 0.75rem;
+  font-weight: 560;
+  text-decoration: none;
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.linkColumn a span {
+  font-size: 0.65rem;
+  color: v.$color-blue;
+}
+
+.linkColumn a:hover,
+.linkColumn a:focus-visible {
+  color: v.$color-blue;
+  transform: translateX(2px);
+  outline: none;
+}
+
+.contactItems {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.contactItems > a {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 2.35rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.7rem;
+  color: v.$color-blue-ink;
+  text-decoration: none;
+}
+
+.contactIcon {
+  width: 2.35rem;
+  height: 2.35rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: rgba(31, 133, 206, 0.09);
+  color: v.$color-blue;
+}
+
+.contactIcon svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.contactItems > a > span:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 0.04rem;
+}
+
+.contactItems small {
+  color: rgba(17, 24, 39, 0.42);
+  font-size: 0.62rem;
+}
+
+.contactItems strong {
+  overflow: hidden;
+  color: v.$color-blue-ink;
+  font-size: 0.72rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contactCta {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 1.25rem;
+  border-radius: 999px;
+  background: v.$color-blue-ink;
+  padding: 0.62rem 0.82rem 0.62rem 0.95rem;
+  color: v.$color-white;
+  font-size: 0.7rem;
+  font-weight: 750;
+  text-decoration: none;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.contactCta span {
+  width: 1.35rem;
+  height: 1.35rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: v.$color-yellow;
+  color: v.$color-blue-ink;
+}
+
+.contactCta:hover,
+.contactCta:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 0.65rem 1.3rem rgba(12, 59, 92, 0.16);
+  outline: none;
+}
+
+.bottomBar {
+  width: min(calc(100% - 2rem), 90rem);
+  min-height: 4.3rem;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: clamp(1rem, 0.6rem + 0.6vw, 1.75rem);
-
-  color: rgba(17, 24, 39, 0.56);
-  font-size: v.$font-size-meta;
+  gap: 1rem 2rem;
+  border-top: 1px solid v.$color-surface-line;
+  color: rgba(17, 24, 39, 0.5);
+  font-size: 0.69rem;
 }
 
-.identity,
-.contacts {
+.bottomBar p {
+  margin: 0;
+}
+
+.legal {
   display: flex;
-  align-items: center;
-}
-
-.identity {
-  gap: 0.75rem;
-
-  strong {
-    color: v.$color-blue-deep;
-    font-size: v.$font-size-meta;
-    font-weight: 700;
-  }
-}
-
-.process {
-  padding-left: 0.75rem;
-  border-left: 1px solid v.$color-surface-line;
-  color: rgba(17, 24, 39, 0.46);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.contacts {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.65rem 1.2rem;
+  align-items: center;
 }
 
-.contact {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-
+.legal a {
   color: v.$color-blue-deep;
   font-weight: 600;
-  transition: color 0.15s ease;
+  text-decoration: none;
+}
 
-  svg {
-    width: 0.95rem;
-    height: 0.95rem;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+.legal a:hover,
+.legal a:focus-visible {
+  color: v.$color-blue;
+  outline: none;
+}
+
+@media (max-width: 1100px) {
+  .mainFooter {
+    grid-template-columns: 1.4fr repeat(2, 0.7fr);
   }
 
-  &:hover,
-  &:focus-visible {
-    color: v.$color-blue;
+  .contactColumn {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.5rem;
+    border-top: 1px solid v.$color-surface-line;
+    padding-top: 1.5rem;
+  }
+
+  .contactColumn h3,
+  .contactCta {
+    margin: 0;
+  }
+
+  .contactItems {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 767px) {
-  .inner {
-    min-height: auto;
+@media (max-width: 820px) {
+  .newsletterCard {
+    grid-template-columns: 0.75fr 1.25fr;
+  }
+
+  .newsletterCard > :last-child {
+    padding: 1.8rem 1.5rem 1.8rem 0;
+  }
+
+  .newsletterArt::before {
+    width: 12rem;
+    height: 12rem;
+  }
+
+  .mainFooter {
+    grid-template-columns: 1.35fr 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .brandColumn {
+    grid-column: 1 / -1;
+  }
+
+  .brandDescription {
+    max-width: 42rem;
+  }
+
+  .contactColumn {
+    grid-column: 3;
+    display: block;
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .contactItems {
+    grid-template-columns: 1fr;
+  }
+
+  .contactCta {
+    margin-top: 1.1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .newsletterWrap,
+  .mainFooter,
+  .bottomBar {
+    width: min(calc(100% - 1rem), 38rem);
+  }
+
+  .newsletterWrap {
+    margin-top: -0.7rem;
+  }
+
+  .newsletterCard {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .newsletterArt {
+    min-height: 9.5rem;
+  }
+
+  .newsletterArt::before {
+    width: 9rem;
+    height: 9rem;
+  }
+
+  .artOrbitOne {
+    width: 13rem;
+    height: 4.8rem;
+  }
+
+  .artOrbitTwo {
+    width: 10rem;
+    height: 3.6rem;
+  }
+
+  .envelope {
+    width: 8.5rem;
+  }
+
+  .newsletterCard > :last-child {
+    padding: 0.4rem 1.25rem 1.45rem;
+  }
+
+  .mainFooter {
+    grid-template-columns: 1fr 1fr;
+    padding-top: 3rem;
+  }
+
+  .brandColumn {
+    grid-column: 1 / -1;
+  }
+
+  .contactColumn {
+    grid-column: 1 / -1;
+    border-top: 1px solid v.$color-surface-line;
+    padding-top: 1.5rem;
+  }
+
+  .contactItems {
+    grid-template-columns: 1fr;
+  }
+
+  .bottomBar {
+    min-height: 0;
     flex-direction: column;
-    gap: 0.65rem;
-    padding-top: 0.85rem;
-    padding-bottom: 0.85rem;
-    text-align: center;
+    align-items: flex-start;
+    padding: 1.1rem 0 1.4rem;
   }
 
-  .identity {
-    flex-wrap: wrap;
-    justify-content: center;
+  .legal {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 420px) {
+  .mainFooter {
+    grid-template-columns: 1fr;
   }
 
-  .process {
-    padding-left: 0;
-    border-left: 0;
+  .linkColumn,
+  .contactColumn {
+    grid-column: 1;
   }
 
-  .contacts {
-    justify-content: center;
-    gap: 0.7rem 1rem;
+  .brandLogo {
+    width: 3.8rem;
+    height: 3.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .linkColumn a,
+  .contactCta {
+    transition: none;
+  }
+
+  .linkColumn a:hover,
+  .linkColumn a:focus-visible,
+  .contactCta:hover,
+  .contactCta:focus-visible {
+    transform: none;
   }
 }

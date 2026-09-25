@@ -6,7 +6,6 @@ import PanelHero, {
   type PanelHeroProps,
   type PanelSideImage,
 } from "./PanelHero";
-import BibleVerseCarousel from "./BibleVerseCarousel";
 import styles from "./PanelFrame.module.scss";
 
 type PanelFrameProps = {
@@ -36,10 +35,6 @@ export default function PanelFrame({
         {children}
       </div>
 
-      <BibleVerseCarousel
-        intervalMs={180_000}
-        variant="strip"
-      />
 
       <SiteFooter />
     </div>

@@ -1,0 +1,7 @@
+from django.db import migrations, models
+
+class Migration(migrations.Migration):
+    dependencies=[("audit","0002_alter_auditlog_action")]
+    operations=[migrations.AlterField(model_name="auditlog", name="action", field=models.CharField(choices=[
+        ("login_success","Connexion réussie"),("login_failed","Échec de connexion"),("logout","Déconnexion"),("otp_requested","OTP demandé"),("otp_success","OTP validé"),("otp_failed","Échec OTP"),("user_created","Utilisateur créé"),("user_updated","Utilisateur modifié"),("role_changed","Rôle modifié"),("permission_changed","Permission modifiée"),("content_created","Contenu créé"),("content_updated","Contenu modifié"),("content_published","Contenu publié"),("content_archived","Contenu archivé"),("content_deleted","Contenu supprimé"),("media_uploaded","Média téléversé"),("media_deleted","Média supprimé"),("document_opened","Document ouvert"),("contact_read","Demande de contact consultée"),("contact_status_changed","Statut contact modifié"),("contact_replied","Réponse contact envoyée"),("chat_assigned","Conversation prise en charge"),("chat_replied","Réponse chat envoyée"),("chat_closed","Conversation fermée"),("newsletter_subscriber_changed","Abonné newsletter modifié"),("newsletter_campaign_created","Campagne newsletter créée"),("newsletter_campaign_sent","Campagne newsletter envoyée")
+    ], db_index=True, max_length=64, verbose_name="action"))]

@@ -1,0 +1,77 @@
+{% extends "backoffice/base.html" %}
+{% load static %}
+{% block title %}Conversation — Back-office CST/CSMo{% endblock %}
+{% block extra_scripts %}<script src="{% static 'backoffice/js/chat_realtime.js' %}" defer></script>{% endblock %}
+{% block content %}
+<section
+  class="bo-page"
+  data-chat-backoffice
+  data-public-id="{{ conversation.public_id }}"
+  data-can-reply="{% if perms.communication.reply_conversation and conversation.status != 'fermee' and conversation.status != 'archivee' %}1{% else %}0{% endif %}"
+>
+  <header class="bo-page-head">
+    <div>
+      <a class="bo-back-link" href="{% url 'backoffice:communication_conversations' %}">← Retour à la messagerie</a>
+      <span class="bo-eyebrow">Conversation</span>
+      <h1>{{ conversation.visitor_name|default:"Visiteur" }}</h1>
+      <p>Échange visiteur ↔ équipe autorisée, avec accusés de lecture et indicateur de saisie.</p>
+    </div>
+  </header>
+
+  <div class="bo-chat-layout">
+    <aside class="bo-chat-sidebar">
+      <div class="bo-chat-person">
+        <span class="bo-chat-person__avatar" aria-hidden="true">{{ conversation.visitor_name|default:'V'|slice:':1'|upper }}</span>
+        <span class="bo-chat-person__copy"><strong>{{ conversation.visitor_name|default:"Visiteur" }}</strong><span>{{ conversation.visitor_email|default:"Sans e-mail" }}</span></span>
+      </div>
+
+      <dl class="bo-chat-facts">
+        <div><dt>Statut</dt><dd><span class="bo-status bo-status--{{ conversation.status }}">{{ conversation.get_status_display }}</span></dd></div>
+        <div><dt>Assignée à</dt><dd>{{ conversation.assigned_to.email|default:"Non assignée" }}</dd></div>
+        <div><dt>Créée le</dt><dd>{{ conversation.created_at|date:"d/m/Y à H:i" }}</dd></div>
+        <div><dt>Dernière activité</dt><dd>{{ conversation.last_activity_at|date:"d/m/Y à H:i" }}</dd></div>
+      </dl>
+
+      <div class="bo-chat-sidebar__actions">
+        {% if perms.communication.reply_conversation and not conversation.assigned_to %}
+          <form method="post" action="{% url 'backoffice:communication_conversation_take' conversation.pk %}">{% csrf_token %}<button class="bo-btn" type="submit">Prendre en charge</button></form>
+        {% endif %}
+        {% if perms.communication.manage_conversation and conversation.status != 'fermee' %}
+          <form method="post" action="{% url 'backoffice:communication_conversation_close' conversation.pk %}">{% csrf_token %}<button class="bo-btn bo-btn--soft" type="submit">Fermer la conversation</button></form>
+        {% endif %}
+      </div>
+    </aside>
+
+    <section class="bo-chat-workspace" aria-label="Messages de la conversation">
+      <div class="bo-chat-toolbar">
+        <span class="bo-chat-live" data-chat-connection data-state="connecting"><i aria-hidden="true"></i><span data-chat-connection-label>Connexion…</span></span>
+        <span class="bo-chat-toolbar__hint">Les messages apparaissent sans rechargement.</span>
+      </div>
+
+      <div class="bo-chat-thread" data-chat-thread aria-live="polite">
+        {% for m in conversation.messages.all %}
+          <div class="bo-chat-bubble bo-chat-bubble--{% if m.sender_type == 'membre' %}member{% else %}visitor{% endif %}" data-message-id="{{ m.pk }}" data-sender="{{ m.sender_type }}">
+            <p>{{ m.content }}</p>
+            <div class="bo-chat-bubble__meta">
+              <time>{{ m.created_at|date:"H:i" }}</time>
+              {% if m.sender_type == 'membre' %}<span class="bo-chat-receipt {% if m.is_read %}is-read{% endif %}">{% if m.is_read %}Lu{% else %}Envoyé{% endif %}</span>{% endif %}
+            </div>
+          </div>
+        {% endfor %}
+        <div class="bo-chat-typing" data-remote-typing hidden><i></i><i></i><i></i><span>Le visiteur écrit…</span></div>
+      </div>
+
+      {% if perms.communication.reply_conversation and conversation.status != 'fermee' and conversation.status != 'archivee' %}
+        <form method="post" class="bo-chat-composer" data-chat-composer>
+          {% csrf_token %}
+          <textarea name="message" maxlength="3000" rows="2" required placeholder="Écrire une réponse…" data-chat-input aria-label="Répondre au visiteur"></textarea>
+          <button class="bo-btn" type="submit">Envoyer</button>
+        </form>
+      {% else %}
+        <div class="bo-notice">Cette conversation est fermée ou vous ne disposez pas du droit de réponse.</div>
+      {% endif %}
+      <div class="bo-chat-error" data-chat-error hidden></div>
+    </section>
+  </div>
+</section>
+{% endblock %}

@@ -21,6 +21,15 @@ class AuditAction(models.TextChoices):
     MEDIA_UPLOADED = "media_uploaded", "Média téléversé"
     MEDIA_DELETED = "media_deleted", "Média supprimé"
     DOCUMENT_OPENED = "document_opened", "Document ouvert"
+    CONTACT_READ = "contact_read", "Demande de contact consultée"
+    CONTACT_STATUS_CHANGED = "contact_status_changed", "Statut contact modifié"
+    CONTACT_REPLIED = "contact_replied", "Réponse contact envoyée"
+    CHAT_ASSIGNED = "chat_assigned", "Conversation prise en charge"
+    CHAT_REPLIED = "chat_replied", "Réponse chat envoyée"
+    CHAT_CLOSED = "chat_closed", "Conversation fermée"
+    NEWSLETTER_SUBSCRIBER_CHANGED = "newsletter_subscriber_changed", "Abonné newsletter modifié"
+    NEWSLETTER_CAMPAIGN_CREATED = "newsletter_campaign_created", "Campagne newsletter créée"
+    NEWSLETTER_CAMPAIGN_SENT = "newsletter_campaign_sent", "Campagne newsletter envoyée"
 
 
 class AuditLog(models.Model):

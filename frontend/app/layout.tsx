@@ -9,6 +9,8 @@ import SiteFooter from "@/components/layout/SiteFooter";
 import FooterVisibility from "@/components/layout/FooterVisibility";
 import PageLoader from "@/components/layout/PageLoader";
 import AlertTickerProvider from "@/components/layout/AlertTickerProvider";
+import { CookieConsentProvider } from "@/components/cookies/CookieConsent";
+import ChatWidget from "@/components/chat/ChatWidget";
 // import SocialFloatingLinks from "@/components/layout/SocialFloatingLinks";
 import styles from "./layout.module.scss";
 
@@ -101,6 +103,7 @@ export default function RootLayout({
           Aller au contenu
         </a>
 
+        <CookieConsentProvider>
         <AlertTickerProvider>
           <Navbar />
 
@@ -113,7 +116,9 @@ export default function RootLayout({
           <FooterVisibility>
             <SiteFooter />
           </FooterVisibility>
+          <ChatWidget />
         </AlertTickerProvider>
+        </CookieConsentProvider>
       </body>
     </html>
   );

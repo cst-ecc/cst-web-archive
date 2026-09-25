@@ -41,8 +41,8 @@ export const HOME_NAV_LINKS: NavItem[] = [
   { label: "Accueil", href: "/" },
   { label: "Comprendre", href: "/#comprendre" },
   { label: "Où en sommes-nous ?", href: "/#avancement" },
-  { label: "Le CST", href: "/presentation" },
-  { label: "Le CSMo", href: "/csmo" },
+  { label: "Le CST", href: "/#cst" },
+  { label: "Le CSMo", href: "/#csmo" },
   { label: "L’Église en marche", href: "/#eglise-en-marche" },
   { label: "Ressources", href: "/documents" },
   {
@@ -82,7 +82,7 @@ export const NAV_LINKS: NavItem[] = [
   },
   {
     label: "CST",
-    href: "/presentation",
+    href: "/#cst",
     children: [
       {
         label: "Présentation",

@@ -3,70 +3,113 @@
 {% block title %}Tableau de bord — CST/CSMo{% endblock %}
 
 {% block content %}
-<section class="bo-page">
-  <header class="bo-page-head">
-    <div>
-      <span class="bo-eyebrow">Back-office CST / CSMo</span>
+<section class="bo-page bo-dashboard">
+  <div class="bo-dashboard-hero">
+    <div class="bo-dashboard-hero__copy">
+      <span class="bo-eyebrow">Back-office institutionnel</span>
       <h1>Tableau de bord</h1>
-      <p>Votre session est protégée par une authentification à deux facteurs.</p>
+      <p>
+        Pilotez les contenus publics, les échanges avec les visiteurs et les accès
+        depuis un même espace de gestion.
+      </p>
+    </div>
+    <span class="bo-dashboard-hero__secure"><i aria-hidden="true"></i> Authentification à deux facteurs active</span>
+  </div>
+
+  {% if perms.communication.view_contactrequest or perms.communication.view_conversation or perms.communication.view_newslettersubscriber %}
+    <div>
+      <div class="bo-section-heading">
+        <div>
+          <h2>Aperçu communication</h2>
+          <p>Les indicateurs essentiels qui demandent votre attention.</p>
+        </div>
+      </div>
+      <div class="bo-stat-grid">
+        {% if perms.communication.view_contactrequest %}
+          <a class="bo-stat-card" href="{% url 'backoffice:communication_contacts' %}" style="text-decoration:none">
+            <span class="bo-stat-card__icon" aria-hidden="true">C</span>
+            <span class="bo-stat-card__copy"><strong>{{ communication_stats.new_contacts }}</strong><span>Nouveaux contacts</span></span>
+          </a>
+        {% endif %}
+        {% if perms.communication.view_conversation %}
+          <a class="bo-stat-card" href="{% url 'backoffice:communication_conversations' %}" style="text-decoration:none">
+            <span class="bo-stat-card__icon" aria-hidden="true">M</span>
+            <span class="bo-stat-card__copy"><strong>{{ communication_stats.waiting_conversations }}</strong><span>Conversations en attente</span></span>
+          </a>
+          <a class="bo-stat-card" href="{% url 'backoffice:communication_conversations' %}" style="text-decoration:none">
+            <span class="bo-stat-card__icon" aria-hidden="true">•</span>
+            <span class="bo-stat-card__copy"><strong>{{ communication_stats.unread_messages }}</strong><span>Messages non lus</span></span>
+          </a>
+        {% endif %}
+        {% if perms.communication.view_newslettersubscriber %}
+          <a class="bo-stat-card" href="{% url 'backoffice:communication_subscribers' %}" style="text-decoration:none">
+            <span class="bo-stat-card__icon" aria-hidden="true">@</span>
+            <span class="bo-stat-card__copy"><strong>{{ communication_stats.newsletter_subscribers }}</strong><span>Abonnés actifs</span></span>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div>
+    <div class="bo-section-heading">
+      <div>
+        <h2>Modules de gestion</h2>
+        <p>Accédez rapidement aux différents espaces du site.</p>
+      </div>
     </div>
 
-    <form method="post" action="{% url 'backoffice:logout' %}">
-      {% csrf_token %}
-      <button type="submit" class="bo-btn bo-btn--soft">
-        Se déconnecter
-      </button>
-    </form>
-  </header>
-
-  <div class="bo-grid bo-grid--cards">
-    {% if perms.news.view_news %}
-      <a class="bo-module-card" href="{% url 'backoffice:news_list' %}">
-        <span>Contenus</span>
-        <strong>Actualités</strong>
-        <em>Créer, préparer, valider et publier les actualités.</em>
-      </a>
-    {% endif %}
-
-    {% if perms.gallery.view_galleryalbum %}
-      <a class="bo-module-card" href="{% url 'backoffice:gallery_list' %}">
-        <span>Médias</span>
-        <strong>Galerie</strong>
-        <em>Créer des albums, importer plusieurs images et publier.</em>
-      </a>
-    {% endif %}
-
-    {% if perms.documents.view_document %}
-      <a class="bo-module-card" href="{% url 'backoffice:document_list' %}">
-        <span>Bibliothèque</span>
-        <strong>Documents</strong>
-        <em>Classer, téléverser et publier les documents institutionnels.</em>
-      </a>
-    {% endif %}
-
-    {% if request.user.is_superuser %}
-      <a class="bo-module-card" href="{% url 'backoffice:user_list' %}">
-        <span>Administration</span>
-        <strong>Utilisateurs</strong>
-        <em>Créer, inviter, modifier ou suspendre les accès.</em>
-      </a>
-    {% endif %}
+    <div class="bo-grid bo-grid--cards">
+      {% if perms.news.view_news %}
+        <a class="bo-module-card" href="{% url 'backoffice:news_list' %}">
+          <span class="bo-module-card__top"><i class="bo-module-card__icon">AC</i><i class="bo-module-card__arrow">→</i></span>
+          <span>Contenus</span><strong>Actualités</strong><em>Créer, préparer, valider et publier les actualités institutionnelles.</em>
+        </a>
+      {% endif %}
+      {% if perms.gallery.view_galleryalbum %}
+        <a class="bo-module-card" href="{% url 'backoffice:gallery_list' %}">
+          <span class="bo-module-card__top"><i class="bo-module-card__icon">GA</i><i class="bo-module-card__arrow">→</i></span>
+          <span>Médias</span><strong>Galerie</strong><em>Créer les albums, importer les images et administrer leur publication.</em>
+        </a>
+      {% endif %}
+      {% if perms.documents.view_document %}
+        <a class="bo-module-card" href="{% url 'backoffice:document_list' %}">
+          <span class="bo-module-card__top"><i class="bo-module-card__icon">DO</i><i class="bo-module-card__arrow">→</i></span>
+          <span>Bibliothèque</span><strong>Documents</strong><em>Classer, téléverser, prévisualiser et publier les documents.</em>
+        </a>
+      {% endif %}
+      {% if perms.communication.view_contactrequest %}
+        <a class="bo-module-card" href="{% url 'backoffice:communication_contacts' %}">
+          <span class="bo-module-card__top"><i class="bo-module-card__icon">CO</i><i class="bo-module-card__arrow">→</i></span>
+          <span>Communication · {{ communication_stats.new_contacts }} nouveau(x)</span><strong>Contacts</strong><em>Consulter, qualifier et traiter les demandes reçues depuis le site.</em>
+        </a>
+      {% endif %}
+      {% if perms.communication.view_conversation %}
+        <a class="bo-module-card" href="{% url 'backoffice:communication_conversations' %}">
+          <span class="bo-module-card__top"><i class="bo-module-card__icon">CH</i><i class="bo-module-card__arrow">→</i></span>
+          <span>Communication · {{ communication_stats.unread_messages }} non lu(s)</span><strong>Messagerie</strong><em>Répondre en temps réel aux visiteurs et suivre les conversations.</em>
+        </a>
+      {% endif %}
+      {% if perms.communication.view_newslettersubscriber %}
+        <a class="bo-module-card" href="{% url 'backoffice:communication_subscribers' %}">
+          <span class="bo-module-card__top"><i class="bo-module-card__icon">NL</i><i class="bo-module-card__arrow">→</i></span>
+          <span>Communication · {{ communication_stats.newsletter_subscribers }} actif(s)</span><strong>Newsletter</strong><em>Gérer les abonnés, préparer les campagnes et suivre les envois.</em>
+        </a>
+      {% endif %}
+      {% if request.user.is_superuser %}
+        <a class="bo-module-card" href="{% url 'backoffice:user_list' %}">
+          <span class="bo-module-card__top"><i class="bo-module-card__icon">UT</i><i class="bo-module-card__arrow">→</i></span>
+          <span>Administration</span><strong>Utilisateurs</strong><em>Créer, inviter, modifier ou suspendre les accès au back-office.</em>
+        </a>
+      {% endif %}
+    </div>
   </div>
 
   <div class="bo-card bo-card--compact">
     <dl class="bo-definition-list">
-      <div>
-        <dt>Utilisateur</dt>
-        <dd>{{ request.user.email }}</dd>
-      </div>
-      <div>
-        <dt>Rôle</dt>
-        <dd>{{ role_label }}</dd>
-      </div>
-      <div>
-        <dt>Authentification</dt>
-        <dd>Mot de passe + OTP vérifié</dd>
-      </div>
+      <div><dt>Utilisateur connecté</dt><dd>{{ request.user.email }}</dd></div>
+      <div><dt>Rôle</dt><dd>{{ role_label }}</dd></div>
+      <div><dt>Sécurité</dt><dd>Mot de passe + OTP vérifié</dd></div>
     </dl>
   </div>
 </section>

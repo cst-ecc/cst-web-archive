@@ -22,7 +22,7 @@ export const HERO_SLIDES: HeroSlide[] = [
       "Une même dynamique au service de l’unité, de la gouvernance et de l’avenir de l’Église du Christianisme Céleste.",
     backgroundImage: "/images/home/hero-unite.jpeg",
     primary: { label: "Comprendre le processus", href: "#processus" },
-    secondary: { label: "Découvrir le CST", href: "/presentation" },
+    secondary: { label: "Découvrir le CST", href: "/#cst" },
     tone: "unity",
   },
   {
@@ -31,7 +31,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     lead:
       "Dialogue, harmonisation, consolidation des textes et préparation d’une gouvernance commune : le CST a conduit la phase de transition.",
     backgroundImage: "/images/home/hero-cst.jpg",
-    primary: { label: "Découvrir le CST", href: "/presentation" },
+    primary: { label: "Découvrir le CST", href: "/#cst" },
     secondary: {
       label: "Voir le passage à la mise en œuvre",
       href: "#processus",

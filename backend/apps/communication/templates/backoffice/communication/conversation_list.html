@@ -1,0 +1,51 @@
+{% extends "backoffice/base.html" %}
+{% block title %}Messagerie — Back-office CST/CSMo{% endblock %}
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head">
+    <div>
+      <span class="bo-eyebrow">Communication</span>
+      <h1>Messagerie</h1>
+      <p>Conversations reçues depuis le widget public. Les échanges ouverts se mettent à jour en temps réel.</p>
+    </div>
+  </header>
+
+  <form method="get" class="bo-news-filters">
+    <select name="status" aria-label="Filtrer par statut">
+      <option value="">Tous les statuts</option>
+      {% for value,label in status_choices %}<option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <button class="bo-btn bo-btn--soft">Filtrer</button>
+  </form>
+
+  <div class="bo-communication-list">
+    {% for c in page_obj %}
+      <a class="bo-conversation-row" href="{% url 'backoffice:communication_conversation_detail' c.pk %}">
+        <span class="bo-conversation-person">
+          <span class="bo-conversation-avatar" aria-hidden="true">{{ c.visitor_name|default:'V'|slice:':1'|upper }}</span>
+          <span class="bo-conversation-person__copy">
+            <strong>{{ c.visitor_name|default:"Visiteur" }}</strong>
+            <span>{{ c.visitor_email|default:"Sans e-mail" }}</span>
+          </span>
+        </span>
+        <span class="bo-status bo-status--{{ c.status }}">{{ c.get_status_display }}</span>
+        <span class="bo-conversation-meta"><span>Assignation</span><strong>{{ c.assigned_to.email|default:"Non assignée" }}</strong></span>
+        <span style="display:flex;align-items:center;gap:.55rem">
+          {% if c.unread_count %}<span class="bo-unread-badge" title="Messages non lus">{{ c.unread_count }}</span>{% endif %}
+          <time class="bo-conversation-time">{{ c.last_activity_at|date:"d/m · H:i" }}</time>
+        </span>
+      </a>
+    {% empty %}
+      <div class="bo-card bo-empty">Aucune conversation pour ce filtre.</div>
+    {% endfor %}
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="bo-pagination" aria-label="Pagination">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}">← Précédent</a>{% endif %}
+      <span>Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}">Suivant →</a>{% endif %}
+    </nav>
+  {% endif %}
+</section>
+{% endblock %}
