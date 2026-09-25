@@ -41,8 +41,8 @@ export default function SystemState({
 
         <div className={styles.brandRow}>
           <img
-            src="/logo/logo.svg"
-            alt="CST — Conseil Supérieur de Transition"
+            src="/logo/logo-original.png"
+            alt="ECC — Eglise du Christianisme Céleste"
             className={styles.logo}
           />
           <span className={styles.eyebrow}>{eyebrow}</span>

@@ -6,7 +6,7 @@ import Button from "@/components/ui/Button";
 export const metadata: Metadata = {
   title: "Site en maintenance",
   description:
-    "Le site CST & CSMo ECC est momentanément indisponible pour une opération de maintenance.",
+    "Le site est momentanément indisponible pour une opération de maintenance.",
   robots: {
     index: false,
     follow: false,
