@@ -503,6 +503,8 @@ export default function Navbar() {
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, []);
 
+  if (pathname === "/maintenance") return null;
+
   return (
     <header className={cn(styles.header, styles.headerHome, styles.headerSolid)}>
       <div className={cn(styles.bar, styles.homeBar)}>

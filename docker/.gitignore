@@ -2,3 +2,6 @@
 .env.prod
 !.env.dev.example
 !.env.prod.example
+
+# Drapeau local de maintenance publique — ne jamais commiter actif.
+maintenance/enabled

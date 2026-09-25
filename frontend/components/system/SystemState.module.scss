@@ -1,0 +1,286 @@
+@use "../../styles/variables" as v;
+
+.shell {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-height: clamp(34rem, 72dvh, 48rem);
+  padding: clamp(2.5rem, 7vw, 6rem) clamp(1rem, 4vw, 3rem);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 10% 15%, rgba(31, 133, 206, 0.11), transparent 28rem),
+    radial-gradient(circle at 88% 82%, rgba(241, 233, 6, 0.13), transparent 24rem),
+    linear-gradient(145deg, #f7fafc 0%, #ffffff 48%, #f3f7fa 100%);
+}
+
+.standalone {
+  min-height: 100dvh;
+}
+
+.orbLeft,
+.orbRight {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+.orbLeft {
+  width: clamp(12rem, 26vw, 26rem);
+  aspect-ratio: 1;
+  left: clamp(-10rem, -8vw, -3rem);
+  top: clamp(-8rem, -5vw, -2rem);
+  border: 1px solid rgba(31, 133, 206, 0.18);
+  box-shadow:
+    inset 0 0 0 2.5rem rgba(31, 133, 206, 0.025),
+    inset 0 0 0 5rem rgba(31, 133, 206, 0.018);
+}
+
+.orbRight {
+  width: clamp(10rem, 20vw, 20rem);
+  aspect-ratio: 1;
+  right: clamp(-7rem, -4vw, -2rem);
+  bottom: clamp(-7rem, -4vw, -2rem);
+  border: 1px solid rgba(218, 167, 16, 0.2);
+  background: rgba(241, 233, 6, 0.035);
+}
+
+.card {
+  position: relative;
+  width: min(100%, 62rem);
+  overflow: hidden;
+  border: 1px solid rgba(18, 84, 127, 0.12);
+  border-radius: clamp(1.2rem, 2vw, 1.8rem);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 28px 70px rgba(12, 59, 92, 0.09),
+    0 4px 16px rgba(17, 24, 39, 0.04);
+  backdrop-filter: blur(12px);
+}
+
+.accentBar {
+  height: 0.38rem;
+  background: linear-gradient(90deg, v.$color-blue-deep 0 31%, v.$color-blue 31% 72%, v.$color-yellow 72% 100%);
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  padding: clamp(1rem, 2vw, 1.45rem) clamp(1.15rem, 3vw, 2rem);
+  border-bottom: 1px solid v.$color-surface-line;
+}
+
+.logo {
+  display: block;
+  width: clamp(8.4rem, 18vw, 11rem);
+  height: auto;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.35rem 0.72rem;
+  border: 1px solid rgba(31, 133, 206, 0.16);
+  border-radius: 999px;
+  background: rgba(31, 133, 206, 0.055);
+  color: v.$color-blue-deep;
+  font-size: v.$font-size-meta;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.72fr) minmax(0, 2fr);
+  align-items: center;
+  gap: clamp(1.25rem, 4vw, 3.5rem);
+  padding: clamp(2rem, 5vw, 4rem);
+}
+
+.codeWrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: clamp(9rem, 18vw, 13rem);
+  border-right: 1px solid v.$color-surface-line;
+}
+
+.codeWrap::before,
+.codeWrap::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.codeWrap::before {
+  width: clamp(7.5rem, 14vw, 11rem);
+  aspect-ratio: 1;
+  border: 1px dashed rgba(31, 133, 206, 0.28);
+}
+
+.codeWrap::after {
+  width: clamp(5.8rem, 11vw, 8.5rem);
+  aspect-ratio: 1;
+  border: 1px solid rgba(241, 233, 6, 0.62);
+  background: rgba(241, 233, 6, 0.035);
+}
+
+.code {
+  position: relative;
+  z-index: 1;
+  font-family: v.$font-display;
+  font-size: clamp(2.65rem, 6vw, 5.1rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+  color: v.$color-blue-deep;
+}
+
+.copy {
+  min-width: 0;
+}
+
+.kicker {
+  margin-bottom: 0.62rem;
+  color: v.$color-blue;
+  font-size: v.$font-size-meta;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  max-width: 14ch;
+  font-family: v.$font-display;
+  font-size: clamp(1.75rem, 3.3vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: v.$color-blue-ink;
+}
+
+.description {
+  max-width: 43rem;
+  margin-top: 1rem;
+  color: rgba(17, 24, 39, 0.72);
+  font-size: clamp(0.96rem, 1.6vw, 1.08rem);
+  line-height: 1.75;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.6rem;
+}
+
+.note {
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid v.$color-surface-line;
+  color: rgba(17, 24, 39, 0.56);
+  font-size: v.$font-size-small;
+  line-height: 1.65;
+}
+
+.maintenance {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(241, 233, 6, 0.18), transparent 28rem),
+    radial-gradient(circle at 88% 75%, rgba(31, 133, 206, 0.12), transparent 25rem),
+    linear-gradient(145deg, #fffef1 0%, #ffffff 50%, #f4f9fc 100%);
+
+  .accentBar {
+    background: linear-gradient(90deg, v.$color-yellow 0 38%, v.$color-gold 38% 56%, v.$color-blue 56% 100%);
+  }
+
+  .eyebrow {
+    border-color: rgba(218, 167, 16, 0.26);
+    background: rgba(241, 233, 6, 0.16);
+    color: v.$color-ink;
+  }
+
+  .codeWrap::before {
+    border-color: rgba(218, 167, 16, 0.34);
+  }
+
+  .codeWrap::after {
+    border-color: rgba(31, 133, 206, 0.35);
+    background: rgba(31, 133, 206, 0.035);
+  }
+
+  .code {
+    font-size: clamp(1.3rem, 2.7vw, 2.15rem);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: v.$color-gold;
+  }
+}
+
+@media (max-width: 767px) {
+  .shell {
+    min-height: calc(100dvh - 4.5rem);
+    padding: 1.15rem;
+  }
+
+  .brandRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .eyebrow {
+    align-self: flex-start;
+  }
+
+  .content {
+    grid-template-columns: 1fr;
+    gap: 1.3rem;
+    padding: 1.4rem 1.2rem 1.7rem;
+  }
+
+  .codeWrap {
+    justify-content: start;
+    min-height: 5.7rem;
+    border-right: 0;
+    border-bottom: 1px solid v.$color-surface-line;
+    overflow: hidden;
+  }
+
+  .codeWrap::before {
+    left: 0.2rem;
+  }
+
+  .codeWrap::after {
+    left: 1rem;
+  }
+
+  .code {
+    justify-self: start;
+    margin-left: 2rem;
+  }
+
+  .title {
+    max-width: none;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .actions > * {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    backdrop-filter: none;
+  }
+}

@@ -336,7 +336,7 @@ if ! git cat-file -e "${RELEASE_SHA}^{commit}" 2>/dev/null; then
   git fetch origin "${RELEASE_SHA}"
 fi
 
-git clean -fd -e docker/.env.prod
+git clean -fd -e docker/.env.prod -e docker/maintenance/enabled
 git reset --hard "${RELEASE_SHA}"
 
 CURRENT_SHA="$(git rev-parse HEAD)"
@@ -540,7 +540,7 @@ fi
 
 if [ "${BACKEND}" = "true" ] || [ "${FRONTEND}" = "true" ]; then
   section "WAIT FOR GATEWAY UPSTREAM RECONCILIATION"
-  gateway_route_check "Gateway → Frontend" "/" 15 2
+  gateway_route_check "Gateway → Frontend" "/frontend-health" 15 2
   gateway_route_check "Gateway → API health" "/api/v1/health/" 15 2
 fi
 
@@ -572,7 +572,7 @@ docker exec cst-gateway \
   http://127.0.0.1:8080/gateway-health
 echo "✅ Gateway health OK"
 
-gateway_route_check "Gateway → Frontend OK" "/" 10 2
+gateway_route_check "Gateway → Frontend OK" "/frontend-health" 10 2
 gateway_route_check "Gateway → API health OK" "/api/v1/health/" 10 2
 
 section "INTERNAL BUSINESS API"
@@ -587,7 +587,28 @@ docker exec cst-gateway \
 echo "✅ API Home Special interne OK"
 
 section "PUBLIC HTTPS"
-public_check "Homepage" "${PUBLIC_URL}/"
+if [ -f "${DOCKER_DIR}/maintenance/enabled" ]; then
+  MAINTENANCE_STATUS="$(
+    curl \
+      --silent \
+      --show-error \
+      --output /dev/null \
+      --write-out '%{http_code}' \
+      --connect-timeout 10 \
+      --max-time 30 \
+      "${PUBLIC_URL}/" \
+      || true
+  )"
+
+  if [ "${MAINTENANCE_STATUS}" != "503" ]; then
+    echo "❌ Homepage maintenance : HTTP ${MAINTENANCE_STATUS:-000}, 503 attendu"
+    exit 1
+  fi
+
+  echo "✅ Homepage maintenance : HTTP 503"
+else
+  public_check "Homepage" "${PUBLIC_URL}/"
+fi
 public_check "API health" "${PUBLIC_URL}/api/v1/health/"
 public_check "API News" "${PUBLIC_URL}/api/v1/news/"
 public_check "API Home Special" "${PUBLIC_URL}/api/v1/news/home-special/"

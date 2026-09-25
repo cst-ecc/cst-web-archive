@@ -1,20 +1,22 @@
-import Container from "@/components/layout/Container";
+import SystemState from "@/components/system/SystemState";
 import Button from "@/components/ui/Button";
-import styles from "./not-found.module.scss";
 
 export default function NotFound() {
   return (
-    <Container className={styles.wrapper}>
-      <p className={styles.code}>404</p>
-      <h1 className={styles.title}>Page introuvable</h1>
-      <p className={styles.text}>
-        La page demandée n'existe pas ou a été déplacée. Vous pouvez revenir à
-        l'accueil ou consulter la bibliothèque documentaire.
-      </p>
-      <div className={styles.actions}>
-        <Button href="/">Accueil</Button>
-        <Button href="/documents" variant="outline">Bibliothèque</Button>
-      </div>
-    </Container>
+    <SystemState
+      code="404"
+      eyebrow="Erreur de navigation"
+      title="Cette page est introuvable"
+      description="L’adresse demandée n’existe pas, a été déplacée ou n’est plus disponible. Le site reste accessible : vous pouvez revenir à l’accueil ou poursuivre vers la bibliothèque documentaire."
+      actions={
+        <>
+          <Button href="/">Retour à l’accueil</Button>
+          <Button href="/documents" variant="outline">
+            Consulter les documents
+          </Button>
+        </>
+      }
+      note="Si vous avez suivi un lien publié récemment, vous pouvez également revenir à la page précédente et réessayer."
+    />
   );
 }

@@ -252,6 +252,9 @@ services:
     volumes:
       - cst_media_data:/srv/cst/media:ro
       - cst_static_data:/srv/cst/static:ro
+      # Drapeau de maintenance publique : créer/supprimer `maintenance/enabled`
+      # sur le VPS. Le backend/API et le back-office restent accessibles.
+      - ./maintenance:/etc/cst-maintenance:ro
 
     networks:
       cst_internal:
@@ -280,7 +283,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget --timeout=5 --tries=1 --header='Host: cst.ecc.bj' -q -O /dev/null http://127.0.0.1:8080/ && wget --timeout=5 --tries=1 --header='Host: cst.ecc.bj' -q -O /dev/null http://127.0.0.1:8080/api/v1/health/ || exit 1"
+          "wget --timeout=5 --tries=1 --header='Host: cst.ecc.bj' -q -O /dev/null http://127.0.0.1:8080/frontend-health && wget --timeout=5 --tries=1 --header='Host: cst.ecc.bj' -q -O /dev/null http://127.0.0.1:8080/api/v1/health/ || exit 1"
         ]
       interval: 30s
       timeout: 10s

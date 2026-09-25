@@ -150,6 +150,7 @@ services:
     volumes:
       - cst_media_data:/srv/cst/media:ro
       - cst_static_data:/srv/cst/static:ro
+      - ./maintenance:/etc/cst-maintenance:ro
 
     networks:
       cst_internal:
