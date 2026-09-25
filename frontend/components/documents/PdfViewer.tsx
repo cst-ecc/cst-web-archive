@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { toPublicMediaHref } from "@/lib/media";
 import { shouldUseNativePdfReader } from "@/lib/pdf-device";
 
 import styles from "./PdfViewer.module.scss";
@@ -23,10 +24,12 @@ export default function PdfViewer({
   const [loaded, setLoaded] = useState(false);
   const [readerMode, setReaderMode] = useState<ReaderMode>("detecting");
 
+  const publicSrc = useMemo(() => toPublicMediaHref(src), [src]);
+
   const viewerSrc = useMemo(() => {
     const fragment = "toolbar=0&navpanes=0&scrollbar=1&view=FitH";
-    return src.includes("#") ? src : `${src}#${fragment}`;
-  }, [src]);
+    return publicSrc.includes("#") ? publicSrc : `${publicSrc}#${fragment}`;
+  }, [publicSrc]);
 
   useEffect(() => {
     setReaderMode(shouldUseNativePdfReader() ? "native" : "embedded");
@@ -35,7 +38,7 @@ export default function PdfViewer({
   useEffect(() => {
     let active = true;
 
-    if (!src || src === "#") {
+    if (!publicSrc || publicSrc === "#") {
       setAvailability("error");
       return () => {
         active = false;
@@ -43,7 +46,7 @@ export default function PdfViewer({
     }
 
     try {
-      const resolved = new URL(src, window.location.href);
+      const resolved = new URL(publicSrc, window.location.href);
       if (resolved.origin !== window.location.origin) {
         setAvailability("ready");
         return () => {
@@ -57,7 +60,7 @@ export default function PdfViewer({
       };
     }
 
-    void fetch(src, { method: "HEAD", cache: "no-store" })
+    void fetch(publicSrc, { method: "HEAD", cache: "no-store" })
       .then((response) => {
         if (active) setAvailability(response.ok ? "ready" : "error");
       })
@@ -68,7 +71,7 @@ export default function PdfViewer({
     return () => {
       active = false;
     };
-  }, [src]);
+  }, [publicSrc]);
 
   const enterFullscreen = async () => {
     if (!frameRef.current?.requestFullscreen) return;
@@ -129,7 +132,7 @@ export default function PdfViewer({
           </div>
 
           {availability === "ready" ? (
-            <a className={styles.mobileOpenButton} href={src}>
+            <a className={styles.mobileOpenButton} href={publicSrc}>
               Lire toutes les pages
               <span aria-hidden="true">→</span>
             </a>
