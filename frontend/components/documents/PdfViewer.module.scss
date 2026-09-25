@@ -176,3 +176,110 @@
     }
   }
 }
+
+/* ------------------------------------------------------------------
+   Lecture téléphone / tablette
+   ------------------------------------------------------------------ */
+
+.mobileReader {
+  min-height: clamp(18rem, 48svh, 30rem);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1rem;
+  padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(31, 133, 206, 0.08), transparent 42%),
+    v.$color-surface-muted;
+}
+
+.mobileReaderIcon {
+  display: grid;
+  place-items: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  border: 1px solid rgba(31, 133, 206, 0.18);
+  border-radius: 50%;
+  background: v.$color-white;
+  color: v.$color-blue-deep;
+  box-shadow: 0 10px 30px rgba(18, 84, 127, 0.09);
+}
+
+.mobileReaderCopy {
+  max-width: 32rem;
+  display: grid;
+  gap: 0.45rem;
+  color: rgba(17, 24, 39, 0.66);
+  font-size: v.$font-size-small;
+  line-height: 1.6;
+
+  strong {
+    color: v.$color-blue-ink;
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.15rem);
+    line-height: 1.35;
+  }
+}
+
+.mobileOpenButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 2.75rem;
+  margin-top: 0.25rem;
+  padding: 0.65rem 1rem;
+  border-radius: v.$radius-lg;
+  background: v.$color-blue-deep;
+  color: v.$color-white;
+  font-size: v.$font-size-small;
+  font-weight: 750;
+  text-decoration: none;
+  box-shadow: 0 10px 24px rgba(18, 84, 127, 0.16);
+  transition:
+    transform 0.16s ease,
+    background-color 0.16s ease,
+    box-shadow 0.16s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: v.$color-blue;
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(18, 84, 127, 0.2);
+  }
+
+  @include m.focus-ring;
+}
+
+.mobileChecking {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 2.75rem;
+  color: rgba(17, 24, 39, 0.64);
+  font-size: v.$font-size-small;
+  font-weight: 650;
+}
+
+@media (max-width: 767px) {
+  .mobileReader {
+    min-height: 56svh;
+    padding-inline: 1rem;
+  }
+
+  .mobileOpenButton {
+    width: min(100%, 22rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobileOpenButton {
+    transition: none;
+
+    &:hover,
+    &:focus-visible {
+      transform: none;
+    }
+  }
+}
