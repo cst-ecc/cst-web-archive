@@ -86,6 +86,11 @@ urlpatterns = [
     ),
 
     path("documents/", document_views.document_list_view, name="document_list"),
+    path(
+        "documents/bulk-confidentiality/",
+        document_views.document_bulk_confidentiality_view,
+        name="document_bulk_confidentiality",
+    ),
     path("documents/new/", document_views.document_create_view, name="document_create"),
     path(
         "documents/<int:pk>/edit/",

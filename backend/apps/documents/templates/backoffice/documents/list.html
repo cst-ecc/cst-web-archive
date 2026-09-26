@@ -64,10 +64,82 @@
     </noscript>
   </form>
 
+  {% if perms.documents.publish_document and page_obj.object_list %}
+    <form
+      method="post"
+      action="{% url 'backoffice:document_bulk_confidentiality' %}"
+      class="bo-document-bulk-form"
+      data-document-bulk-form
+    >
+      {% csrf_token %}
+      <input type="hidden" name="return_query" value="{{ request.GET.urlencode }}">
+
+      <section class="bo-document-bulk-panel" data-document-bulk-panel aria-label="Actions groupées sur les documents">
+        <div class="bo-document-bulk-panel__header">
+          <div class="bo-document-bulk-panel__summary">
+            <span class="bo-document-bulk-panel__icon" aria-hidden="true">✓</span>
+            <div>
+              <strong>Gestion groupée de la confidentialité</strong>
+              <p data-document-selection-label>Sélectionnez un ou plusieurs documents dans le tableau.</p>
+            </div>
+          </div>
+          <span class="bo-document-selection-count" data-document-selected-count>0 sélectionné</span>
+        </div>
+
+        <div class="bo-document-bulk-panel__bar">
+          <div class="bo-document-bulk-panel__tools" aria-label="Outils de sélection">
+            <button type="button" class="bo-btn bo-btn--soft bo-btn--compact" data-document-select-page>
+              Tout sélectionner sur cette page
+            </button>
+            <button type="button" class="bo-link-button bo-document-clear" data-document-clear-selection hidden>
+              Effacer la sélection
+            </button>
+          </div>
+
+          <div class="bo-document-bulk-panel__actions" aria-label="Actions de confidentialité">
+            <span class="bo-document-bulk-panel__actions-label">Appliquer à la sélection :</span>
+            <button
+              type="submit"
+              name="action"
+              value="make_confidential"
+              class="bo-btn bo-document-bulk-action bo-document-bulk-action--confidential"
+              data-bulk-action="make_confidential"
+            >
+              <span class="bo-document-bulk-action__icon" aria-hidden="true">🔒</span>
+              Rendre confidentiels
+            </button>
+            <button
+              type="submit"
+              name="action"
+              value="make_public"
+              class="bo-btn bo-btn--soft bo-document-bulk-action bo-document-bulk-action--public"
+              data-bulk-action="make_public"
+            >
+              <span class="bo-document-bulk-action__icon" aria-hidden="true">◉</span>
+              Rendre publics
+            </button>
+          </div>
+        </div>
+      </section>
+  {% endif %}
+
   <div class="bo-table-wrap">
-    <table class="bo-table">
+    <table class="bo-table bo-documents-table">
       <thead>
         <tr>
+          {% if perms.documents.publish_document and page_obj.object_list %}
+            <th class="bo-table__selection">
+              <label class="bo-document-select-all" title="Sélectionner tous les documents de cette page">
+                <input
+                  type="checkbox"
+                  class="bo-document-checkbox"
+                  data-document-select-all
+                  aria-label="Sélectionner tous les documents de cette page"
+                >
+                <span class="sr-only">Tout sélectionner</span>
+              </label>
+            </th>
+          {% endif %}
           <th>Document</th>
           <th>Statut</th>
           <th>Type</th>
@@ -80,8 +152,23 @@
       </thead>
       <tbody>
         {% for document in page_obj %}
-          <tr>
-            <td>
+          <tr data-document-row>
+            {% if perms.documents.publish_document %}
+              <td class="bo-table__selection">
+                <label class="bo-document-row-selector">
+                  <input
+                    type="checkbox"
+                    class="bo-document-checkbox"
+                    name="document_ids"
+                    value="{{ document.pk }}"
+                    data-document-checkbox
+                    aria-label="Sélectionner {{ document.title }}"
+                  >
+                  <span class="sr-only">Sélectionner {{ document.title }}</span>
+                </label>
+              </td>
+            {% endif %}
+            <td class="bo-document-cell">
               <strong>{{ document.title }}</strong>
               <span>{{ document.reference|default:document.summary|truncatechars:90 }}</span>
             </td>
@@ -113,12 +200,16 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="8" class="bo-empty">Aucun document trouvé.</td>
+            <td colspan="{% if perms.documents.publish_document and page_obj.object_list %}9{% else %}8{% endif %}" class="bo-empty">Aucun document trouvé.</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
+  {% if perms.documents.publish_document and page_obj.object_list %}
+    </form>
+  {% endif %}
 
   {% if page_obj.paginator.num_pages > 1 %}
     <nav class="bo-pagination" aria-label="Pagination">
@@ -136,4 +227,134 @@
     </nav>
   {% endif %}
 </section>
+
+{% if perms.documents.publish_document and page_obj.object_list %}
+<script>
+(function () {
+  "use strict";
+
+  const form = document.querySelector("[data-document-bulk-form]");
+  if (!form) return;
+
+  const selectAll = form.querySelector("[data-document-select-all]");
+  const checkboxes = Array.from(form.querySelectorAll("[data-document-checkbox]"));
+  const panel = form.querySelector("[data-document-bulk-panel]");
+  const countNode = form.querySelector("[data-document-selected-count]");
+  const labelNode = form.querySelector("[data-document-selection-label]");
+  const selectPageButton = form.querySelector("[data-document-select-page]");
+  const clearButton = form.querySelector("[data-document-clear-selection]");
+  const actionButtons = Array.from(form.querySelectorAll("[data-bulk-action]"));
+
+  if (!selectAll || checkboxes.length === 0) return;
+
+  function getSelected() {
+    return checkboxes.filter(function (checkbox) {
+      return checkbox.checked;
+    });
+  }
+
+  function setAll(checked) {
+    checkboxes.forEach(function (checkbox) {
+      checkbox.checked = checked;
+    });
+    updateState();
+  }
+
+  function updateState() {
+    const selected = getSelected();
+    const count = selected.length;
+    const hasSelection = count > 0;
+    const allSelected = count === checkboxes.length;
+
+    selectAll.checked = allSelected;
+    selectAll.indeterminate = hasSelection && !allSelected;
+
+    if (countNode) {
+      countNode.textContent = count + (count > 1 ? " sélectionnés" : " sélectionné");
+    }
+
+    if (labelNode) {
+      labelNode.textContent = hasSelection
+        ? (count > 1
+            ? count + " documents sont prêts pour une action groupée."
+            : "1 document est prêt pour une action groupée.")
+        : "Sélectionnez un ou plusieurs documents dans le tableau.";
+    }
+
+    if (panel) panel.classList.toggle("is-active", hasSelection);
+    if (clearButton) clearButton.hidden = !hasSelection;
+
+    if (selectPageButton) {
+      selectPageButton.textContent = allSelected
+        ? "Toute la page est sélectionnée"
+        : "Tout sélectionner sur cette page";
+    }
+
+    actionButtons.forEach(function (button) {
+      button.disabled = !hasSelection;
+      button.setAttribute("aria-disabled", hasSelection ? "false" : "true");
+    });
+
+    checkboxes.forEach(function (checkbox) {
+      const row = checkbox.closest("[data-document-row]");
+      if (row) row.classList.toggle("is-selected", checkbox.checked);
+    });
+  }
+
+  selectAll.addEventListener("change", function () {
+    setAll(selectAll.checked);
+  });
+
+  if (selectPageButton) {
+    selectPageButton.addEventListener("click", function () {
+      setAll(true);
+    });
+  }
+
+  if (clearButton) {
+    clearButton.addEventListener("click", function () {
+      setAll(false);
+    });
+  }
+
+  checkboxes.forEach(function (checkbox) {
+    checkbox.addEventListener("change", updateState);
+  });
+
+  form.addEventListener("submit", function (event) {
+    const selected = getSelected();
+    if (selected.length === 0) {
+      event.preventDefault();
+      window.alert("Sélectionnez au moins un document avant d’appliquer une action.");
+      return;
+    }
+
+    const submitter = event.submitter;
+    if (!submitter) return;
+
+    const count = selected.length;
+    let message = "";
+
+    if (submitter.value === "make_confidential") {
+      message =
+        "Rendre " + count + " document(s) confidentiel(s) ?\n\n" +
+        "Ces documents ne seront plus accessibles librement. " +
+        "Toute consultation nécessitera une autorisation.";
+    } else if (submitter.value === "make_public") {
+      message =
+        "Rendre " + count + " document(s) public(s) ?\n\n" +
+        "Ils redeviendront accessibles sans demande d’autorisation. " +
+        "Les autorisations temporaires existantes seront révoquées et " +
+        "les demandes encore en attente seront clôturées.";
+    }
+
+    if (message && !window.confirm(message)) {
+      event.preventDefault();
+    }
+  });
+
+  updateState();
+})();
+</script>
+{% endif %}
 {% endblock %}

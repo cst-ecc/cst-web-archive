@@ -2,8 +2,10 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.http import FileResponse
+from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods, require_POST
 
@@ -99,6 +101,142 @@ def document_list_view(request):
             "kind_choices": DocumentKind.choices,
         },
     )
+
+
+def _document_list_redirect(request):
+    from urllib.parse import parse_qsl, urlencode
+
+    allowed_keys = {"q", "status", "kind", "confidential", "page"}
+    raw_query = (request.POST.get("return_query") or "").strip()
+    filtered_pairs = [
+        (key, value)
+        for key, value in parse_qsl(raw_query, keep_blank_values=False)
+        if key in allowed_keys
+    ]
+    base_url = reverse("backoffice:document_list")
+    query = urlencode(filtered_pairs)
+    return redirect(f"{base_url}?{query}" if query else base_url)
+
+
+@never_cache
+@require_POST
+@backoffice_2fa_required
+def document_bulk_confidentiality_view(request):
+    if not request.user.has_perm("documents.publish_document"):
+        raise PermissionDenied
+
+    action = (request.POST.get("action") or "").strip()
+    if action not in {"make_confidential", "make_public"}:
+        messages.error(request, "L’action demandée est invalide.")
+        return _document_list_redirect(request)
+
+    raw_ids = request.POST.getlist("document_ids")
+    document_ids = []
+    seen = set()
+    for raw_id in raw_ids:
+        try:
+            document_id = int(raw_id)
+        except (TypeError, ValueError):
+            continue
+        if document_id <= 0 or document_id in seen:
+            continue
+        seen.add(document_id)
+        document_ids.append(document_id)
+
+    if not document_ids:
+        messages.warning(request, "Sélectionnez au moins un document.")
+        return _document_list_redirect(request)
+
+    # La liste affiche 20 éléments par page. La limite supérieure protège
+    # néanmoins l’endpoint contre un POST fabriqué contenant des milliers d’IDs.
+    if len(document_ids) > 100:
+        messages.error(request, "La sélection contient trop de documents.")
+        return _document_list_redirect(request)
+
+    make_confidential = action == "make_confidential"
+    changed = 0
+    unchanged = 0
+
+    with transaction.atomic():
+        # visible_documents_queryset() utilise select_related() pour la liste
+        # du back-office. Plusieurs de ces relations sont nullable, ce qui
+        # produit des LEFT OUTER JOIN. PostgreSQL refuse FOR UPDATE sur le
+        # côté nullable d'un OUTER JOIN. On supprime donc ces jointures pour
+        # cette requête de verrouillage : seuls les enregistrements Document
+        # ont besoin d'être verrouillés pendant l'action groupée.
+        documents = list(
+            visible_documents_queryset(request.user)
+            .select_related(None)
+            .select_for_update()
+            .filter(pk__in=document_ids)
+            .order_by("pk")
+        )
+        if len(documents) != len(document_ids):
+            # Un identifiant non visible ne doit jamais être traité silencieusement.
+            raise PermissionDenied
+
+        for document in documents:
+            if document.is_confidential == make_confidential:
+                unchanged += 1
+                continue
+
+            previous_value = document.is_confidential
+            document.is_confidential = make_confidential
+            document.last_editor = request.user
+            # Utiliser save() est intentionnel : lorsqu’un document redevient
+            # public, Document.save() révoque les autorisations et clôture les
+            # demandes confidentielles encore ouvertes. QuerySet.update()
+            # contournerait cette logique de sécurité.
+            document.save(
+                update_fields=["is_confidential", "last_editor", "updated_at"]
+            )
+            changed += 1
+
+            audit_log(
+                action=AuditAction.CONTENT_UPDATED,
+                actor=request.user,
+                request=request,
+                target=document,
+                description=(
+                    "Document rendu confidentiel par action groupée."
+                    if make_confidential
+                    else "Document rendu public par action groupée."
+                ),
+                metadata={
+                    "bulk_action": True,
+                    "bulk_action_name": action,
+                    "batch_size": len(documents),
+                    "previous_is_confidential": previous_value,
+                    "is_confidential": make_confidential,
+                },
+            )
+
+    if changed:
+        if make_confidential:
+            message = (
+                "1 document a été rendu confidentiel."
+                if changed == 1
+                else f"{changed} documents ont été rendus confidentiels."
+            )
+        else:
+            message = (
+                "1 document a été rendu public. Les anciennes autorisations "
+                "concernées ont été invalidées."
+                if changed == 1
+                else f"{changed} documents ont été rendus publics. Les anciennes "
+                "autorisations concernées ont été invalidées."
+            )
+        messages.success(request, message)
+
+    if unchanged:
+        message = (
+            "1 document était déjà dans cet état et n’a pas été modifié."
+            if unchanged == 1
+            else f"{unchanged} documents étaient déjà dans cet état et n’ont pas été modifiés."
+        )
+        messages.info(request, message)
+
+    return _document_list_redirect(request)
 
 
 @never_cache
