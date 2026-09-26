@@ -1,0 +1,134 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Demande d’accès — {{ access_request.document.title }}{% endblock %}
+
+{% block content %}
+<section class="bo-form-page bo-form-page--wide">
+  <a class="bo-back-link" href="{% url 'backoffice:document_access_request_list' %}">← Demandes d’accès</a>
+  <span class="bo-eyebrow">Document confidentiel</span>
+  <h1>{{ access_request.full_name }}</h1>
+
+  <div class="bo-access-layout">
+    <article class="bo-card">
+      <div class="bo-access-heading">
+        <div>
+          <span class="bo-access-status bo-access-status--{{ access_request.status }}">{{ access_request.get_status_display }}</span>
+          <h2>{{ access_request.document.title }}</h2>
+        </div>
+      </div>
+
+      <dl class="bo-definition-list">
+        <div><dt>E-mail</dt><dd>{{ access_request.email }}</dd></div>
+        <div><dt>Téléphone</dt><dd>{{ access_request.phone|default:"—" }}</dd></div>
+        <div><dt>Organisation / qualité</dt><dd>{{ access_request.organization|default:"—" }}</dd></div>
+        <div><dt>Demande reçue</dt><dd>{{ access_request.created_at|date:"d/m/Y à H:i" }}</dd></div>
+        <div><dt>Motif</dt><dd>{{ access_request.reason|linebreaksbr }}</dd></div>
+      </dl>
+    </article>
+
+    {% if access_request.status == "pending" %}
+      <aside class="bo-card bo-access-actions-card">
+        <h2>Décision</h2>
+        <form method="post" action="{% url 'backoffice:document_access_request_approve' access_request.pk %}" class="bo-form">
+          {% csrf_token %}
+          {% for field in approval_form %}
+            <div class="bo-field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<small class="bo-help">{{ field.help_text }}</small>{% endif %}
+            </div>
+          {% endfor %}
+          <button type="submit" class="bo-btn">Autoriser et envoyer le lien</button>
+        </form>
+
+        <hr class="bo-access-separator">
+
+        <form method="post" action="{% url 'backoffice:document_access_request_refuse' access_request.pk %}" class="bo-form">
+          {% csrf_token %}
+          {% for field in refusal_form %}
+            <div class="bo-field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+            </div>
+          {% endfor %}
+          <button type="submit" class="bo-btn--danger">Refuser la demande</button>
+        </form>
+      </aside>
+    {% elif grant %}
+      <aside class="bo-card bo-access-actions-card">
+        <h2>Autorisation {{ grant.reference }}</h2>
+        <dl class="bo-definition-list bo-definition-list--compact">
+          <div><dt>Expire</dt><dd>{{ grant.expires_at|date:"d/m/Y à H:i" }}</dd></div>
+          <div><dt>Ouvertures</dt><dd>{{ grant.open_count }} / {{ grant.max_opens }}</dd></div>
+          <div><dt>Dernière ouverture</dt><dd>{{ grant.last_opened_at|date:"d/m/Y à H:i"|default:"—" }}</dd></div>
+          <div><dt>Dernière vérification</dt><dd>{{ grant.last_verified_at|date:"d/m/Y à H:i"|default:"—" }}</dd></div>
+          <div><dt>Lien envoyé</dt><dd>{{ grant.link_sent_at|date:"d/m/Y à H:i"|default:"—" }}</dd></div>
+          <div>
+            <dt>État</dt>
+            <dd>
+              {% if grant.is_revoked %}<span class="bo-access-status bo-access-status--refused">Révoquée</span>
+              {% elif grant.is_expired %}<span class="bo-access-status bo-access-status--expired">Expirée</span>
+              {% elif not grant.has_remaining_opens %}<span class="bo-access-status bo-access-status--expired">Limite atteinte</span>
+              {% else %}<span class="bo-access-status bo-access-status--approved">Active</span>{% endif %}
+            </dd>
+          </div>
+        </dl>
+
+        {% if grant.is_active %}
+          <form method="post" action="{% url 'backoffice:document_access_grant_resend' grant.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="bo-btn bo-btn--soft">Régénérer et renvoyer le lien</button>
+          </form>
+          <form method="post" action="{% url 'backoffice:document_access_grant_revoke' grant.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="bo-btn--danger">Révoquer immédiatement</button>
+          </form>
+        {% endif %}
+      </aside>
+    {% else %}
+      <aside class="bo-card bo-access-actions-card">
+        <h2>Demande refusée</h2>
+        <p>{{ access_request.refusal_reason|default:"Aucun motif interne n’a été renseigné." }}</p>
+      </aside>
+    {% endif %}
+  </div>
+
+  <section class="bo-card bo-access-history">
+    <div class="bo-access-history__head">
+      <div>
+        <span class="bo-eyebrow">Traçabilité</span>
+        <h2>Historique de l’accès</h2>
+      </div>
+      <span>30 événements maximum</span>
+    </div>
+
+    <div class="bo-table-wrap">
+      <table class="bo-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Événement</th>
+            <th>Adresse IP</th>
+            <th>Acteur</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in access_logs %}
+            <tr>
+              <td>{{ log.created_at|date:"d/m/Y H:i:s" }}</td>
+              <td>
+                <strong>{{ log.get_action_display }}</strong>
+                {% if log.description %}<span>{{ log.description }}</span>{% endif %}
+              </td>
+              <td>{{ log.ip_address|default:"—" }}</td>
+              <td>{% if log.actor %}{{ log.actor.email }}{% else %}Visiteur / destinataire{% endif %}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="bo-empty">Aucun événement enregistré pour le moment.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+{% endblock %}

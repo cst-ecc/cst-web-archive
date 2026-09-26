@@ -37,7 +37,7 @@ export default async function DocumentDetailPage({
   const doc = await getDocumentBySlug(params.slug);
   if (!doc) notFound();
 
-  const readablePdf = doc.fileType === "pdf" && Boolean(doc.fileUrl) && doc.fileUrl !== "#";
+  const readablePdf = !doc.isConfidential && doc.fileType === "pdf" && Boolean(doc.fileUrl) && doc.fileUrl !== "#";
 
   return (
     <>
@@ -90,6 +90,20 @@ export default async function DocumentDetailPage({
                 className={styles.readButton}
                 returnHref={`/documents/${doc.slug}`}
               />
+            ) : doc.isConfidential ? (
+              <>
+                <div className={styles.confidentialNotice}>
+                  <strong>Document à accès contrôlé</strong>
+                  <span>Une autorisation nominative est nécessaire pour consulter ce fichier.</span>
+                </div>
+                <DocumentReadButton
+                  slug={doc.slug}
+                  label="Demander l’accès"
+                  className={styles.readButton}
+                  returnHref={`/documents/${doc.slug}`}
+                  isConfidential
+                />
+              </>
             ) : (
               <p className={styles.unavailable}>Lecture intégrée indisponible pour ce fichier.</p>
             )}

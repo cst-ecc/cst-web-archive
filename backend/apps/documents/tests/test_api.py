@@ -65,8 +65,10 @@ class PublicDocumentApiTests(TestCase):
 
         self.assertEqual(payload["title"], "Document API")
         self.assertEqual(payload["kind"], "rapport")
-        self.assertTrue(payload["fileUrl"].startswith("/media/"))
+        self.assertTrue(payload["fileUrl"].endswith("/content/"))
         self.assertTrue(payload["downloadUrl"].endswith("/download/"))
+        self.assertFalse(payload["isConfidential"])
+        self.assertTrue(payload["canRead"])
         self.assertEqual(payload["openCount"], 0)
 
     def test_draft_detail_is_not_public(self):

@@ -12,11 +12,18 @@
       <p>Créer, classer, valider et publier les documents institutionnels.</p>
     </div>
 
-    {% if perms.documents.add_document %}
-      <a href="{% url 'backoffice:document_create' %}" class="bo-btn">
-        Nouveau document
-      </a>
-    {% endif %}
+    <div class="bo-page-head__actions">
+      {% if perms.documents.publish_document %}
+        <a href="{% url 'backoffice:document_access_request_list' %}" class="bo-btn bo-btn--soft">
+          Demandes d’accès{% if pending_access_requests %} ({{ pending_access_requests }}){% endif %}
+        </a>
+      {% endif %}
+      {% if perms.documents.add_document %}
+        <a href="{% url 'backoffice:document_create' %}" class="bo-btn">
+          Nouveau document
+        </a>
+      {% endif %}
+    </div>
   </header>
 
   <form method="get" class="bo-news-filters" data-auto-submit-filter>
@@ -46,6 +53,12 @@
       {% endfor %}
     </select>
 
+    <select name="confidential" aria-label="Filtrer par confidentialité">
+      <option value="">Toute confidentialité</option>
+      <option value="yes" {% if confidential_filter == 'yes' %}selected{% endif %}>Confidentiels</option>
+      <option value="no" {% if confidential_filter == 'no' %}selected{% endif %}>Publics</option>
+    </select>
+
     <noscript>
       <button type="submit" class="bo-btn bo-btn--soft">Filtrer</button>
     </noscript>
@@ -58,6 +71,7 @@
           <th>Document</th>
           <th>Statut</th>
           <th>Type</th>
+          <th>Accès</th>
           <th>Date</th>
           <th>Taille</th>
           <th>Ouvertures</th>
@@ -77,6 +91,13 @@
               </span>
             </td>
             <td>{{ document.get_kind_display }}</td>
+            <td>
+              {% if document.is_confidential %}
+                <span class="bo-confidential-badge">🔒 Confidentiel</span>
+              {% else %}
+                <span class="bo-public-badge">Public</span>
+              {% endif %}
+            </td>
             <td>{{ document.date|date:"d/m/Y" }}</td>
             <td>{{ document.size_label|default:"—" }}</td>
             <td>{{ document.open_count }}</td>
@@ -92,7 +113,7 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="7" class="bo-empty">Aucun document trouvé.</td>
+            <td colspan="8" class="bo-empty">Aucun document trouvé.</td>
           </tr>
         {% endfor %}
       </tbody>
@@ -102,13 +123,13 @@
   {% if page_obj.paginator.num_pages > 1 %}
     <nav class="bo-pagination" aria-label="Pagination">
       {% if page_obj.has_previous %}
-        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&kind={{ kind_filter|urlencode }}&page={{ page_obj.previous_page_number }}">
+        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&kind={{ kind_filter|urlencode }}&confidential={{ confidential_filter|urlencode }}&page={{ page_obj.previous_page_number }}">
           Précédent
         </a>
       {% endif %}
       <span>Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
       {% if page_obj.has_next %}
-        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&kind={{ kind_filter|urlencode }}&page={{ page_obj.next_page_number }}">
+        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&kind={{ kind_filter|urlencode }}&confidential={{ confidential_filter|urlencode }}&page={{ page_obj.next_page_number }}">
           Suivant
         </a>
       {% endif %}

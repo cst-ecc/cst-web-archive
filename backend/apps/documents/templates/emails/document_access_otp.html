@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="fr">
+<body style="margin:0;background:#f4f7fa;font-family:Arial,sans-serif;color:#17354c">
+  <div style="max-width:640px;margin:0 auto;padding:32px 20px">
+    <div style="background:#fff;border:1px solid #dbe5ec;border-radius:16px;padding:28px;text-align:center">
+      <p style="margin:0 0 8px;color:#1f85ce;font-weight:700">CST / CSMO</p>
+      <h1 style="margin:0 0 18px;font-size:24px">Code de vérification</h1>
+      <p>Pour consulter <strong>« {{ document.title }} »</strong>, saisissez le code suivant :</p>
+      <div style="margin:24px auto;padding:16px;border-radius:12px;background:#eef5fa;font-size:30px;font-weight:800;letter-spacing:8px">{{ code }}</div>
+      <p style="color:#5c6f7d;font-size:14px">Ce code expire dans {{ expiry_minutes }} minute{{ expiry_minutes|pluralize }}. Ne le communiquez à personne.</p>
+    </div>
+  </div>
+</body>
+</html>

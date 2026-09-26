@@ -44,9 +44,9 @@ export interface DocumentItem {
   date: string;
   summary: string;
   /** Chemin/URL du fichier. En phase mock : chemin dans /public. */
-  fileUrl: string;
+  fileUrl: string | null;
   /** Ancienne URL de téléchargement conservée pour compatibilité API ; non utilisée dans l’interface publique. */
-  downloadUrl?: string;
+  downloadUrl?: string | null;
   fileType: "pdf" | "docx" | "xlsx" | "image" | "autre";
   /** Taille en octets (formatée à l'affichage). */
   fileSize: number;
@@ -59,6 +59,10 @@ export interface DocumentItem {
   downloads: number;
   /** Nombre d’ouvertures demandées via l’action de lecture intégrée. */
   openCount?: number;
+  /** Document soumis à une autorisation préalable. */
+  isConfidential?: boolean;
+  /** Indique si la lecture publique directe est possible. */
+  canRead?: boolean;
   /** Sessions liées (slugs). */
   relatedSessionSlugs?: string[];
 }

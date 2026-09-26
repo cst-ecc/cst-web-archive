@@ -1,0 +1,238 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.stateCard,
+.verifyCard,
+.viewer {
+  @include m.card;
+}
+
+.stateCard {
+  min-height: 12rem;
+  display: grid;
+  align-content: center;
+  gap: .5rem;
+  padding: 1.5rem;
+  color: rgba(17, 24, 39, .68);
+
+  strong {
+    color: v.$color-blue-ink;
+    font-size: v.$font-size-card-title;
+  }
+}
+
+.verifyCard {
+  max-width: 46rem;
+  margin-inline: auto;
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+
+  h1,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    color: v.$color-blue-ink;
+    font-size: clamp(1.5rem, 1.15rem + 1vw, 2.2rem);
+  }
+
+  p {
+    color: rgba(17, 24, 39, .68);
+    line-height: 1.65;
+  }
+}
+
+.lock {
+  width: fit-content;
+  padding: .32rem .65rem;
+  border-radius: 999px;
+  background: #fff6d8;
+  color: #7b5a00;
+  font-size: v.$font-size-meta;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.meta {
+  display: grid;
+  gap: .35rem;
+  padding: .9rem 1rem;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-lg;
+  background: v.$color-surface-muted;
+  color: rgba(17, 24, 39, .66);
+  font-size: v.$font-size-meta;
+}
+
+.otpForm {
+  display: grid;
+  gap: .9rem;
+
+  label {
+    display: grid;
+    gap: .45rem;
+    color: v.$color-blue-ink;
+    font-weight: 700;
+  }
+
+  input {
+    width: min(100%, 16rem);
+    min-height: 3.25rem;
+    padding: .7rem 1rem;
+    border: 1px solid v.$color-surface-line;
+    border-radius: v.$radius-lg;
+    font: inherit;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: .28em;
+    text-align: center;
+  }
+}
+
+.otpActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .7rem;
+}
+
+.message,
+.error {
+  padding: .75rem .9rem;
+  border-radius: v.$radius-lg;
+  font-size: v.$font-size-small;
+}
+
+.message {
+  background: #eef9f1;
+  color: #286b3d !important;
+}
+
+.error {
+  background: #fff1f1;
+  color: #8b2929 !important;
+}
+
+.viewer {
+  width: 100%;
+  overflow: hidden;
+}
+
+.viewer:fullscreen {
+  border: 0;
+  border-radius: 0;
+  background: v.$color-white;
+
+  .frameWrap {
+    height: calc(100vh - 7.5rem);
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4rem;
+  padding: .75rem 1rem;
+  border-bottom: 1px solid v.$color-surface-line;
+  background: v.$color-surface-muted;
+
+  > div {
+    min-width: 0;
+    display: grid;
+    gap: .2rem;
+  }
+
+  strong {
+    color: v.$color-blue-ink;
+  }
+
+  span {
+    color: rgba(17, 24, 39, .58);
+    font-size: v.$font-size-meta;
+  }
+
+  button {
+    flex: 0 0 auto;
+    min-height: 2.3rem;
+    padding: .45rem .7rem;
+    border: 1px solid v.$color-surface-line;
+    border-radius: v.$radius-lg;
+    background: v.$color-white;
+    color: v.$color-blue-deep;
+    font: inherit;
+    font-size: v.$font-size-meta;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+.frameWrap {
+  position: relative;
+  height: clamp(34rem, 72vh, 58rem);
+  min-height: 30rem;
+  background: #e9eef3;
+}
+
+.frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: white;
+}
+
+.watermarkLayer {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-content: space-around;
+  justify-items: center;
+  opacity: .16;
+
+  span {
+    width: 14rem;
+    color: #193e5a;
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .05em;
+    text-align: center;
+    text-transform: uppercase;
+    transform: rotate(-28deg);
+    user-select: none;
+  }
+}
+
+.footerNote {
+  padding: .75rem 1rem;
+  border-top: 1px solid v.$color-surface-line;
+  color: rgba(17, 24, 39, .58);
+  font-size: v.$font-size-meta;
+  line-height: 1.5;
+}
+
+@media (max-width: 767px) {
+  .toolbar {
+    align-items: flex-start;
+
+    span {
+      display: none;
+    }
+  }
+
+  .frameWrap {
+    height: 72svh;
+    min-height: 30rem;
+  }
+
+  .watermarkLayer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

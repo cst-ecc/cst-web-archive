@@ -51,6 +51,7 @@ class DocumentForm(forms.ModelForm):
             "date",
             "file",
             "pages",
+            "is_confidential",
             "featured",
             "display_order",
         )
@@ -60,6 +61,10 @@ class DocumentForm(forms.ModelForm):
         help_texts = {
             "file": "PDF, Word, Excel, PowerPoint ou OpenDocument.",
             "pages": "Optionnel. Utile pour les PDF ou rapports.",
+            "is_confidential": (
+                "Si activé, le fichier n’est plus accessible publiquement. "
+                "Une demande et une autorisation temporaire seront nécessaires."
+            ),
             "featured": "Réservé aux responsables autorisés à publier.",
         }
 
@@ -79,6 +84,9 @@ class DocumentForm(forms.ModelForm):
         )
 
         if user is not None and not user.has_perm("documents.publish_document"):
+            # La confidentialité modifie immédiatement l'exposition publique du fichier.
+            # Elle reste donc sous le contrôle des responsables habilités à publier.
+            self.fields.pop("is_confidential", None)
             self.fields.pop("featured", None)
             self.fields.pop("display_order", None)
 
@@ -147,3 +155,33 @@ class DocumentForm(forms.ModelForm):
             self.save_m2m()
 
         return document
+
+
+class DocumentAccessApprovalForm(forms.Form):
+    duration_hours = forms.ChoiceField(
+        label="Durée de l’autorisation",
+        choices=(
+            ("1", "1 heure"),
+            ("6", "6 heures"),
+            ("24", "24 heures"),
+            ("72", "3 jours"),
+            ("168", "7 jours"),
+        ),
+        initial="24",
+    )
+    max_opens = forms.IntegerField(
+        label="Nombre maximal d’ouvertures",
+        min_value=1,
+        max_value=100,
+        initial=5,
+        help_text="Une ouverture correspond au chargement du document dans le lecteur sécurisé.",
+    )
+
+
+class DocumentAccessRefusalForm(forms.Form):
+    refusal_reason = forms.CharField(
+        label="Motif du refus",
+        required=False,
+        max_length=1000,
+        widget=forms.Textarea(attrs={"rows": 4}),
+    )

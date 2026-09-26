@@ -37,13 +37,13 @@
     {% csrf_token %}
 
     {% for field in form %}
-      <div class="bo-field {% if field.name == 'featured' %}bo-field--checkbox{% endif %}">
+      <div class="bo-field {% if field.name == 'featured' or field.name == 'is_confidential' %}bo-field--checkbox{% endif %}">
         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
 
         {% if field.name == "file" and document and document.file %}
           <div class="bo-current-file">
             <span>Fichier actuel</span>
-            <a href="{{ document.file.url }}" target="_blank" rel="noopener">
+            <a href="{% url 'backoffice:document_file' document.pk %}" target="_blank" rel="noopener">
               {{ document.original_filename|default:document.file.name }}
             </a>
             <small>

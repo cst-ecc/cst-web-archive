@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import PdfViewer from "@/components/documents/PdfViewer";
 import Container from "@/components/layout/Container";
@@ -45,6 +45,7 @@ export default async function DocumentReaderPage({
 }) {
   const doc = await getDocumentBySlug(params.slug);
   if (!doc) notFound();
+  if (doc.isConfidential) redirect(`/documents/${doc.slug}/demande-acces`);
 
   const fallbackHref = safeReturnHref(
     searchParams?.from,
@@ -74,7 +75,7 @@ export default async function DocumentReaderPage({
 
         <div className={styles.viewerWrap}>
           {canDisplayPdf ? (
-            <PdfViewer src={doc.fileUrl} title={doc.title} />
+            <PdfViewer src={doc.fileUrl!} title={doc.title} />
           ) : (
             <div className={styles.unavailable} role="status">
               <strong>Lecture intégrée indisponible</strong>

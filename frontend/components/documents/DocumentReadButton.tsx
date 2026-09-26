@@ -11,12 +11,14 @@ export default function DocumentReadButton({
   variant = "solid",
   className,
   returnHref,
+  isConfidential = false,
 }: {
   slug: string;
   label?: string;
   variant?: "solid" | "outline" | "ghost" | "yellow";
   className?: string;
   returnHref?: string;
+  isConfidential?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -24,6 +26,11 @@ export default function DocumentReadButton({
   const handleRead = () => {
     const source = returnHref ?? pathname ?? "/documents";
     const encodedSlug = encodeURIComponent(slug);
+
+    if (isConfidential) {
+      router.push(`/documents/${encodedSlug}/demande-acces`);
+      return;
+    }
     const encodedSource = encodeURIComponent(source);
     const auditUrl = `/api/v1/documents/${encodedSlug}/view/?source=${encodedSource}`;
 

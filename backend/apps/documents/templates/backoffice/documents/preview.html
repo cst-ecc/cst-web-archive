@@ -35,7 +35,7 @@
       <dt>Fichier</dt>
       <dd>
         {% if document.file %}
-          <a href="{{ document.file.url }}" target="_blank" rel="noopener">
+          <a href="{% url 'backoffice:document_file' document.pk %}" target="_blank" rel="noopener">
             {{ document.original_filename|default:document.file.name }}
           </a>
         {% else %}
@@ -50,6 +50,16 @@
     <div>
       <dt>Pages</dt>
       <dd>{{ document.pages|default:"—" }}</dd>
+    </div>
+    <div>
+      <dt>Confidentialité</dt>
+      <dd>
+        {% if document.is_confidential %}
+          <span class="bo-confidential-badge">🔒 Confidentiel</span>
+        {% else %}
+          <span class="bo-public-badge">Public</span>
+        {% endif %}
+      </dd>
     </div>
   </dl>
 </article>

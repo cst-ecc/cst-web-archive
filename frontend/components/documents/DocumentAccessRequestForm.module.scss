@@ -1,0 +1,106 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins" as m;
+
+.form,
+.success {
+  @include m.card;
+  width: 100%;
+  padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+}
+
+.form {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+
+  @include m.respond(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.field {
+  display: grid;
+  gap: .45rem;
+  color: v.$color-blue-ink;
+  font-size: v.$font-size-small;
+  font-weight: 700;
+
+  input,
+  textarea {
+    width: 100%;
+    border: 1px solid v.$color-surface-line;
+    border-radius: v.$radius-lg;
+    background: v.$color-white;
+    color: v.$color-ink;
+    font: inherit;
+    font-weight: 500;
+    padding: .78rem .9rem;
+  }
+
+  textarea {
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  input:focus,
+  textarea:focus {
+    outline: 2px solid rgba(31, 133, 206, .2);
+    border-color: v.$color-blue;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.note {
+  margin: 0;
+  color: rgba(17, 24, 39, .58);
+  font-size: v.$font-size-meta;
+  line-height: 1.55;
+}
+
+.error {
+  margin: 0;
+  padding: .8rem 1rem;
+  border: 1px solid #efc9c9;
+  border-radius: v.$radius-lg;
+  background: #fff1f1;
+  color: #8b2929;
+  font-size: v.$font-size-small;
+}
+
+.success {
+  display: grid;
+  justify-items: start;
+  gap: .7rem;
+  border-color: rgba(45, 138, 76, .22);
+  background: #f4fbf6;
+
+  strong {
+    color: v.$color-blue-ink;
+    font-size: v.$font-size-card-title;
+  }
+
+  p {
+    margin: 0;
+    color: rgba(17, 24, 39, .68);
+    line-height: 1.65;
+  }
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: #2d8a4c;
+  color: white;
+  font-weight: 900;
+}

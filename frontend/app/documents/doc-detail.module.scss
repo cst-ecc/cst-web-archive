@@ -157,3 +157,20 @@
     align-items: flex-start;
   }
 }
+
+.confidentialNotice {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: .3rem;
+  padding: .9rem 1rem;
+  border: 1px solid #ead79e;
+  border-radius: v.$radius-lg;
+  background: #fff9e8;
+  color: rgba(87, 62, 0, .76);
+  font-size: v.$font-size-meta;
+  line-height: 1.5;
+
+  strong {
+    color: #6d5000;
+  }
+}

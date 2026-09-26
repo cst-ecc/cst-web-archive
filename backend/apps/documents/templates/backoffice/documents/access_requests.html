@@ -1,0 +1,86 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Demandes d’accès — Back-office CST/CSMO{% endblock %}
+
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head">
+    <div>
+      <a class="bo-back-link" href="{% url 'backoffice:document_list' %}">← Documents</a>
+      <span class="bo-eyebrow">Documents confidentiels</span>
+      <h1>Demandes d’accès</h1>
+      <p>Examiner les demandes et contrôler les autorisations temporaires.</p>
+    </div>
+  </header>
+
+  <div class="bo-access-stats">
+    <a href="?status=pending" class="bo-access-stat {% if status_filter == 'pending' %}is-active{% endif %}">
+      <span>En attente</span><strong>{{ counts.pending }}</strong>
+    </a>
+    <a href="?status=approved" class="bo-access-stat {% if status_filter == 'approved' %}is-active{% endif %}">
+      <span>Autorisées</span><strong>{{ counts.approved }}</strong>
+    </a>
+    <a href="?status=refused" class="bo-access-stat {% if status_filter == 'refused' %}is-active{% endif %}">
+      <span>Refusées</span><strong>{{ counts.refused }}</strong>
+    </a>
+    <a href="?status=all" class="bo-access-stat {% if status_filter == 'all' %}is-active{% endif %}">
+      <span>Toutes</span><strong>{{ counts.pending|add:counts.approved|add:counts.refused }}</strong>
+    </a>
+  </div>
+
+  <form method="get" class="bo-news-filters">
+    <input type="hidden" name="status" value="{{ status_filter }}">
+    <input type="search" name="q" value="{{ query }}" placeholder="Nom, e-mail, document, organisation" aria-label="Rechercher une demande">
+    <button type="submit" class="bo-btn bo-btn--soft">Rechercher</button>
+  </form>
+
+  <div class="bo-table-wrap">
+    <table class="bo-table">
+      <thead>
+        <tr>
+          <th>Demandeur</th>
+          <th>Document</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th><span class="sr-only">Action</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in page_obj %}
+          <tr>
+            <td>
+              <strong>{{ item.full_name }}</strong>
+              <span>{{ item.email }}{% if item.organization %} · {{ item.organization }}{% endif %}</span>
+            </td>
+            <td>
+              <strong>{{ item.document.title }}</strong>
+              <span>{{ item.document.reference|default:"Document confidentiel" }}</span>
+            </td>
+            <td>{{ item.created_at|date:"d/m/Y H:i" }}</td>
+            <td>
+              <span class="bo-access-status bo-access-status--{{ item.status }}">{{ item.get_status_display }}</span>
+            </td>
+            <td class="bo-table__actions">
+              <a href="{% url 'backoffice:document_access_request_detail' item.pk %}">Examiner</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="bo-empty">Aucune demande trouvée.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="bo-pagination" aria-label="Pagination">
+      {% if page_obj.has_previous %}
+        <a href="?status={{ status_filter|urlencode }}&q={{ query|urlencode }}&page={{ page_obj.previous_page_number }}">Précédent</a>
+      {% endif %}
+      <span>Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?status={{ status_filter|urlencode }}&q={{ query|urlencode }}&page={{ page_obj.next_page_number }}">Suivant</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
+{% endblock %}

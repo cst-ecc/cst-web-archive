@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fr">
+<body style="margin:0;background:#f4f7fa;font-family:Arial,sans-serif;color:#17354c">
+  <div style="max-width:640px;margin:0 auto;padding:32px 20px">
+    <div style="background:#fff;border:1px solid #dbe5ec;border-radius:16px;padding:28px">
+      <p style="margin:0 0 8px;color:#1f85ce;font-weight:700">CST / CSMO</p>
+      <h1 style="margin:0 0 18px;font-size:24px">Accès au document autorisé</h1>
+      <p>Bonjour {{ grant.recipient_name }},</p>
+      <p>Votre demande d’accès au document <strong>« {{ document.title }} »</strong> a été autorisée.</p>
+      <p style="margin:24px 0">
+        <a href="{{ access_url }}" style="display:inline-block;padding:12px 18px;border-radius:10px;background:#173f5f;color:#fff;text-decoration:none;font-weight:700">Ouvrir le lien sécurisé</a>
+      </p>
+      <p>Expiration : <strong>{{ grant.expires_at|date:"d/m/Y à H:i" }}</strong><br>
+      Ouvertures maximales : <strong>{{ grant.max_opens }}</strong><br>
+      Référence : <strong>{{ grant.reference }}</strong></p>
+      <p style="color:#5c6f7d;font-size:14px">Une vérification par code e-mail sera demandée avant la consultation. Ne transférez pas ce lien.</p>
+    </div>
+  </div>
+</body>
+</html>

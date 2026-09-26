@@ -1,0 +1,13 @@
+Bonjour {{ grant.recipient_name }},
+
+Votre demande d’accès au document « {{ document.title }} » a été autorisée.
+
+Lien sécurisé : {{ access_url }}
+
+Cette autorisation expire le {{ grant.expires_at|date:"d/m/Y à H:i" }} et permet au maximum {{ grant.max_opens }} ouverture{{ grant.max_opens|pluralize }}.
+
+Une vérification par code e-mail sera demandée avant la consultation.
+
+Référence de l’autorisation : {{ grant.reference }}
+
+CST / CSMO

@@ -102,4 +102,39 @@ urlpatterns = [
         document_views.document_transition_view,
         name="document_transition",
     ),
+    path(
+        "documents/<int:pk>/file/",
+        document_views.document_file_view,
+        name="document_file",
+    ),
+    path(
+        "documents/access-requests/",
+        document_views.document_access_request_list_view,
+        name="document_access_request_list",
+    ),
+    path(
+        "documents/access-requests/<int:pk>/",
+        document_views.document_access_request_detail_view,
+        name="document_access_request_detail",
+    ),
+    path(
+        "documents/access-requests/<int:pk>/approve/",
+        document_views.document_access_request_approve_view,
+        name="document_access_request_approve",
+    ),
+    path(
+        "documents/access-requests/<int:pk>/refuse/",
+        document_views.document_access_request_refuse_view,
+        name="document_access_request_refuse",
+    ),
+    path(
+        "documents/access-grants/<int:pk>/revoke/",
+        document_views.document_access_grant_revoke_view,
+        name="document_access_grant_revoke",
+    ),
+    path(
+        "documents/access-grants/<int:pk>/resend/",
+        document_views.document_access_grant_resend_view,
+        name="document_access_grant_resend",
+    ),
 ]

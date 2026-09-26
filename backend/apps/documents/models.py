@@ -4,7 +4,7 @@ import uuid
 from pathlib import Path
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -28,6 +28,12 @@ class DocumentKind(models.TextChoices):
     CONSOLIDATED_TEXT = "texte_consolide", "Texte consolidé"
     POPULARIZATION = "vulgarisation", "Vulgarisation"
     OTHER = "autre", "Autre"
+
+
+class DocumentAccessRequestStatus(models.TextChoices):
+    PENDING = "pending", "En attente"
+    APPROVED = "approved", "Autorisée"
+    REFUSED = "refused", "Refusée"
 
 
 class DocumentCategory(TimeStampedModel):
@@ -94,6 +100,15 @@ class Document(TimeStampedModel):
     display_order = models.PositiveIntegerField("ordre d’affichage", default=0)
     downloads = models.PositiveIntegerField("téléchargements", default=0)
     open_count = models.PositiveIntegerField("ouvertures", default=0)
+    is_confidential = models.BooleanField(
+        "document confidentiel",
+        default=False,
+        db_index=True,
+        help_text=(
+            "Si activé, le fichier n’est plus accessible publiquement et nécessite "
+            "une autorisation temporaire."
+        ),
+    )
 
     submitted_at = models.DateTimeField("soumis le", null=True, blank=True)
     published_at = models.DateTimeField("publié le", null=True, blank=True)
@@ -177,6 +192,18 @@ class Document(TimeStampedModel):
         return f"{round(size / 1024 / 1024, 1)} Mo"
 
     def save(self, *args, **kwargs):
+        previous_is_confidential = None
+        update_fields = kwargs.get("update_fields")
+        confidentiality_may_change = (
+            update_fields is None or "is_confidential" in update_fields
+        )
+        if self.pk and confidentiality_may_change:
+            previous_is_confidential = (
+                Document.objects.filter(pk=self.pk)
+                .values_list("is_confidential", flat=True)
+                .first()
+            )
+
         if not self.slug:
             base = slugify(self.title)[:230] or "document"
             candidate = base
@@ -184,4 +211,222 @@ class Document(TimeStampedModel):
                 candidate = f"{base[:220]}-{uuid.uuid4().hex[:8]}"
             self.slug = candidate
 
+        # Dès qu'un document redevient public, la mise à jour du document et
+        # l'invalidation de ses anciennes autorisations sont atomiques. Ainsi,
+        # aucune autorisation confidentielle ne peut redevenir valide si le
+        # document est marqué confidentiel à nouveau plus tard.
+        if previous_is_confidential is True and not self.is_confidential:
+            with transaction.atomic():
+                super().save(*args, **kwargs)
+                now = timezone.now()
+                self.access_grants.filter(revoked_at__isnull=True).update(
+                    revoked_at=now,
+                    updated_at=now,
+                )
+                DocumentAccessOTP.objects.filter(
+                    grant__document=self,
+                    used_at__isnull=True,
+                    invalidated_at__isnull=True,
+                ).update(invalidated_at=now)
+                self.access_requests.filter(
+                    status=DocumentAccessRequestStatus.PENDING
+                ).update(
+                    status=DocumentAccessRequestStatus.REFUSED,
+                    reviewed_at=now,
+                    refusal_reason=(
+                        "Demande clôturée automatiquement : le document a été rendu public."
+                    ),
+                    updated_at=now,
+                )
+            return
+
         super().save(*args, **kwargs)
+
+class DocumentAccessRequest(TimeStampedModel):
+    document = models.ForeignKey(
+        Document,
+        verbose_name="document",
+        related_name="access_requests",
+        on_delete=models.CASCADE,
+    )
+    full_name = models.CharField("nom et prénoms", max_length=180)
+    email = models.EmailField("adresse e-mail", db_index=True)
+    phone = models.CharField("téléphone", max_length=40, blank=True)
+    organization = models.CharField("organisation / qualité", max_length=180, blank=True)
+    reason = models.TextField("motif de la demande")
+    status = models.CharField(
+        "statut",
+        max_length=20,
+        choices=DocumentAccessRequestStatus.choices,
+        default=DocumentAccessRequestStatus.PENDING,
+        db_index=True,
+    )
+    reviewed_at = models.DateTimeField("examinée le", null=True, blank=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="examinée par",
+        related_name="document_access_requests_reviewed",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    refusal_reason = models.TextField("motif du refus", blank=True)
+
+    class Meta:
+        verbose_name = "demande d’accès à un document"
+        verbose_name_plural = "demandes d’accès aux documents"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(
+                fields=["status", "-created_at"],
+                name="doc_access_req_status_idx",
+            ),
+            models.Index(
+                fields=["document", "email"],
+                name="doc_access_req_doc_mail_idx",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.full_name} — {self.document.title}"
+
+
+class DocumentAccessGrant(TimeStampedModel):
+    public_id = models.UUIDField("référence publique", default=uuid.uuid4, unique=True, editable=False)
+    request = models.OneToOneField(
+        DocumentAccessRequest,
+        verbose_name="demande",
+        related_name="grant",
+        on_delete=models.CASCADE,
+    )
+    document = models.ForeignKey(
+        Document,
+        verbose_name="document",
+        related_name="access_grants",
+        on_delete=models.CASCADE,
+    )
+    recipient_name = models.CharField("destinataire", max_length=180)
+    recipient_email = models.EmailField("e-mail destinataire", db_index=True)
+    token_hash = models.CharField("hash du lien", max_length=64, unique=True, db_index=True)
+    expires_at = models.DateTimeField("expiration", db_index=True)
+    max_opens = models.PositiveIntegerField("ouvertures maximales", default=5)
+    open_count = models.PositiveIntegerField("ouvertures", default=0)
+    last_opened_at = models.DateTimeField("dernière ouverture", null=True, blank=True)
+    last_verified_at = models.DateTimeField("dernière vérification", null=True, blank=True)
+    revoked_at = models.DateTimeField("révoquée le", null=True, blank=True)
+    revoked_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="révoquée par",
+        related_name="document_access_grants_revoked",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="créée par",
+        related_name="document_access_grants_created",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    link_sent_at = models.DateTimeField("lien envoyé le", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "autorisation d’accès à un document"
+        verbose_name_plural = "autorisations d’accès aux documents"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(
+                fields=["document", "expires_at"],
+                name="doc_access_grant_exp_idx",
+            ),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(max_opens__gte=1),
+                name="doc_access_grant_max_opens_gte_1",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.recipient_name} — {self.document.title}"
+
+    @property
+    def is_expired(self) -> bool:
+        return timezone.now() >= self.expires_at
+
+    @property
+    def is_revoked(self) -> bool:
+        return self.revoked_at is not None
+
+    @property
+    def has_remaining_opens(self) -> bool:
+        return self.open_count < self.max_opens
+
+    @property
+    def is_active(self) -> bool:
+        return (
+            self.document.is_confidential
+            and not self.is_expired
+            and not self.is_revoked
+            and self.has_remaining_opens
+        )
+
+    @property
+    def remaining_opens(self) -> int:
+        return max(0, self.max_opens - self.open_count)
+
+    @property
+    def reference(self) -> str:
+        return self.public_id.hex[:12].upper()
+
+
+class DocumentAccessOTP(models.Model):
+    grant = models.ForeignKey(
+        DocumentAccessGrant,
+        verbose_name="autorisation",
+        related_name="otps",
+        on_delete=models.CASCADE,
+    )
+    code_hash = models.CharField("hash du code", max_length=255)
+    expires_at = models.DateTimeField("expiration", db_index=True)
+    attempts = models.PositiveSmallIntegerField("tentatives", default=0)
+    max_attempts = models.PositiveSmallIntegerField("tentatives maximales", default=5)
+    resend_available_at = models.DateTimeField("renvoi autorisé à partir de")
+    used_at = models.DateTimeField("utilisé le", null=True, blank=True)
+    invalidated_at = models.DateTimeField("invalidé le", null=True, blank=True)
+    ip_address = models.GenericIPAddressField("adresse IP", null=True, blank=True)
+    user_agent = models.TextField("user-agent", blank=True)
+    created_at = models.DateTimeField("créé le", auto_now_add=True, db_index=True)
+
+    class Meta:
+        verbose_name = "OTP d’accès à un document"
+        verbose_name_plural = "OTP d’accès aux documents"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(
+                fields=["grant", "-created_at"],
+                name="doc_access_otp_grant_idx",
+            ),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(max_attempts__gte=1),
+                name="doc_access_otp_max_attempts_gte_1",
+            ),
+        ]
+
+    @property
+    def is_expired(self) -> bool:
+        return timezone.now() >= self.expires_at
+
+    @property
+    def is_active(self) -> bool:
+        return (
+            not self.is_expired
+            and self.used_at is None
+            and self.invalidated_at is None
+            and self.attempts < self.max_attempts
+        )
+

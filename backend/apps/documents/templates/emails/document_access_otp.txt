@@ -1,0 +1,11 @@
+Bonjour {{ grant.recipient_name }},
+
+Votre code de vérification pour consulter « {{ document.title }} » est :
+
+{{ code }}
+
+Ce code expire dans {{ expiry_minutes }} minute{{ expiry_minutes|pluralize }}.
+
+Ne communiquez ce code à personne.
+
+CST / CSMO

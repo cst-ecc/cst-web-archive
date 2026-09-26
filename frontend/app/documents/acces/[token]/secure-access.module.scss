@@ -1,0 +1,8 @@
+@use "../../../../styles/variables" as v;
+
+.wrapper {
+  width: 100%;
+  max-width: v.$max-width-home;
+  margin-inline: auto;
+  padding-block: clamp(1.5rem, 1rem + 1vw, 2.5rem) clamp(3rem, 2rem + 2vw, 4.5rem);
+}

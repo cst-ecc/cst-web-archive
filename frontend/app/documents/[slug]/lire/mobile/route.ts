@@ -37,6 +37,7 @@ export async function GET(
 
   if (
     !doc ||
+    doc.isConfidential ||
     doc.fileType !== "pdf" ||
     !doc.fileUrl ||
     doc.fileUrl === "#"
@@ -50,8 +51,10 @@ export async function GET(
     return redirectWithoutInternalOrigin(fallbackLocation(params.slug));
   }
 
-  // Les médias Django doivent toujours rester sur l'origine publique courante.
-  if (publicHref.startsWith("/media/")) {
+  // Les ressources servies par le gateway (/api/ ou /media/) doivent rester
+  // sur l’origine publique courante. Les documents passent désormais par
+  // l’endpoint Django contrôlé plutôt que par /media/documents/.
+  if (publicHref.startsWith("/")) {
     return redirectWithoutInternalOrigin(publicHref);
   }
 

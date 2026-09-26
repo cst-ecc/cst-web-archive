@@ -19,6 +19,10 @@ class DocumentFormTests(TestCase):
             slug="rapports",
         )
 
+    def test_confidentiality_is_reserved_for_publishers(self):
+        form = DocumentForm(user=self.user)
+        self.assertNotIn("is_confidential", form.fields)
+
     def test_document_accepts_long_original_filename(self):
         long_name = (
             "Déroulement de la Rencontre d'information, d'échange et de partage "
