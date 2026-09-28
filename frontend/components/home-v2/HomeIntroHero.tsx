@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { HomeNavigate } from "./homeV2.types";
 import styles from "./HomeIntroHero.module.scss";
+import Link from "next/link";
 
 export default function HomeIntroHero({
   onNavigate,
@@ -39,20 +40,19 @@ export default function HomeIntroHero({
           </p>
 
           <div className={styles.actions}>
-            <button
-              type="button"
+            <Link
+              href="/documents"
               className={styles.primary}
-              onClick={() => onNavigate("comprendre")}
             >
-              Découvrir la démarche <span aria-hidden>→</span>
-            </button>
+              Voir les documents
+            </Link>
 
             <button
               type="button"
               className={styles.secondary}
-              onClick={() => onNavigate("avancement")}
+              onClick={() => onNavigate("comprendre")}
             >
-              Où en sommes-nous ?
+              Voir la demarche  <span aria-hidden>→</span>
             </button>
           </div>
         </div>
