@@ -3,6 +3,7 @@ from django.urls import path
 from apps.documents import backoffice_views as document_views
 from apps.gallery import backoffice_views as gallery_views
 from apps.news import backoffice_views as news_views
+from apps.communication import backoffice_views as communication_views
 
 from . import user_views, views
 
@@ -85,12 +86,10 @@ urlpatterns = [
         name="gallery_image_delete",
     ),
 
+    path("contacts/", communication_views.contact_list_view, name="contact_list"),
+    path("contacts/<int:pk>/", communication_views.contact_detail_view, name="contact_detail"),
+
     path("documents/", document_views.document_list_view, name="document_list"),
-    path(
-        "documents/bulk-confidentiality/",
-        document_views.document_bulk_confidentiality_view,
-        name="document_bulk_confidentiality",
-    ),
     path("documents/new/", document_views.document_create_view, name="document_create"),
     path(
         "documents/<int:pk>/edit/",
@@ -111,35 +110,5 @@ urlpatterns = [
         "documents/<int:pk>/file/",
         document_views.document_file_view,
         name="document_file",
-    ),
-    path(
-        "documents/access-requests/",
-        document_views.document_access_request_list_view,
-        name="document_access_request_list",
-    ),
-    path(
-        "documents/access-requests/<int:pk>/",
-        document_views.document_access_request_detail_view,
-        name="document_access_request_detail",
-    ),
-    path(
-        "documents/access-requests/<int:pk>/approve/",
-        document_views.document_access_request_approve_view,
-        name="document_access_request_approve",
-    ),
-    path(
-        "documents/access-requests/<int:pk>/refuse/",
-        document_views.document_access_request_refuse_view,
-        name="document_access_request_refuse",
-    ),
-    path(
-        "documents/access-grants/<int:pk>/revoke/",
-        document_views.document_access_grant_revoke_view,
-        name="document_access_grant_revoke",
-    ),
-    path(
-        "documents/access-grants/<int:pk>/resend/",
-        document_views.document_access_grant_resend_view,
-        name="document_access_grant_resend",
     ),
 ]

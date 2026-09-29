@@ -1,4 +1,5 @@
 {% extends "backoffice/base.html" %}
+{% block page_heading %}Documents{% endblock %}
 
 {% block title %}Aperçu — {{ document.title }}{% endblock %}
 
@@ -52,14 +53,12 @@
       <dd>{{ document.pages|default:"—" }}</dd>
     </div>
     <div>
-      <dt>Confidentialité</dt>
-      <dd>
-        {% if document.is_confidential %}
-          <span class="bo-confidential-badge">🔒 Confidentiel</span>
-        {% else %}
-          <span class="bo-public-badge">Public</span>
-        {% endif %}
-      </dd>
+      <dt>Ouvertures</dt>
+      <dd>{{ document.open_count }}</dd>
+    </div>
+    <div>
+      <dt>Téléchargements</dt>
+      <dd>{{ document.downloads }}</dd>
     </div>
   </dl>
 </article>

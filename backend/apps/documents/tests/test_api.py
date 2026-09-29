@@ -67,8 +67,6 @@ class PublicDocumentApiTests(TestCase):
         self.assertEqual(payload["kind"], "rapport")
         self.assertTrue(payload["fileUrl"].endswith("/content/"))
         self.assertTrue(payload["downloadUrl"].endswith("/download/"))
-        self.assertFalse(payload["isConfidential"])
-        self.assertTrue(payload["canRead"])
         self.assertEqual(payload["openCount"], 0)
 
     def test_draft_detail_is_not_public(self):
@@ -111,6 +109,25 @@ class PublicDocumentApiTests(TestCase):
         self.assertEqual(response.json()["openCount"], 2)
         document.refresh_from_db()
         self.assertEqual(document.open_count, 2)
+
+
+    def test_download_endpoint_counts_downloads(self):
+        document = self._document(title="Document téléchargé", status=PublicationStatus.PUBLISHED)
+        response = self.client.get(
+            reverse("documents_api:download", kwargs={"slug": document.slug})
+            + "?source=/documents"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("attachment", response["Content-Disposition"])
+        document.refresh_from_db()
+        self.assertEqual(document.downloads, 1)
+        self.assertTrue(
+            AuditLog.objects.filter(
+                action=AuditAction.DOCUMENT_DOWNLOADED,
+                target_id=str(document.pk),
+            ).exists()
+        )
 
     def test_view_endpoint_rejects_unpublished_document(self):
         document = self._document(title="Document privé", status=PublicationStatus.DRAFT)

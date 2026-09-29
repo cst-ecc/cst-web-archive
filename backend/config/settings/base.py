@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "apps.news.apps.NewsConfig",
     "apps.gallery.apps.GalleryConfig",
     "apps.documents.apps.DocumentsConfig",
+    "apps.communication.apps.CommunicationConfig",
 ]
 
 MIDDLEWARE = [
@@ -127,6 +128,24 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS")
 EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=10)
+
+# Cache partagé : Redis existe déjà pour Celery et sert aussi au rate limiting.
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": env("REDIS_CACHE_URL", default="redis://cst-redis:6379/1"),
+        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+    }
+}
+
+CONTACT_RATE_LIMIT_COUNT = env.int("CONTACT_RATE_LIMIT_COUNT", default=5)
+CONTACT_RATE_LIMIT_WINDOW_SECONDS = env.int(
+    "CONTACT_RATE_LIMIT_WINDOW_SECONDS", default=3600
+)
+CONTACT_NOTIFICATION_EMAILS = env.list(
+    "CONTACT_NOTIFICATION_EMAILS", default=[]
+)
 
 # Préparé pour l'étape OTP ; le mécanisme n'est pas encore implémenté.
 OTP_EXPIRY_MINUTES = env.int("OTP_EXPIRY_MINUTES")

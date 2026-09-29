@@ -1,0 +1,8 @@
+Bonjour {{ contact.full_name }},
+
+Votre message a bien été reçu et enregistré par le CST / CSMo de l’Église du Christianisme Céleste.
+
+Objet : {{ contact.subject }}
+
+Cordialement,
+CST / CSMo ECC

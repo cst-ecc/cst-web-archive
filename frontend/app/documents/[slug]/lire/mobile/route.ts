@@ -37,7 +37,6 @@ export async function GET(
 
   if (
     !doc ||
-    doc.isConfidential ||
     doc.fileType !== "pdf" ||
     !doc.fileUrl ||
     doc.fileUrl === "#"

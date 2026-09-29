@@ -179,9 +179,30 @@ def transition_document(
 
 
 @transaction.atomic
-def increment_downloads(document: Document) -> None:
-    # Conservé pour compatibilité avec l’ancien endpoint public.
+def increment_downloads(*, document: Document, request=None, source: str = "") -> int:
+    """Compte un téléchargement initié par le bouton/endpoint officiel.
+
+    Le compteur représente des événements de téléchargement, pas des personnes
+    uniques : sans authentification publique, deux téléchargements du même visiteur
+    restent deux téléchargements. Chaque événement est néanmoins journalisé avec
+    l’IP et le user-agent déjà gérés par le module d’audit.
+    """
     Document.objects.filter(pk=document.pk).update(downloads=F("downloads") + 1)
+    document.refresh_from_db(fields=["downloads"])
+
+    audit_log(
+        action=AuditAction.DOCUMENT_DOWNLOADED,
+        request=request,
+        target=document,
+        description="Téléchargement public d’un document.",
+        metadata={
+            "source": source[:500],
+            "downloads": document.downloads,
+            "slug": document.slug,
+        },
+    )
+
+    return document.downloads
 
 
 @transaction.atomic

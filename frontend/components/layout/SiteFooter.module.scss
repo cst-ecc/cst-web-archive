@@ -104,3 +104,33 @@
     gap: 0.7rem 1rem;
   }
 }
+
+.footerActions {
+  display: grid;
+  justify-items: end;
+  gap: 0.35rem;
+}
+
+.privacy {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem 0.9rem;
+  color: rgba(17, 24, 39, 0.5);
+  font-size: 0.72rem;
+
+  a:hover {
+    color: v.$color-blue;
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 767px) {
+  .footerActions {
+    justify-items: center;
+  }
+
+  .privacy {
+    justify-content: center;
+  }
+}

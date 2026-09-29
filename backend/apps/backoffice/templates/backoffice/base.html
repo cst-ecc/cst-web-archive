@@ -8,36 +8,132 @@
   <title>{% block title %}Back-office CST/CSMo{% endblock %}</title>
 
   <link rel="stylesheet" href="{% static 'backoffice/css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'backoffice/css/layout.css' %}">
   <link rel="stylesheet" href="{% static 'backoffice/css/components.css' %}">
   <link rel="stylesheet" href="{% static 'backoffice/css/forms.css' %}">
   <link rel="stylesheet" href="{% static 'backoffice/css/tables.css' %}">
   <link rel="stylesheet" href="{% static 'backoffice/css/news.css' %}">
   <link rel="stylesheet" href="{% static 'backoffice/css/gallery.css' %}">
   <link rel="stylesheet" href="{% static 'backoffice/css/documents.css' %}">
+  <link rel="stylesheet" href="{% static 'backoffice/css/communication.css' %}">
   <link rel="stylesheet" href="{% static 'backoffice/css/loader.css' %}">
 
+  <script src="{% static 'backoffice/js/layout.js' %}" defer></script>
   <script src="{% static 'backoffice/js/messages.js' %}" defer></script>
   <script src="{% static 'backoffice/js/filters.js' %}" defer></script>
   <script src="{% static 'backoffice/js/uploads.js' %}" defer></script>
   <script src="{% static 'backoffice/js/gallery_chunk_upload.js' %}" defer></script>
   <script src="{% static 'backoffice/js/loading.js' %}" defer></script>
 </head>
-<body>
-  <main class="bo-shell">
-    {% if messages %}
-      <div class="bo-messages" aria-live="polite">
-        {% for message in messages %}
-          <div
-            class="bo-message bo-message--{{ message.tags|default:'info' }}"
-            data-auto-dismiss-message
-          >
-            <span>{{ message }}</span>
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
+<body class="{% if request.user.is_authenticated %}bo-body--app{% else %}bo-body--auth{% endif %}">
+  {% if messages %}
+    <div class="bo-messages" aria-live="polite" aria-atomic="true">
+      {% for message in messages %}
+        <div class="bo-message bo-message--{{ message.tags|default:'info' }}" data-auto-dismiss-message>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-    {% block content %}{% endblock %}
-  </main>
+  {% if request.user.is_authenticated %}
+    {% with url_name=request.resolver_match.url_name %}
+      <div class="bo-app" data-admin-layout>
+        <aside class="bo-sidebar" id="bo-sidebar" aria-label="Navigation du back-office">
+          <div class="bo-sidebar__brand">
+            <a href="{% url 'backoffice:dashboard' %}" class="bo-brand-mark" aria-label="Tableau de bord CST CSMo">
+              <span class="bo-brand-mark__symbol">C</span>
+              <span class="bo-brand-mark__text"><strong>CST / CSMo</strong><small>Administration</small></span>
+            </a>
+            <button class="bo-icon-btn bo-sidebar__collapse" type="button" data-sidebar-collapse aria-label="Réduire la navigation" title="Réduire la navigation">‹</button>
+          </div>
+
+          <nav class="bo-nav">
+            <div class="bo-nav__group">
+              <span class="bo-nav__label">Vue d'ensemble</span>
+              <a class="bo-nav__item{% if url_name == 'dashboard' %} is-active{% endif %}" href="{% url 'backoffice:dashboard' %}">
+                <span class="bo-nav__icon" aria-hidden="true">⌂</span><span class="bo-nav__text">Tableau de bord</span>
+              </a>
+            </div>
+
+            <div class="bo-nav__group">
+              <span class="bo-nav__label">Contenus</span>
+              {% if perms.news.view_news %}
+                <a class="bo-nav__item{% if 'news' in url_name %} is-active{% endif %}" href="{% url 'backoffice:news_list' %}">
+                  <span class="bo-nav__icon" aria-hidden="true">N</span><span class="bo-nav__text">Actualités</span>
+                </a>
+              {% endif %}
+              {% if perms.gallery.view_galleryalbum %}
+                <a class="bo-nav__item{% if 'gallery' in url_name %} is-active{% endif %}" href="{% url 'backoffice:gallery_list' %}">
+                  <span class="bo-nav__icon" aria-hidden="true">G</span><span class="bo-nav__text">Galerie</span>
+                </a>
+              {% endif %}
+              {% if perms.documents.view_document %}
+                <a class="bo-nav__item{% if 'document' in url_name %} is-active{% endif %}" href="{% url 'backoffice:document_list' %}">
+                  <span class="bo-nav__icon" aria-hidden="true">D</span><span class="bo-nav__text">Documents</span>
+                </a>
+              {% endif %}
+            </div>
+
+            {% if perms.communication.view_contact %}
+              <div class="bo-nav__group">
+                <span class="bo-nav__label">Communication</span>
+                <a class="bo-nav__item{% if 'contact' in url_name %} is-active{% endif %}" href="{% url 'backoffice:contact_list' %}">
+                  <span class="bo-nav__icon" aria-hidden="true">@</span><span class="bo-nav__text">Contacts</span>
+                </a>
+              </div>
+            {% endif %}
+
+            {% if request.user.is_superuser %}
+              <div class="bo-nav__group">
+                <span class="bo-nav__label">Administration</span>
+                <a class="bo-nav__item{% if 'user_' in url_name %} is-active{% endif %}" href="{% url 'backoffice:user_list' %}">
+                  <span class="bo-nav__icon" aria-hidden="true">U</span><span class="bo-nav__text">Utilisateurs</span>
+                </a>
+              </div>
+            {% endif %}
+          </nav>
+
+          <div class="bo-sidebar__footer">
+            <span class="bo-sidebar__account"><strong>{{ request.user.email }}</strong><small>Session 2FA active</small></span>
+          </div>
+        </aside>
+
+        <div class="bo-sidebar-backdrop" data-sidebar-backdrop></div>
+
+        <div class="bo-workspace">
+          <header class="bo-topbar">
+            <div class="bo-topbar__left">
+              <button class="bo-icon-btn bo-menu-btn" type="button" data-sidebar-toggle aria-expanded="false" aria-controls="bo-sidebar" aria-label="Ouvrir la navigation">☰</button>
+              <div class="bo-breadcrumb">
+                <a href="{% url 'backoffice:dashboard' %}">Administration</a>
+                <span aria-hidden="true">/</span>
+                <strong>{% block page_heading %}Back-office{% endblock %}</strong>
+              </div>
+            </div>
+            <div class="bo-topbar__right">
+              <a class="bo-topbar__site-link" href="/" target="_blank" rel="noopener">Voir le site ↗</a>
+              <form method="post" action="{% url 'backoffice:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="bo-icon-btn" title="Se déconnecter" aria-label="Se déconnecter">↪</button>
+              </form>
+            </div>
+          </header>
+
+          <main class="bo-main" id="bo-main">
+    {% endwith %}
+  {% else %}
+    <main class="bo-auth-shell">
+  {% endif %}
+
+      {% block content %}{% endblock %}
+
+  {% if request.user.is_authenticated %}
+          </main>
+        </div>
+      </div>
+  {% else %}
+    </main>
+  {% endif %}
 </body>
 </html>

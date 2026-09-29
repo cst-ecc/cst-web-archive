@@ -1,0 +1,93 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Contacts — Back-office CST/CSMo{% endblock %}
+{% block page_heading %}Demandes de contact{% endblock %}
+
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head bo-page-head--compact">
+    <div>
+      <span class="bo-eyebrow">Communication</span>
+      <h1>Demandes de contact</h1>
+      <p>Consultez, filtrez et traitez les messages envoyés depuis le site public.</p>
+    </div>
+    <div class="bo-head-stat" aria-label="Nouveaux contacts">
+      <strong>{{ new_count }}</strong>
+      <span>nouveau{{ new_count|pluralize }}</span>
+    </div>
+  </header>
+
+  <form method="get" class="bo-filter-panel" aria-label="Filtres des contacts">
+    <div class="bo-filter-panel__search">
+      <label class="sr-only" for="contact-search">Rechercher</label>
+      <input id="contact-search" type="search" name="q" value="{{ query }}" placeholder="Nom, e-mail ou objet…">
+    </div>
+    <div>
+      <label class="sr-only" for="contact-status">Statut</label>
+      <select id="contact-status" name="status">
+        <option value="">Tous les statuts</option>
+        {% for value, label in status_choices %}
+          <option value="{{ value }}"{% if status_filter == value %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="sr-only" for="contact-category">Catégorie</label>
+      <select id="contact-category" name="category">
+        <option value="">Toutes les catégories</option>
+        {% for value, label in category_choices %}
+          <option value="{{ value }}"{% if category_filter == value %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="bo-btn" type="submit">Filtrer</button>
+    {% if query or status_filter or category_filter %}
+      <a class="bo-btn bo-btn--soft" href="{% url 'backoffice:contact_list' %}">Réinitialiser</a>
+    {% endif %}
+  </form>
+
+  <div class="bo-table-wrap">
+    <table class="bo-table bo-table--responsive">
+      <thead>
+        <tr>
+          <th>Contact</th>
+          <th>Objet</th>
+          <th>Catégorie</th>
+          <th>Statut</th>
+          <th>Date</th>
+          <th class="bo-table__actions">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contact in page_obj %}
+          <tr{% if contact.status == 'new' %} class="bo-table-row--new"{% endif %}>
+            <td data-label="Contact">
+              <strong>{{ contact.full_name }}</strong>
+              <span>{{ contact.email }}</span>
+            </td>
+            <td data-label="Objet">{{ contact.subject }}</td>
+            <td data-label="Catégorie">{{ contact.get_category_display }}</td>
+            <td data-label="Statut"><span class="bo-status bo-status--{{ contact.status }}">{{ contact.get_status_display }}</span></td>
+            <td data-label="Date"><time datetime="{{ contact.created_at|date:'c' }}">{{ contact.created_at|date:"d/m/Y H:i" }}</time></td>
+            <td data-label="Action" class="bo-table__actions"><a href="{% url 'backoffice:contact_detail' contact.pk %}">Ouvrir</a></td>
+          </tr>
+        {% empty %}
+          <tr><td class="bo-empty" colspan="6">Aucune demande ne correspond aux critères.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="bo-pagination" aria-label="Pagination">
+      {% if page_obj.has_previous %}
+        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&category={{ category_filter|urlencode }}&page={{ page_obj.previous_page_number }}">Précédent</a>
+      {% endif %}
+      <span>Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?q={{ query|urlencode }}&status={{ status_filter|urlencode }}&category={{ category_filter|urlencode }}&page={{ page_obj.next_page_number }}">Suivant</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { SITE } from "@/lib/constants";
+import CookieSettingsButton from "@/components/cookies/CookieSettingsButton";
 
 import styles from "./SiteFooter.module.scss";
 
@@ -18,7 +20,8 @@ export default function SiteFooter() {
           {/* <span className={styles.process}>{SITE.fullName}</span> */}
         </div>
 
-        <div className={styles.contacts} aria-label="Coordonnées">
+        <div className={styles.footerActions}>
+          <div className={styles.contacts} aria-label="Coordonnées">
           <a href={`mailto:${SITE.email}`} className={styles.contact}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <rect x="3" y="5" width="18" height="14" rx="2" />
@@ -39,6 +42,11 @@ export default function SiteFooter() {
               <span>{phone}</span>
             </a>
           ))}
+          </div>
+          <div className={styles.privacy}>
+            <Link href="/politique-cookies">Politique de cookies</Link>
+            <CookieSettingsButton />
+          </div>
         </div>
       </div>
     </footer>

@@ -1,23 +1,30 @@
 {% extends "backoffice/base.html" %}
 
 {% block title %}Tableau de bord — CST/CSMo{% endblock %}
+{% block page_heading %}Tableau de bord{% endblock %}
 
 {% block content %}
 <section class="bo-page">
-  <header class="bo-page-head">
+  <header class="bo-page-head bo-page-head--compact">
     <div>
       <span class="bo-eyebrow">Back-office CST / CSMo</span>
       <h1>Tableau de bord</h1>
-      <p>Votre session est protégée par une authentification à deux facteurs.</p>
+      <p>Une vue synthétique des contenus et demandes qui nécessitent votre attention.</p>
     </div>
-
-    <form method="post" action="{% url 'backoffice:logout' %}">
-      {% csrf_token %}
-      <button type="submit" class="bo-btn bo-btn--soft">
-        Se déconnecter
-      </button>
-    </form>
+    <span class="bo-status bo-status--active">Session sécurisée</span>
   </header>
+
+  {% if dashboard_stats %}
+    <div class="bo-stat-grid" aria-label="Indicateurs">
+      {% for stat in dashboard_stats %}
+        <article class="bo-stat-card">
+          <span>{{ stat.label }}</span>
+          <strong>{{ stat.value }}</strong>
+          <small>{{ stat.hint }}</small>
+        </article>
+      {% endfor %}
+    </div>
+  {% endif %}
 
   <div class="bo-grid bo-grid--cards">
     {% if perms.news.view_news %}
@@ -32,7 +39,7 @@
       <a class="bo-module-card" href="{% url 'backoffice:gallery_list' %}">
         <span>Médias</span>
         <strong>Galerie</strong>
-        <em>Créer des albums, importer plusieurs images et publier.</em>
+        <em>Gérer les albums, couvertures et images publiées.</em>
       </a>
     {% endif %}
 
@@ -41,6 +48,14 @@
         <span>Bibliothèque</span>
         <strong>Documents</strong>
         <em>Classer, téléverser et publier les documents institutionnels.</em>
+      </a>
+    {% endif %}
+
+    {% if perms.communication.view_contact %}
+      <a class="bo-module-card" href="{% url 'backoffice:contact_list' %}">
+        <span>Communication</span>
+        <strong>Contacts</strong>
+        <em>Lire, qualifier, traiter et répondre aux demandes reçues.</em>
       </a>
     {% endif %}
 
@@ -55,18 +70,9 @@
 
   <div class="bo-card bo-card--compact">
     <dl class="bo-definition-list">
-      <div>
-        <dt>Utilisateur</dt>
-        <dd>{{ request.user.email }}</dd>
-      </div>
-      <div>
-        <dt>Rôle</dt>
-        <dd>{{ role_label }}</dd>
-      </div>
-      <div>
-        <dt>Authentification</dt>
-        <dd>Mot de passe + OTP vérifié</dd>
-      </div>
+      <div><dt>Utilisateur</dt><dd>{{ request.user.email }}</dd></div>
+      <div><dt>Rôle</dt><dd>{{ role_label }}</dd></div>
+      <div><dt>Authentification</dt><dd>Mot de passe + OTP vérifié</dd></div>
     </dl>
   </div>
 </section>

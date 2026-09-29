@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import DocumentDownloadButton from "@/components/documents/DocumentDownloadButton";
 import DocumentReadButton from "@/components/documents/DocumentReadButton";
 import Container from "@/components/layout/Container";
 import SiteAlertTicker from "@/components/layout/SiteAlertTicker";
@@ -37,7 +38,7 @@ export default async function DocumentDetailPage({
   const doc = await getDocumentBySlug(params.slug);
   if (!doc) notFound();
 
-  const readablePdf = !doc.isConfidential && doc.fileType === "pdf" && Boolean(doc.fileUrl) && doc.fileUrl !== "#";
+  const readablePdf = doc.fileType === "pdf" && Boolean(doc.fileUrl) && doc.fileUrl !== "#";
 
   return (
     <>
@@ -81,27 +82,26 @@ export default async function DocumentDetailPage({
                 <dt className={styles.ficheLabel}>Ouvertures</dt>
                 <dd className={styles.ficheValue}>{doc.openCount ?? 0}</dd>
               </div>
+              <div className={styles.ficheRow}>
+                <dt className={styles.ficheLabel}>Téléchargements</dt>
+                <dd className={styles.ficheValue}>{doc.downloads ?? 0}</dd>
+              </div>
             </dl>
 
             {readablePdf ? (
-              <DocumentReadButton
-                slug={doc.slug}
-                label="Lire le document"
-                className={styles.readButton}
-                returnHref={`/documents/${doc.slug}`}
-              />
-            ) : doc.isConfidential ? (
               <>
-                <div className={styles.confidentialNotice}>
-                  <strong>Document à accès contrôlé</strong>
-                  <span>Une autorisation nominative est nécessaire pour consulter ce fichier.</span>
-                </div>
                 <DocumentReadButton
                   slug={doc.slug}
-                  label="Demander l’accès"
+                  label="Ouvrir le document"
                   className={styles.readButton}
                   returnHref={`/documents/${doc.slug}`}
-                  isConfidential
+                />
+                <DocumentDownloadButton
+                  slug={doc.slug}
+                  label="Télécharger le document"
+                  variant="outline"
+                  className={styles.downloadButton}
+                  returnHref={`/documents/${doc.slug}`}
                 />
               </>
             ) : (

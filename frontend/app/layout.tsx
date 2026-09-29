@@ -9,6 +9,7 @@ import SiteFooter from "@/components/layout/SiteFooter";
 import FooterVisibility from "@/components/layout/FooterVisibility";
 import PageLoader from "@/components/layout/PageLoader";
 import AlertTickerProvider from "@/components/layout/AlertTickerProvider";
+import CookieConsentProvider from "@/components/cookies/CookieConsentProvider";
 // import SocialFloatingLinks from "@/components/layout/SocialFloatingLinks";
 import styles from "./layout.module.scss";
 
@@ -95,25 +96,27 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${display.variable} ${body.variable}`}>
       <body className={styles.body}>
-        <PageLoader />
+        <CookieConsentProvider>
+          <PageLoader />
 
-        <a href="#contenu" className="skip-link">
-          Aller au contenu
-        </a>
+          <a href="#contenu" className="skip-link">
+            Aller au contenu
+          </a>
 
-        <AlertTickerProvider>
-          <Navbar />
+          <AlertTickerProvider>
+            <Navbar />
 
-          {/* <SocialFloatingLinks /> */}
+            {/* <SocialFloatingLinks /> */}
 
-          <main id="contenu" className={styles.main}>
-            {children}
-          </main>
+            <main id="contenu" className={styles.main}>
+              {children}
+            </main>
 
-          <FooterVisibility>
-            <SiteFooter />
-          </FooterVisibility>
-        </AlertTickerProvider>
+            <FooterVisibility>
+              <SiteFooter />
+            </FooterVisibility>
+          </AlertTickerProvider>
+        </CookieConsentProvider>
       </body>
     </html>
   );

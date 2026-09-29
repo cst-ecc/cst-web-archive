@@ -1,0 +1,145 @@
+@use "../../styles/variables" as v;
+
+.banner {
+  position: fixed;
+  z-index: 120;
+  left: 50%;
+  bottom: clamp(0.75rem, 2vw, 1.5rem);
+  width: min(calc(100% - 1.5rem), 72rem);
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding: clamp(1rem, 2vw, 1.3rem);
+  border: 1px solid rgba(12, 59, 92, 0.14);
+  border-radius: v.$radius-xl2;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 1.4rem 4rem rgba(12, 59, 92, 0.18);
+  backdrop-filter: blur(16px);
+}
+
+.bannerCopy {
+  strong { color: v.$color-blue-ink; font-size: 1rem; }
+  p { margin-top: 0.3rem; color: rgba(17,24,39,.68); font-size: .84rem; line-height: 1.55; }
+  a { color: v.$color-blue; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+}
+
+.bannerActions,
+.modalActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .55rem;
+}
+
+.primary,
+.secondary {
+  min-height: 2.65rem;
+  padding: .65rem .9rem;
+  border-radius: v.$radius-lg;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.primary { border: 1px solid v.$color-blue; background: v.$color-blue; color: #fff; }
+.primary:hover { background: v.$color-blue-deep; border-color: v.$color-blue-deep; }
+.secondary { border: 1px solid v.$color-surface-line; background: #fff; color: v.$color-blue-ink; }
+.secondary:hover { background: v.$color-surface-muted; }
+
+.overlay {
+  position: fixed;
+  z-index: 130;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(7, 35, 54, .52);
+  backdrop-filter: blur(5px);
+}
+
+.modal {
+  width: min(100%, 40rem);
+  max-height: min(90vh, 48rem);
+  overflow: auto;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: v.$radius-xl2;
+  background: #fff;
+  box-shadow: 0 1.5rem 5rem rgba(5, 31, 48, .25);
+}
+
+.modalHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.3rem 1rem;
+  border-bottom: 1px solid v.$color-surface-line;
+  span { color: v.$color-blue; font-size: .68rem; font-weight: 850; text-transform: uppercase; letter-spacing: .1em; }
+  h2 { margin-top: .3rem; font-size: 1.35rem; }
+}
+
+.close {
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid v.$color-surface-line;
+  border-radius: 50%;
+  background: #fff;
+  color: v.$color-blue-ink;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.intro { padding: 1rem 1.3rem 0; color: rgba(17,24,39,.66); font-size: .86rem; line-height: 1.6; }
+.categories { display: grid; gap: .75rem; padding: 1rem 1.3rem; }
+.category {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .95rem;
+  border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-lg;
+  background: v.$color-surface-muted;
+  strong { color: v.$color-blue-ink; font-size: .9rem; }
+  p { margin-top: .2rem; color: rgba(17,24,39,.58); font-size: .78rem; line-height: 1.45; }
+}
+.alwaysOn { flex: 0 0 auto; color: v.$color-blue; font-size: .72rem; font-weight: 800; }
+.switch { position: relative; flex: 0 0 auto; width: 2.8rem; height: 1.55rem; }
+.switch input { position: absolute; opacity: 0; pointer-events: none; }
+.switch > span {
+  position: absolute; inset: 0; border-radius: 999px; background: #cbd6de; transition: .18s ease;
+  &::after { content: ""; position: absolute; top: .2rem; left: .2rem; width: 1.15rem; height: 1.15rem; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.18); transition: .18s ease; }
+}
+.switch input:checked + span { background: v.$color-blue; }
+.switch input:checked + span::after { transform: translateX(1.25rem); }
+.switch input:focus-visible + span { outline: 2px solid v.$color-blue; outline-offset: 2px; }
+
+.modalFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.3rem 1.3rem;
+  border-top: 1px solid v.$color-surface-line;
+}
+.policyLink { color: v.$color-blue; font-size: .78rem; font-weight: 750; text-decoration: underline; }
+.footerButton { border: 0; padding: 0; background: transparent; color: v.$color-blue-deep; font: inherit; font-weight: 600; cursor: pointer; }
+.footerButton:hover { color: v.$color-blue; text-decoration: underline; }
+
+@media (max-width: 860px) {
+  .banner { grid-template-columns: 1fr; }
+  .bannerActions { justify-content: flex-start; }
+}
+
+@media (max-width: 640px) {
+  .banner { bottom: .55rem; width: calc(100% - 1rem); padding: .9rem; }
+  .bannerActions, .modalActions { display: grid; grid-template-columns: 1fr; width: 100%; }
+  .bannerActions button, .modalActions button { width: 100%; }
+  .modalFoot { align-items: stretch; flex-direction: column; }
+  .category { align-items: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch > span, .switch > span::after { transition: none; }
+}

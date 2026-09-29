@@ -161,11 +161,8 @@ function normalizePublicDocuments(items: DocumentItem[]): DocumentItem[] {
     .filter(isPublic)
     .filter((document) => Boolean(document.slug && document.title && document.date))
     .map((document) => {
-      const isConfidential = Boolean(document.isConfidential);
-      const fileUrl = isConfidential
-        ? null
-        : document.fileUrl || document.downloadUrl || "#";
-      const downloadUrl = isConfidential ? null : document.downloadUrl || fileUrl;
+      const fileUrl = document.fileUrl || "#";
+      const downloadUrl = document.downloadUrl || null;
 
       return {
         ...document,
@@ -181,8 +178,6 @@ function normalizePublicDocuments(items: DocumentItem[]): DocumentItem[] {
         pages: document.pages ?? undefined,
         sizeLabel: document.sizeLabel ?? "",
         featured: Boolean(document.featured),
-        isConfidential,
-        canRead: document.canRead ?? !isConfidential,
       };
     });
 }

@@ -1,0 +1,106 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}{{ contact.subject }} — Contacts{% endblock %}
+{% block page_heading %}Détail du contact{% endblock %}
+
+{% block content %}
+<section class="bo-page">
+  <header class="bo-page-head bo-page-head--compact">
+    <div>
+      <a class="bo-back-link" href="{% url 'backoffice:contact_list' %}">← Retour aux contacts</a>
+      <span class="bo-eyebrow">{{ contact.get_category_display }}</span>
+      <h1>{{ contact.subject }}</h1>
+      <p>Reçu le {{ contact.created_at|date:"d/m/Y à H:i" }}</p>
+    </div>
+    <span class="bo-status bo-status--{{ contact.status }}">{{ contact.get_status_display }}</span>
+  </header>
+
+  <div class="bo-detail-grid">
+    <article class="bo-card bo-contact-message">
+      <div class="bo-section-head">
+        <div>
+          <span class="bo-eyebrow">Expéditeur</span>
+          <h2>{{ contact.full_name }}</h2>
+        </div>
+      </div>
+      <dl class="bo-definition-list bo-definition-list--compact">
+        <div><dt>E-mail</dt><dd><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></dd></div>
+        <div><dt>Téléphone</dt><dd>{% if contact.phone %}<a href="tel:{{ contact.phone }}">{{ contact.phone }}</a>{% else %}Non renseigné{% endif %}</dd></div>
+        <div><dt>Catégorie</dt><dd>{{ contact.get_category_display }}</dd></div>
+      </dl>
+      <div class="bo-message-content">
+        <h3>Message</h3>
+        <p>{{ contact.message|linebreaksbr }}</p>
+      </div>
+    </article>
+
+    <aside class="bo-stack">
+      {% if can_manage %}
+        <section class="bo-card">
+          <div class="bo-section-head">
+            <div><span class="bo-eyebrow">Traitement</span><h2>Statut</h2></div>
+          </div>
+          <form method="post" class="bo-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="status">
+            <div class="bo-field">
+              <label for="{{ status_form.status.id_for_label }}">Statut de la demande</label>
+              {{ status_form.status }}
+              {% for error in status_form.status.errors %}<p class="bo-error">{{ error }}</p>{% endfor %}
+            </div>
+            <button class="bo-btn" type="submit">Mettre à jour</button>
+          </form>
+        </section>
+      {% endif %}
+
+      <section class="bo-card">
+        <div class="bo-section-head"><div><span class="bo-eyebrow">Suivi</span><h2>Historique</h2></div></div>
+        {% if contact.replies.all %}
+          <div class="bo-timeline">
+            {% for reply in contact.replies.all %}
+              <article class="bo-timeline__item">
+                <div class="bo-timeline__meta">
+                  <strong>{{ reply.created_at|date:"d/m/Y H:i" }}</strong>
+                  <span class="bo-status bo-status--{{ reply.delivery_status }}">{{ reply.get_delivery_status_display }}</span>
+                </div>
+                <p><strong>{{ reply.subject }}</strong></p>
+                <p>{{ reply.message|truncatechars:220 }}</p>
+                {% if reply.author %}<small>Par {{ reply.author.email }}</small>{% endif %}
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="bo-empty-state bo-empty-state--compact">
+            <strong>Aucune réponse envoyée</strong>
+            <span>L'historique apparaîtra ici dès la première réponse.</span>
+          </div>
+        {% endif %}
+      </section>
+    </aside>
+  </div>
+
+  {% if can_reply %}
+    <section class="bo-card bo-reply-card">
+      <div class="bo-section-head">
+        <div><span class="bo-eyebrow">Réponse</span><h2>Répondre par e-mail</h2></div>
+        <p>La réponse est enregistrée dans l'historique, même si l'envoi e-mail échoue.</p>
+      </div>
+      <form method="post" class="bo-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reply">
+        <div class="bo-field">
+          <label for="{{ reply_form.subject.id_for_label }}">Objet</label>
+          {{ reply_form.subject }}
+          {% for error in reply_form.subject.errors %}<p class="bo-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="bo-field">
+          <label for="{{ reply_form.message.id_for_label }}">Message</label>
+          {{ reply_form.message }}
+          {% for error in reply_form.message.errors %}<p class="bo-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="bo-form-actions"><button class="bo-btn" type="submit">Envoyer la réponse</button></div>
+      </form>
+    </section>
+  {% endif %}
+</section>
+{% endblock %}

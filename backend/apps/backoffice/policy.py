@@ -38,6 +38,10 @@ class Capability(StrEnum):
     MEDIA_UPLOAD = "media.upload"
     MEDIA_DELETE = "media.delete"
 
+    CONTACT_VIEW = "contact.view"
+    CONTACT_MANAGE = "contact.manage"
+    CONTACT_REPLY = "contact.reply"
+
 
 ROLE_CAPABILITIES: dict[BackofficeRole, frozenset[Capability]] = {
     BackofficeRole.EDITOR: frozenset(
@@ -59,6 +63,9 @@ ROLE_CAPABILITIES: dict[BackofficeRole, frozenset[Capability]] = {
             Capability.CONTENT_ARCHIVE,
             Capability.MEDIA_UPLOAD,
             Capability.MEDIA_DELETE,
+            Capability.CONTACT_VIEW,
+            Capability.CONTACT_MANAGE,
+            Capability.CONTACT_REPLY,
         }
     ),
     BackofficeRole.SUPERADMIN: frozenset(Capability),
@@ -78,6 +85,9 @@ CAPABILITY_LABELS = {
     Capability.CONTENT_ARCHIVE: "Archiver",
     Capability.MEDIA_UPLOAD: "Téléverser des médias",
     Capability.MEDIA_DELETE: "Supprimer des médias",
+    Capability.CONTACT_VIEW: "Consulter les demandes de contact",
+    Capability.CONTACT_MANAGE: "Gérer les demandes de contact",
+    Capability.CONTACT_REPLY: "Répondre aux demandes de contact",
 }
 
 

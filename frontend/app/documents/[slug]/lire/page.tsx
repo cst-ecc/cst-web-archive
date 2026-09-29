@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
+import DocumentDownloadButton from "@/components/documents/DocumentDownloadButton";
 import PdfViewer from "@/components/documents/PdfViewer";
 import Container from "@/components/layout/Container";
 import SiteAlertTicker from "@/components/layout/SiteAlertTicker";
@@ -45,7 +46,6 @@ export default async function DocumentReaderPage({
 }) {
   const doc = await getDocumentBySlug(params.slug);
   if (!doc) notFound();
-  if (doc.isConfidential) redirect(`/documents/${doc.slug}/demande-acces`);
 
   const fallbackHref = safeReturnHref(
     searchParams?.from,
@@ -67,10 +67,19 @@ export default async function DocumentReaderPage({
         <header className={styles.header}>
           <p className={styles.reference}>{doc.reference || "Document officiel"}</p>
           <h1 className={styles.title}>{doc.title}</h1>
-          <p className={styles.notice}>
-            Le document est affiché dans la plateforme. Aucun téléchargement n’est
-            proposé depuis cette interface.
-          </p>
+          <div className={styles.readerIntro}>
+            <p className={styles.notice}>
+              Le document s’ouvre directement dans la plateforme. Les téléchargements
+              effectués avec le bouton officiel sont comptabilisés séparément.
+            </p>
+            <DocumentDownloadButton
+              slug={doc.slug}
+              label="Télécharger"
+              variant="outline"
+              className={styles.downloadButton}
+              returnHref={`/documents/${doc.slug}/lire`}
+            />
+          </div>
         </header>
 
         <div className={styles.viewerWrap}>

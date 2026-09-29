@@ -2,72 +2,103 @@
 @use "../../styles/mixins" as m;
 
 .wrapper {
-  padding-block: 3rem;
+  padding-block: clamp(2rem, 5vw, 4.5rem);
+}
+
+.intro {
+  max-width: 48rem;
+  margin-bottom: clamp(1.6rem, 4vw, 2.8rem);
+
+  h2 {
+    margin-top: .35rem;
+    font-size: clamp(1.55rem, 3vw, 2.4rem);
+  }
+
+  > p:last-child {
+    margin-top: .75rem;
+    color: rgba(17,24,39,.62);
+    line-height: 1.7;
+  }
+}
+
+.eyebrow,
+.cardLabel {
+  color: v.$color-blue;
+  font-size: .7rem;
+  font-weight: 850;
+  letter-spacing: .1em;
+  text-transform: uppercase;
 }
 
 .layout {
   display: grid;
-  gap: 2.5rem;
+  gap: clamp(1.25rem, 3vw, 2rem);
 
   @include m.respond(lg) {
-    grid-template-columns: 1fr 20rem;
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 22rem);
+    align-items: start;
   }
 }
 
 .sidebar {
+  display: grid;
+  gap: .8rem;
+}
+
+.infoCard,
+.institutionCard,
+.usefulLinks {
   @include m.card;
-  padding: 1.5rem;
-  align-self: start;
+  padding: 1rem;
 }
 
-.sidebarTitle {
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: v.$color-blue-ink;
-}
-
-.coordList {
-  margin-top: 1rem;
+.infoCard {
   display: grid;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: rgba(17, 24, 39, 0.8);
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: .8rem;
+  align-items: start;
 }
 
-.coordLabel {
-  color: rgba(17, 24, 39, 0.6);
-}
-
-.emailLink {
-  color: v.$color-blue;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.linksTitle {
-  margin-top: 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: v.$color-blue-ink;
-}
-
-.linksList {
-  margin-top: 0.75rem;
+.cardIcon {
+  width: 2.25rem;
+  height: 2.25rem;
   display: grid;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-
-  a {
-    color: v.$color-blue;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+  place-items: center;
+  border-radius: .7rem;
+  background: rgba(31,133,206,.09);
+  color: v.$color-blue-deep;
+  font-weight: 850;
 }
+
+.primaryLink {
+  display: block;
+  margin-top: .22rem;
+  color: v.$color-blue-deep;
+  font-size: .9rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+  &:hover { color: v.$color-blue; text-decoration: underline; }
+}
+
+.phoneList { display: grid; gap: .05rem; }
+.cardHint { margin-top: .35rem; color: rgba(17,24,39,.5); font-size: .72rem; line-height: 1.45; }
+
+.institutionCard {
+  strong { display: block; margin-top: .35rem; color: v.$color-blue-ink; font-size: .94rem; }
+  span { display: block; margin-top: .25rem; color: rgba(17,24,39,.56); font-size: .76rem; line-height: 1.45; }
+}
+
+.usefulLinks ul { display: grid; gap: .1rem; margin-top: .45rem; }
+.usefulLinks a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .7rem;
+  padding: .55rem 0;
+  border-bottom: 1px solid v.$color-surface-line;
+  color: v.$color-blue-deep;
+  font-size: .8rem;
+  font-weight: 700;
+  &:hover { color: v.$color-blue; }
+}
+.usefulLinks li:last-child a { border-bottom: 0; }

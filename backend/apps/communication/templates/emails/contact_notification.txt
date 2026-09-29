@@ -1,0 +1,7 @@
+Une nouvelle demande de contact a été enregistrée.
+
+Catégorie : {{ contact.get_category_display }}
+Objet : {{ contact.subject }}
+Date : {{ contact.created_at|date:"d/m/Y H:i" }}
+
+Consultez le back-office pour lire et traiter la demande.

@@ -91,3 +91,82 @@
   border: 0;
   clip: rect(0, 0, 0, 0);
 }
+
+/* Les listes historiques restent scrollables ; les nouvelles tables peuvent
+   activer un mode cartes mobiles avec .bo-table--responsive + data-label. */
+.bo-table-wrap {
+  max-width: 100%;
+  overscroll-behavior-inline: contain;
+}
+
+.bo-table tbody tr:hover td {
+  background-color: rgba(39, 127, 186, .025);
+}
+
+@media (max-width: 760px) {
+  .bo-table--responsive {
+    min-width: 0;
+  }
+
+  .bo-table--responsive thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .bo-table--responsive,
+  .bo-table--responsive tbody,
+  .bo-table--responsive tr,
+  .bo-table--responsive td {
+    display: block;
+    width: 100%;
+  }
+
+  .bo-table--responsive tbody {
+    display: grid;
+    gap: .7rem;
+    padding: .7rem;
+  }
+
+  .bo-table--responsive tr {
+    overflow: hidden;
+    border: 1px solid var(--bo-border);
+    border-radius: var(--bo-radius);
+    background: #fff;
+  }
+
+  .bo-table--responsive td,
+  .bo-table--responsive td:first-child {
+    display: grid;
+    grid-template-columns: 7.2rem minmax(0, 1fr);
+    gap: .65rem;
+    padding: .7rem .8rem;
+    border-bottom: 1px solid #edf2f5;
+    text-align: left !important;
+    white-space: normal;
+  }
+
+  .bo-table--responsive td::before {
+    content: attr(data-label);
+    color: var(--bo-muted);
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .bo-table--responsive td:last-child {
+    border-bottom: 0;
+  }
+
+  .bo-table--responsive .bo-empty {
+    display: block;
+    border: 0;
+  }
+
+  .bo-table--responsive .bo-empty::before {
+    content: none;
+  }
+}

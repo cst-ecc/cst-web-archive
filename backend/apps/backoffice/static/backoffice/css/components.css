@@ -262,3 +262,120 @@
     gap: .25rem;
   }
 }
+
+/* Refonte 2026 — composants transversaux */
+.bo-page-head--compact {
+  padding: clamp(1.1rem, 2.2vw, 1.55rem);
+}
+
+.bo-page-head--compact h1 {
+  font-size: clamp(1.4rem, 2vw, 1.9rem);
+}
+
+.bo-head-stat {
+  flex: 0 0 auto;
+  min-width: 7rem;
+  display: grid;
+  gap: .15rem;
+  padding: .75rem .9rem;
+  border: 1px solid var(--bo-border);
+  border-radius: var(--bo-radius);
+  background: var(--bo-surface-soft);
+  text-align: right;
+}
+
+.bo-head-stat strong {
+  color: var(--bo-primary);
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.bo-head-stat span {
+  color: var(--bo-muted);
+  font-size: .72rem;
+}
+
+.bo-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .85rem;
+}
+
+.bo-stat-card {
+  min-width: 0;
+  padding: 1rem 1.05rem;
+  border: 1px solid var(--bo-border);
+  border-radius: var(--bo-radius);
+  background: var(--bo-surface);
+  box-shadow: 0 .5rem 1.6rem rgba(17, 53, 79, .04);
+}
+
+.bo-stat-card span {
+  display: block;
+  color: var(--bo-muted);
+  font-size: .73rem;
+  font-weight: 800;
+}
+
+.bo-stat-card strong {
+  display: block;
+  margin-top: .25rem;
+  color: var(--bo-primary);
+  font-size: clamp(1.45rem, 2vw, 1.9rem);
+}
+
+.bo-stat-card small {
+  display: block;
+  margin-top: .2rem;
+  color: var(--bo-muted);
+  font-size: .7rem;
+}
+
+.bo-module-card {
+  min-height: 8.5rem;
+}
+
+.bo-module-card:focus-visible,
+.bo-btn:focus-visible,
+.bo-icon-btn:focus-visible,
+.bo-nav__item:focus-visible {
+  outline: none;
+  box-shadow: var(--bo-focus);
+}
+
+.bo-empty-state {
+  display: grid;
+  place-items: center;
+  gap: .35rem;
+  min-height: 10rem;
+  padding: 1.5rem;
+  border: 1px dashed var(--bo-border-strong);
+  border-radius: var(--bo-radius);
+  color: var(--bo-muted);
+  text-align: center;
+}
+
+.bo-empty-state strong {
+  color: var(--bo-text);
+}
+
+.bo-empty-state--compact {
+  min-height: 6rem;
+}
+
+@media (max-width: 1100px) {
+  .bo-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .bo-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bo-head-stat {
+    width: 100%;
+    text-align: left;
+  }
+}

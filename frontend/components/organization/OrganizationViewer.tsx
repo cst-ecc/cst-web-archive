@@ -211,8 +211,8 @@ export default function OrganizationViewer({
             <span className={styles.eyebrow}>Documents associés</span>
             <h3 id="documents-organes-title">Approfondir les organes de gouvernance</h3>
             <p>
-              Ces liens conduisent vers les fiches documentaires publiées sur la plateforme.
-              Les règles d’accès du document restent applicables s’il est confidentiel.
+              Ces liens conduisent vers les fiches documentaires publiées sur la plateforme,
+              où le document peut être ouvert directement et téléchargé si nécessaire.
             </p>
           </div>
 

@@ -194,7 +194,46 @@ def logout_view(request):
 @never_cache
 @backoffice_2fa_required
 def dashboard_view(request):
-    return render(request, "backoffice/dashboard.html", {"role_label": backoffice_role_label(request.user)})
+    from apps.core.publication import PublicationStatus
+    from apps.documents.models import Document
+    from apps.gallery.models import GalleryAlbum
+    from apps.news.models import News
+
+    stats = []
+    if request.user.has_perm("news.view_news"):
+        stats.append({
+            "label": "Actualités publiées",
+            "value": News.objects.filter(status=PublicationStatus.PUBLISHED).count(),
+            "hint": f"{News.objects.filter(status=PublicationStatus.DRAFT).count()} brouillon(s)",
+        })
+    if request.user.has_perm("documents.view_document"):
+        stats.append({
+            "label": "Documents publiés",
+            "value": Document.objects.filter(status=PublicationStatus.PUBLISHED).count(),
+            "hint": "Bibliothèque institutionnelle",
+        })
+    if request.user.has_perm("gallery.view_galleryalbum"):
+        stats.append({
+            "label": "Albums publiés",
+            "value": GalleryAlbum.objects.filter(status=PublicationStatus.PUBLISHED).count(),
+            "hint": "Galerie publique",
+        })
+    if request.user.has_perm("communication.view_contact"):
+        from apps.communication.models import Contact, ContactStatus
+        stats.append({
+            "label": "Nouveaux contacts",
+            "value": Contact.objects.filter(status=ContactStatus.NEW).count(),
+            "hint": "Demandes à consulter",
+        })
+
+    return render(
+        request,
+        "backoffice/dashboard.html",
+        {
+            "role_label": backoffice_role_label(request.user),
+            "dashboard_stats": stats[:4],
+        },
+    )
 
 
 def _masked_email(email: str) -> str:

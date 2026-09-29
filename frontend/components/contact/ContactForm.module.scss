@@ -3,76 +3,59 @@
 
 .card {
   @include m.card;
-  padding: 1.5rem;
-
-  @include m.respond(sm) {
-    padding: 2rem;
-  }
-}
-
-.row2 {
+  position: relative;
   display: grid;
-  gap: 1rem;
+  gap: 1.15rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  overflow: hidden;
 
-  @include m.respond(sm) {
-    grid-template-columns: repeat(2, 1fr);
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(90deg, v.$color-blue, v.$color-gold, v.$color-yellow);
   }
 }
 
-.fieldGroup {
-  margin-top: 1rem;
+.heading {
+  padding-bottom: .25rem;
+  h2 { margin-top: .2rem; font-size: clamp(1.45rem, 2.5vw, 2rem); }
+  > p:last-child { margin-top: .45rem; color: rgba(17,24,39,.58); font-size: .84rem; }
 }
-
-.label {
-  margin-bottom: 0.25rem;
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
+.kicker { color: v.$color-blue; font-size: .7rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.row2 { display: grid; gap: 1rem; @include m.respond(sm) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.field { min-width: 0; display: grid; gap: .38rem; }
+.label { color: v.$color-blue-ink; font-size: .82rem; font-weight: 750; span { color: v.$color-accent; } }
+.optional { margin-left: .35rem; color: rgba(17,24,39,.42) !important; font-size: .68rem; font-weight: 600; }
 .input {
   width: 100%;
-  border-radius: v.$radius-lg;
+  min-height: 3rem;
   border: 1px solid v.$color-surface-line;
+  border-radius: v.$radius-lg;
   background: v.$color-white;
-  padding: 0.625rem 0.75rem;
-  font-size: 0.875rem;
-
-  &:focus {
-    border-color: v.$color-blue;
-  }
+  padding: .72rem .82rem;
+  color: v.$color-ink;
+  font-size: .9rem;
+  transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  &:hover { border-color: rgba(31,133,206,.35); }
+  &:focus { outline: none; border-color: v.$color-blue; box-shadow: 0 0 0 3px rgba(31,133,206,.12); }
+  &[aria-invalid="true"] { border-color: v.$color-accent; background: rgba(178,58,72,.02); }
 }
+textarea.input { resize: vertical; min-height: 10rem; line-height: 1.6; }
+.error { color: v.$color-accent; font-size: .74rem; font-weight: 650; }
+.messageLabel { display: flex; align-items: center; justify-content: space-between; gap: 1rem; small { color: rgba(17,24,39,.4); font-size: .7rem; } }
+.serverError { padding: .8rem .9rem; border: 1px solid rgba(178,58,72,.2); border-radius: v.$radius-lg; background: rgba(178,58,72,.06); color: #8d2f3a; font-size: .82rem; line-height: 1.5; }
+.honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.formFooter { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-top: .2rem; p { max-width: 26rem; color: rgba(17,24,39,.48); font-size: .72rem; line-height: 1.5; } }
+.submitButton { flex: 0 0 auto; min-width: 10.5rem; }
+.confirmation { @include m.card; display: grid; justify-items: start; gap: .45rem; padding: clamp(1.4rem, 4vw, 2.4rem); background: linear-gradient(135deg, rgba(31,133,206,.06), #fff 65%); }
+.confirmIcon { width: 2.75rem; height: 2.75rem; display: grid; place-items: center; border-radius: 50%; background: v.$color-blue; color: #fff; font-size: 1.25rem; font-weight: 850; }
+.confirmTitle { margin-top: .15rem; font-size: 1.45rem; }
+.confirmText { max-width: 34rem; color: rgba(17,24,39,.65); line-height: 1.6; }
+.confirmButton { margin-top: .65rem; }
 
-.error {
-  margin-top: 0.25rem;
-  font-size: 0.75rem;
-  color: v.$color-accent;
-}
-
-.submitButton {
-  margin-top: 1.5rem;
-}
-
-// État : confirmation
-.confirmation {
-  border-radius: v.$radius-xl2;
-  border: 1px solid rgba(31, 133, 206, 0.3);
-  background: rgba(31, 133, 206, 0.05);
-  padding: 2rem;
-}
-
-.confirmTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: v.$color-blue-ink;
-}
-
-.confirmText {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: rgba(17, 24, 39, 0.7);
-}
-
-.confirmButton {
-  margin-top: 1.5rem;
+@media (max-width: 640px) {
+  .formFooter { align-items: stretch; flex-direction: column; }
+  .submitButton { width: 100%; }
 }

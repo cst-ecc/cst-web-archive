@@ -233,8 +233,7 @@ export function resolveOrganizationHotspots(
 
     if (!best) return definition;
 
-    const href =
-      !best.isConfidential && best.fileType === "pdf" && best.fileUrl
+    const href = best.fileType === "pdf" && best.fileUrl
         ? `/documents/${best.slug}/lire?from=/organigramme`
         : `/documents/${best.slug}`;
 

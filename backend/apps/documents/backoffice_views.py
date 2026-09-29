@@ -1,41 +1,20 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
-from django.http import FileResponse
-from django.db import transaction
 from django.db.models import Q
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods, require_POST
 
-from apps.audit.models import AuditAction, AuditLog
+from apps.audit.models import AuditAction
 from apps.audit.services import audit_log
 from apps.backoffice.access import backoffice_2fa_required
 from apps.backoffice.workflow import ACTION_LABELS, available_actions
 from apps.core.publication import PublicationStatus
 
-from .forms import (
-    DocumentAccessApprovalForm,
-    DocumentAccessRefusalForm,
-    DocumentForm,
-)
-from .models import (
-    Document,
-    DocumentAccessGrant,
-    DocumentAccessRequest,
-    DocumentAccessRequestStatus,
-    DocumentKind,
-)
-from .access import (
-    AccessGrantError,
-    approve_access_request,
-    mark_grant_link_sent,
-    refuse_access_request,
-    revoke_grant,
-    rotate_grant_token,
-)
-from .emails import send_document_access_granted_email
+from .forms import DocumentForm
+from .models import DocumentKind
 from .services import (
     can_edit_document,
     can_preview_document,
@@ -59,7 +38,6 @@ def document_list_view(request):
     query = (request.GET.get("q") or "").strip()
     status = (request.GET.get("status") or "").strip()
     kind = (request.GET.get("kind") or "").strip()
-    confidential = (request.GET.get("confidential") or "").strip()
 
     if query:
         qs = qs.filter(
@@ -74,11 +52,6 @@ def document_list_view(request):
     if kind:
         qs = qs.filter(kind=kind)
 
-    if confidential == "yes":
-        qs = qs.filter(is_confidential=True)
-    elif confidential == "no":
-        qs = qs.filter(is_confidential=False)
-
     page_obj = Paginator(qs, 20).get_page(request.GET.get("page"))
 
     return render(
@@ -89,154 +62,10 @@ def document_list_view(request):
             "query": query,
             "status_filter": status,
             "kind_filter": kind,
-            "confidential_filter": confidential,
-            "pending_access_requests": (
-                DocumentAccessRequest.objects.filter(
-                    status=DocumentAccessRequestStatus.PENDING
-                ).count()
-                if request.user.has_perm("documents.publish_document")
-                else 0
-            ),
             "status_choices": PublicationStatus.choices,
             "kind_choices": DocumentKind.choices,
         },
     )
-
-
-def _document_list_redirect(request):
-    from urllib.parse import parse_qsl, urlencode
-
-    allowed_keys = {"q", "status", "kind", "confidential", "page"}
-    raw_query = (request.POST.get("return_query") or "").strip()
-    filtered_pairs = [
-        (key, value)
-        for key, value in parse_qsl(raw_query, keep_blank_values=False)
-        if key in allowed_keys
-    ]
-    base_url = reverse("backoffice:document_list")
-    query = urlencode(filtered_pairs)
-    return redirect(f"{base_url}?{query}" if query else base_url)
-
-
-@never_cache
-@require_POST
-@backoffice_2fa_required
-def document_bulk_confidentiality_view(request):
-    if not request.user.has_perm("documents.publish_document"):
-        raise PermissionDenied
-
-    action = (request.POST.get("action") or "").strip()
-    if action not in {"make_confidential", "make_public"}:
-        messages.error(request, "L’action demandée est invalide.")
-        return _document_list_redirect(request)
-
-    raw_ids = request.POST.getlist("document_ids")
-    document_ids = []
-    seen = set()
-    for raw_id in raw_ids:
-        try:
-            document_id = int(raw_id)
-        except (TypeError, ValueError):
-            continue
-        if document_id <= 0 or document_id in seen:
-            continue
-        seen.add(document_id)
-        document_ids.append(document_id)
-
-    if not document_ids:
-        messages.warning(request, "Sélectionnez au moins un document.")
-        return _document_list_redirect(request)
-
-    # La liste affiche 20 éléments par page. La limite supérieure protège
-    # néanmoins l’endpoint contre un POST fabriqué contenant des milliers d’IDs.
-    if len(document_ids) > 100:
-        messages.error(request, "La sélection contient trop de documents.")
-        return _document_list_redirect(request)
-
-    make_confidential = action == "make_confidential"
-    changed = 0
-    unchanged = 0
-
-    with transaction.atomic():
-        # visible_documents_queryset() utilise select_related() pour la liste
-        # du back-office. Plusieurs de ces relations sont nullable, ce qui
-        # produit des LEFT OUTER JOIN. PostgreSQL refuse FOR UPDATE sur le
-        # côté nullable d'un OUTER JOIN. On supprime donc ces jointures pour
-        # cette requête de verrouillage : seuls les enregistrements Document
-        # ont besoin d'être verrouillés pendant l'action groupée.
-        documents = list(
-            visible_documents_queryset(request.user)
-            .select_related(None)
-            .select_for_update()
-            .filter(pk__in=document_ids)
-            .order_by("pk")
-        )
-        if len(documents) != len(document_ids):
-            # Un identifiant non visible ne doit jamais être traité silencieusement.
-            raise PermissionDenied
-
-        for document in documents:
-            if document.is_confidential == make_confidential:
-                unchanged += 1
-                continue
-
-            previous_value = document.is_confidential
-            document.is_confidential = make_confidential
-            document.last_editor = request.user
-            # Utiliser save() est intentionnel : lorsqu’un document redevient
-            # public, Document.save() révoque les autorisations et clôture les
-            # demandes confidentielles encore ouvertes. QuerySet.update()
-            # contournerait cette logique de sécurité.
-            document.save(
-                update_fields=["is_confidential", "last_editor", "updated_at"]
-            )
-            changed += 1
-
-            audit_log(
-                action=AuditAction.CONTENT_UPDATED,
-                actor=request.user,
-                request=request,
-                target=document,
-                description=(
-                    "Document rendu confidentiel par action groupée."
-                    if make_confidential
-                    else "Document rendu public par action groupée."
-                ),
-                metadata={
-                    "bulk_action": True,
-                    "bulk_action_name": action,
-                    "batch_size": len(documents),
-                    "previous_is_confidential": previous_value,
-                    "is_confidential": make_confidential,
-                },
-            )
-
-    if changed:
-        if make_confidential:
-            message = (
-                "1 document a été rendu confidentiel."
-                if changed == 1
-                else f"{changed} documents ont été rendus confidentiels."
-            )
-        else:
-            message = (
-                "1 document a été rendu public. Les anciennes autorisations "
-                "concernées ont été invalidées."
-                if changed == 1
-                else f"{changed} documents ont été rendus publics. Les anciennes "
-                "autorisations concernées ont été invalidées."
-            )
-        messages.success(request, message)
-
-    if unchanged:
-        message = (
-            "1 document était déjà dans cet état et n’a pas été modifié."
-            if unchanged == 1
-            else f"{unchanged} documents étaient déjà dans cet état et n’ont pas été modifiés."
-        )
-        messages.info(request, message)
-
-    return _document_list_redirect(request)
 
 
 @never_cache
@@ -261,10 +90,7 @@ def document_create_view(request):
                 request=request,
                 target=document,
                 description="Document créé.",
-                metadata={
-                    "status": document.status,
-                    "is_confidential": document.is_confidential,
-                },
+                metadata={"status": document.status},
             )
 
             messages.success(request, "Le document a été créé en brouillon.")
@@ -293,7 +119,6 @@ def document_edit_view(request, pk):
         raise PermissionDenied
 
     if request.method == "POST":
-        previous_is_confidential = document.is_confidential
         form = DocumentForm(
             request.POST,
             request.FILES,
@@ -312,13 +137,7 @@ def document_edit_view(request, pk):
                 request=request,
                 target=updated,
                 description="Document modifié.",
-                metadata={
-                    "status": updated.status,
-                    "is_confidential": updated.is_confidential,
-                    "confidentiality_changed": (
-                        previous_is_confidential != updated.is_confidential
-                    ),
-                },
+                metadata={"status": updated.status},
             )
 
             messages.success(request, "Le document a été enregistré.")
@@ -406,10 +225,7 @@ def document_file_view(request, pk):
         request=request,
         target=document,
         description="Document ouvert depuis le back-office.",
-        metadata={
-            "source": "backoffice",
-            "is_confidential": document.is_confidential,
-        },
+        metadata={"source": "backoffice"},
     )
 
     response = FileResponse(
@@ -422,217 +238,3 @@ def document_file_view(request, pk):
     response["X-Content-Type-Options"] = "nosniff"
     response["X-Robots-Tag"] = "noindex, nofollow, noarchive"
     return response
-
-
-def _require_access_manager(user):
-    if not user.has_perm("documents.publish_document"):
-        raise PermissionDenied
-
-
-@never_cache
-@backoffice_2fa_required
-def document_access_request_list_view(request):
-    _require_access_manager(request.user)
-
-    qs = DocumentAccessRequest.objects.select_related(
-        "document", "reviewed_by"
-    ).order_by("-created_at")
-    status_filter = (request.GET.get("status") or "pending").strip()
-    query = (request.GET.get("q") or "").strip()
-
-    if status_filter in {
-        DocumentAccessRequestStatus.PENDING,
-        DocumentAccessRequestStatus.APPROVED,
-        DocumentAccessRequestStatus.REFUSED,
-    }:
-        qs = qs.filter(status=status_filter)
-    elif status_filter == "all":
-        pass
-    else:
-        status_filter = "pending"
-        qs = qs.filter(status=DocumentAccessRequestStatus.PENDING)
-
-    if query:
-        qs = qs.filter(
-            Q(full_name__icontains=query)
-            | Q(email__icontains=query)
-            | Q(document__title__icontains=query)
-            | Q(organization__icontains=query)
-        )
-
-    page_obj = Paginator(qs, 25).get_page(request.GET.get("page"))
-    counts = {
-        "pending": DocumentAccessRequest.objects.filter(
-            status=DocumentAccessRequestStatus.PENDING
-        ).count(),
-        "approved": DocumentAccessRequest.objects.filter(
-            status=DocumentAccessRequestStatus.APPROVED
-        ).count(),
-        "refused": DocumentAccessRequest.objects.filter(
-            status=DocumentAccessRequestStatus.REFUSED
-        ).count(),
-    }
-
-    return render(
-        request,
-        "backoffice/documents/access_requests.html",
-        {
-            "page_obj": page_obj,
-            "status_filter": status_filter,
-            "query": query,
-            "counts": counts,
-        },
-    )
-
-
-@never_cache
-@backoffice_2fa_required
-def document_access_request_detail_view(request, pk):
-    _require_access_manager(request.user)
-    access_request = get_object_or_404(
-        DocumentAccessRequest.objects.select_related(
-            "document", "reviewed_by"
-        ).prefetch_related("document__access_grants"),
-        pk=pk,
-    )
-    try:
-        grant = access_request.grant
-    except DocumentAccessGrant.DoesNotExist:
-        grant = None
-    log_filters = Q(
-        target_type="documents.documentaccessrequest",
-        target_id=str(access_request.pk),
-    )
-    if grant is not None:
-        log_filters |= Q(
-            target_type="documents.documentaccessgrant",
-            target_id=str(grant.pk),
-        )
-    access_logs = AuditLog.objects.filter(log_filters).select_related("actor")[:30]
-
-    return render(
-        request,
-        "backoffice/documents/access_request_detail.html",
-        {
-            "access_request": access_request,
-            "grant": grant,
-            "access_logs": access_logs,
-            "approval_form": DocumentAccessApprovalForm(),
-            "refusal_form": DocumentAccessRefusalForm(),
-        },
-    )
-
-
-@never_cache
-@require_POST
-@backoffice_2fa_required
-def document_access_request_approve_view(request, pk):
-    _require_access_manager(request.user)
-    access_request = get_object_or_404(
-        DocumentAccessRequest.objects.select_related("document"), pk=pk
-    )
-    form = DocumentAccessApprovalForm(request.POST)
-    if not form.is_valid():
-        messages.error(request, "Vérifiez la durée et le nombre d’ouvertures.")
-        return redirect("backoffice:document_access_request_detail", pk=pk)
-
-    try:
-        grant, raw_token = approve_access_request(
-            access_request=access_request,
-            reviewer=request.user,
-            duration_hours=int(form.cleaned_data["duration_hours"]),
-            max_opens=form.cleaned_data["max_opens"],
-            request=request,
-        )
-    except AccessGrantError as exc:
-        messages.error(request, str(exc))
-        return redirect("backoffice:document_access_request_detail", pk=pk)
-
-    access_url = request.build_absolute_uri(
-        f"/documents/acces/{raw_token}"
-    )
-    try:
-        send_document_access_granted_email(grant=grant, access_url=access_url)
-        mark_grant_link_sent(grant=grant)
-        messages.success(
-            request,
-            "L’autorisation a été créée et le lien sécurisé a été envoyé par e-mail.",
-        )
-    except Exception:
-        messages.warning(
-            request,
-            "L’autorisation a été créée, mais l’e-mail n’a pas pu être envoyé. "
-            "Utilisez « Régénérer et renvoyer le lien » pour réessayer.",
-        )
-
-    return redirect("backoffice:document_access_request_detail", pk=pk)
-
-
-@never_cache
-@require_POST
-@backoffice_2fa_required
-def document_access_request_refuse_view(request, pk):
-    _require_access_manager(request.user)
-    access_request = get_object_or_404(DocumentAccessRequest, pk=pk)
-    form = DocumentAccessRefusalForm(request.POST)
-    if not form.is_valid():
-        messages.error(request, "Le motif du refus est invalide.")
-        return redirect("backoffice:document_access_request_detail", pk=pk)
-
-    try:
-        refuse_access_request(
-            access_request=access_request,
-            reviewer=request.user,
-            reason=form.cleaned_data["refusal_reason"],
-            request=request,
-        )
-        messages.success(request, "La demande a été refusée.")
-    except AccessGrantError as exc:
-        messages.error(request, str(exc))
-
-    return redirect("backoffice:document_access_request_detail", pk=pk)
-
-
-@never_cache
-@require_POST
-@backoffice_2fa_required
-def document_access_grant_revoke_view(request, pk):
-    _require_access_manager(request.user)
-    grant = get_object_or_404(
-        DocumentAccessGrant.objects.select_related("request", "document"), pk=pk
-    )
-    revoke_grant(grant=grant, actor=request.user, request=request)
-    messages.success(request, "L’autorisation a été révoquée immédiatement.")
-    return redirect(
-        "backoffice:document_access_request_detail", pk=grant.request_id
-    )
-
-
-@never_cache
-@require_POST
-@backoffice_2fa_required
-def document_access_grant_resend_view(request, pk):
-    _require_access_manager(request.user)
-    grant = get_object_or_404(
-        DocumentAccessGrant.objects.select_related("request", "document"), pk=pk
-    )
-    try:
-        grant, raw_token = rotate_grant_token(
-            grant=grant,
-            actor=request.user,
-            request=request,
-        )
-        access_url = request.build_absolute_uri(
-            f"/documents/acces/{raw_token}"
-        )
-        send_document_access_granted_email(grant=grant, access_url=access_url)
-        mark_grant_link_sent(grant=grant)
-        messages.success(request, "Un nouveau lien sécurisé a été envoyé. L’ancien lien est invalide.")
-    except AccessGrantError as exc:
-        messages.error(request, str(exc))
-    except Exception:
-        messages.error(request, "Le nouveau lien n’a pas pu être envoyé par e-mail.")
-
-    return redirect(
-        "backoffice:document_access_request_detail", pk=grant.request_id
-    )

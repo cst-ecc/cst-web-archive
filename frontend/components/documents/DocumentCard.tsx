@@ -18,7 +18,7 @@ const FILE_LABEL: Record<DocumentItem["fileType"], string> = {
 };
 
 export default function DocumentCard({ doc, motionDelay = 0 }: { doc: DocumentItem; motionDelay?: number }) {
-  const readablePdf = !doc.isConfidential && doc.fileType === "pdf" && Boolean(doc.fileUrl) && doc.fileUrl !== "#";
+  const readablePdf = doc.fileType === "pdf" && Boolean(doc.fileUrl) && doc.fileUrl !== "#";
 
   return (
     <MotionArticle className={styles.card} delay={motionDelay}>
@@ -52,17 +52,9 @@ export default function DocumentCard({ doc, motionDelay = 0 }: { doc: DocumentIt
           {readablePdf ? (
             <DocumentReadButton
               slug={doc.slug}
-              label="Lire"
+              label="Ouvrir"
               variant="outline"
               className={styles.readButton}
-            />
-          ) : doc.isConfidential ? (
-            <DocumentReadButton
-              slug={doc.slug}
-              label="Demander l’accès"
-              variant="outline"
-              className={styles.readButton}
-              isConfidential
             />
           ) : null}
         </div>

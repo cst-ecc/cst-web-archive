@@ -78,3 +78,30 @@
     text-align: right;
   }
 }
+
+.readerIntro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.readerIntro .notice {
+  flex: 1 1 auto;
+}
+
+.downloadButton {
+  flex: 0 0 auto;
+  min-width: 9.5rem;
+}
+
+@media (max-width: 639px) {
+  .readerIntro {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .downloadButton {
+    width: 100%;
+  }
+}

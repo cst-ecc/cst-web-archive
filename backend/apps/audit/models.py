@@ -21,6 +21,7 @@ class AuditAction(models.TextChoices):
     MEDIA_UPLOADED = "media_uploaded", "Média téléversé"
     MEDIA_DELETED = "media_deleted", "Média supprimé"
     DOCUMENT_OPENED = "document_opened", "Document ouvert"
+    DOCUMENT_DOWNLOADED = "document_downloaded", "Document téléchargé"
     DOCUMENT_ACCESS_REQUESTED = "document_access_requested", "Accès document demandé"
     DOCUMENT_ACCESS_APPROVED = "document_access_approved", "Accès document autorisé"
     DOCUMENT_ACCESS_REFUSED = "document_access_refused", "Accès document refusé"
@@ -30,6 +31,8 @@ class AuditAction(models.TextChoices):
     DOCUMENT_ACCESS_OTP_FAILED = "document_access_otp_failed", "Échec OTP document"
     DOCUMENT_ACCESS_VERIFIED = "document_access_verified", "Accès document vérifié"
     DOCUMENT_SECURE_OPENED = "document_secure_opened", "Document confidentiel ouvert"
+    CONTACT_STATUS_CHANGED = "contact_status_changed", "Statut contact modifié"
+    CONTACT_REPLIED = "contact_replied", "Réponse contact enregistrée"
 
 
 class AuditLog(models.Model):
