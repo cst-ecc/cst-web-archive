@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 
 import PageHeader from "@/components/layout/PageHeader";
 import OrganizationPageContent from "@/components/organization/OrganizationPageContent";
-import { WORLD_ORGANIZATION } from "@/lib/organization";
 
 export const metadata: Metadata = {
   title: "Organigramme de l’Église",
   description:
-    "Organisation structurelle de l’Église du Christianisme Céleste aux niveaux mondial et diocésain.",
+    "Organigramme officiel de l’Église du Christianisme Céleste : niveaux mondial et diocésain, avec accès aux documents relatifs aux organes de gouvernance.",
 };
 
 export default function OrganigrammePage() {
@@ -16,9 +15,9 @@ export default function OrganigrammePage() {
       <PageHeader
         eyebrow="Organisation"
         title="Organigramme de l’Église du Christianisme Céleste"
-        subtitle="Découvrez l’organisation structurelle de l’Église aux niveaux mondial et diocésain."
+        subtitle="Consultez la représentation institutionnelle officielle des niveaux mondial et diocésain et accédez aux documents associés aux principaux organes."
       />
-      <OrganizationPageContent active="world" data={WORLD_ORGANIZATION} />
+      <OrganizationPageContent />
     </>
   );
 }

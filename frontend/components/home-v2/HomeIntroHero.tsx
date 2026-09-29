@@ -44,7 +44,7 @@ export default function HomeIntroHero({
               href="/documents"
               className={styles.primary}
             >
-              Voir les documents
+              Documents officiels
             </Link>
 
             <button

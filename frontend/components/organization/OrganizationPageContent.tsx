@@ -1,18 +1,15 @@
 import Container from "@/components/layout/Container";
 import BackButton from "@/components/navigation/BackButton";
-import type { OrganizationChartData } from "@/lib/organization";
+import { getDocuments } from "@/lib/api";
+import { resolveOrganizationHotspots } from "@/lib/organization";
 
-import OrganizationChart from "./OrganizationChart";
-import OrganizationSubnav from "./OrganizationSubnav";
+import OrganizationViewer from "./OrganizationViewer";
 import styles from "./OrganizationPageContent.module.scss";
 
-export default function OrganizationPageContent({
-  active,
-  data,
-}: {
-  active: "world" | "diocesan";
-  data: OrganizationChartData;
-}) {
+export default async function OrganizationPageContent() {
+  const { results: documents } = await getDocuments({ pageSize: 1000 });
+  const hotspots = resolveOrganizationHotspots(documents);
+
   return (
     <Container className={styles.section}>
       <div className={styles.topline}>
@@ -20,14 +17,11 @@ export default function OrganizationPageContent({
       </div>
 
       <div className={styles.intro}>
-        <p>
-          L’organigramme présente l’organisation structurelle de l’Église du
-          Christianisme Céleste aux niveaux mondial et diocésain.
-        </p>
+        <span className={styles.introEyebrow}>Organisation structurelle</span>
+        <h2>Une lecture fidèle du document institutionnel</h2>
       </div>
 
-      <OrganizationSubnav active={active} />
-      <OrganizationChart data={data} />
+      <OrganizationViewer hotspots={hotspots} />
     </Container>
   );
 }

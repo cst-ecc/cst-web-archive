@@ -10,18 +10,34 @@
 
 .topline {
   width: min(100%, 92rem);
-  margin: 0 auto 1.2rem;
+  margin: 0 auto clamp(1.3rem, 1rem + 0.8vw, 2rem);
 }
 
 .intro {
-  max-width: 52rem;
-  margin: 0 auto clamp(1.35rem, 1rem + 0.9vw, 2rem);
+  max-width: 58rem;
+  margin: 0 auto clamp(1.6rem, 1.1rem + 1.1vw, 2.5rem);
   text-align: center;
 
+  h2 {
+    margin: 0.28rem 0 0;
+    color: v.$color-blue-ink;
+    font-family: v.$font-display;
+    font-size: clamp(1.45rem, 1.2rem + 0.9vw, 2.2rem);
+    line-height: 1.2;
+  }
+
   p {
-    margin: 0;
+    margin: 0.7rem auto 0;
     color: rgba(17, 24, 39, 0.64);
     font-size: v.$font-size-body-fluid;
-    line-height: 1.65;
+    line-height: 1.7;
   }
+}
+
+.introEyebrow {
+  color: v.$color-blue;
+  font-size: v.$font-size-meta;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }

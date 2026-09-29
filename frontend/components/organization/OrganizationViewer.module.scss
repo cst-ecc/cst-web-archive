@@ -1,0 +1,445 @@
+@use "../../styles/variables" as v;
+
+.section {
+  width: 100%;
+}
+
+.heading {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(18rem, 1.15fr);
+  gap: clamp(1rem, 2vw, 2.5rem);
+  align-items: end;
+  margin-bottom: clamp(1rem, 1vw + 0.8rem, 1.8rem);
+
+  h2 {
+    margin: 0.28rem 0 0;
+    color: v.$color-blue-ink;
+    font-family: v.$font-display;
+    font-size: clamp(1.45rem, 1.2rem + 0.85vw, 2.1rem);
+    line-height: 1.18;
+  }
+
+  p {
+    margin: 0;
+    color: rgba(17, 24, 39, 0.65);
+    font-size: v.$font-size-small;
+    line-height: 1.7;
+  }
+}
+
+.eyebrow {
+  color: v.$color-blue;
+  font-size: v.$font-size-meta;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.viewerShell {
+  overflow: hidden;
+  border: 1px solid rgba(18, 84, 127, 0.14);
+  border-radius: v.$radius-xl2;
+  background: #f5f8fb;
+  box-shadow: v.$shadow-card;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid rgba(18, 84, 127, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.zoomGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+
+  button,
+  .zoomValue {
+    height: 2.5rem;
+    border: 1px solid rgba(18, 84, 127, 0.14);
+    border-radius: 0.72rem;
+    background: #fff;
+  }
+
+  button {
+    display: grid;
+    width: 2.5rem;
+    place-items: center;
+    color: v.$color-blue-ink;
+    cursor: pointer;
+    transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+
+    svg {
+      width: 1.15rem;
+      height: 1.15rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: rgba(18, 84, 127, 0.32);
+      background: rgba(31, 133, 206, 0.06);
+      transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba(31, 133, 206, 0.22);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.zoomValue {
+  display: grid;
+  min-width: 4.3rem;
+  padding-inline: 0.7rem;
+  place-items: center;
+  color: v.$color-blue-ink;
+  font-size: 0.78rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.fullscreenButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(18, 84, 127, 0.16);
+  border-radius: 0.72rem;
+  background: #fff;
+  color: v.$color-blue-ink;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+
+  svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover {
+    border-color: rgba(18, 84, 127, 0.32);
+    background: rgba(31, 133, 206, 0.06);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(31, 133, 206, 0.22);
+    outline-offset: 2px;
+  }
+}
+
+.scroller {
+  overflow: auto;
+  max-height: min(76vh, 64rem);
+  padding: clamp(0.65rem, 1.5vw, 1.25rem);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sheet {
+  position: relative;
+  min-width: 100%;
+  margin-inline: auto;
+  background: #fff;
+  box-shadow: 0 16px 45px rgba(8, 41, 64, 0.1);
+  transition: width 180ms ease;
+}
+
+.documentImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+.hotspot {
+  position: absolute;
+  z-index: 2;
+  border: 2px solid transparent;
+  border-radius: 0.2rem;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -0.45rem;
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: rgba(14, 92, 151, 0.78);
+    background: rgba(31, 133, 206, 0.12);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.76);
+    outline: none;
+  }
+
+  &:hover .hotspotIcon,
+  &:focus-visible .hotspotIcon {
+    opacity: 1;
+    transform: translate(35%, -35%) scale(1);
+  }
+}
+
+.hotspotIcon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  width: clamp(1.15rem, 2.1vw, 1.55rem);
+  height: clamp(1.15rem, 2.1vw, 1.55rem);
+  place-items: center;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: v.$color-blue;
+  color: #fff;
+  opacity: 0.88;
+  transform: translate(35%, -35%) scale(0.9);
+  box-shadow: 0 4px 10px rgba(8, 41, 64, 0.2);
+  transition: opacity 150ms ease, transform 150ms ease;
+
+  svg {
+    width: 58%;
+    height: 58%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.helpText {
+  margin: 0;
+  padding: 0.72rem 1rem 0.85rem;
+  border-top: 1px solid rgba(18, 84, 127, 0.1);
+  background: rgba(255, 255, 255, 0.94);
+  color: rgba(17, 24, 39, 0.62);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.related {
+  margin-top: clamp(1.8rem, 2.2vw, 2.8rem);
+  padding: clamp(1.15rem, 1rem + 0.8vw, 1.8rem);
+  border: 1px solid rgba(18, 84, 127, 0.12);
+  border-radius: v.$radius-xl2;
+  background:
+    radial-gradient(circle at top right, rgba(31, 133, 206, 0.07), transparent 34%),
+    #fff;
+}
+
+.relatedHeading {
+  max-width: 54rem;
+
+  h3 {
+    margin: 0.3rem 0 0;
+    color: v.$color-blue-ink;
+    font-size: clamp(1.2rem, 1.05rem + 0.45vw, 1.55rem);
+    line-height: 1.25;
+  }
+
+  p {
+    margin: 0.55rem 0 0;
+    color: rgba(17, 24, 39, 0.62);
+    font-size: v.$font-size-small;
+    line-height: 1.65;
+  }
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+}
+
+.relatedCard {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid rgba(18, 84, 127, 0.12);
+  border-radius: 0.9rem;
+  background: rgba(247, 250, 252, 0.72);
+  color: inherit;
+  text-decoration: none;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease,
+    background 160ms ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba(31, 133, 206, 0.32);
+    background: #fff;
+    box-shadow: 0 12px 25px rgba(8, 41, 64, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(31, 133, 206, 0.22);
+    outline-offset: 2px;
+  }
+}
+
+.relatedIcon {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: 0.72rem;
+  background: rgba(31, 133, 206, 0.1);
+  color: v.$color-blue;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.relatedText {
+  min-width: 0;
+
+  strong,
+  small {
+    display: block;
+  }
+
+  strong {
+    color: v.$color-blue-ink;
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  small {
+    margin-top: 0.18rem;
+    overflow: hidden;
+    color: rgba(17, 24, 39, 0.58);
+    font-size: 0.72rem;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.relatedArrow {
+  color: v.$color-blue;
+  font-size: 1.15rem;
+  transition: transform 160ms ease;
+}
+
+.relatedCard:hover .relatedArrow {
+  transform: translateX(3px);
+}
+
+.viewerShell:fullscreen,
+.fallbackFullscreen {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+  border-radius: 0;
+  background: #eaf0f5;
+
+  .scroller {
+    flex: 1;
+    max-height: none;
+  }
+}
+
+.fallbackFullscreen {
+  position: fixed;
+  z-index: 1200;
+  inset: 0;
+}
+
+@media (max-width: 760px) {
+  .heading {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+  }
+
+  .fullscreenButton span {
+    display: none;
+  }
+
+  .scroller {
+    max-height: 68vh;
+    padding: 0.5rem;
+  }
+
+  .relatedGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .helpText {
+    text-align: left;
+  }
+}
+
+@media (max-width: 430px) {
+  .toolbar {
+    padding: 0.55rem;
+  }
+
+  .zoomGroup {
+    gap: 0.3rem;
+
+    button {
+      width: 2.35rem;
+      height: 2.35rem;
+    }
+  }
+
+  .zoomValue {
+    min-width: 3.8rem;
+    height: 2.35rem;
+    padding-inline: 0.45rem;
+  }
+
+  .fullscreenButton {
+    min-height: 2.35rem;
+    padding-inline: 0.65rem;
+  }
+
+  .hotspotIcon {
+    min-width: 1.05rem;
+    min-height: 1.05rem;
+  }
+}
